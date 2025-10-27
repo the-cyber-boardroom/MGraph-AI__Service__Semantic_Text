@@ -15,9 +15,9 @@ if os.getenv('AWS_REGION'):  # only execute if we are not running inside an AWS 
 
     clear_osbot_modules()
 
-from mgraph_ai_service_semantic_text.fast_api.Service__Fast_API import Service__Fast_API
+from mgraph_ai_service_semantic_text.fast_api.Semantic_Text__Service__Fast_API import Semantic_Text__Service__Fast_API
 
-with Service__Fast_API() as _:
+with Semantic_Text__Service__Fast_API() as _:
     _.setup()
     handler = _.handler()
     app     = _.app()

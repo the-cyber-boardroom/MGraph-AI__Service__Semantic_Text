@@ -1,11 +1,11 @@
-from unittest                                                               import TestCase
-from osbot_fast_api.api.routes.Fast_API__Routes                             import Fast_API__Routes
-from osbot_utils.type_safe.Type_Safe                                        import Type_Safe
-from osbot_utils.utils.Misc                                                 import list_set
-from osbot_utils.utils.Objects                                              import base_classes
-from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Info                    import Routes__Info
-from mgraph_ai_service_semantic_text.service.info.schemas.Schema__Server__Versions   import Schema__Server__Versions
-from mgraph_ai_service_semantic_text.utils.Version                                   import version__mgraph_ai_service_semantic_text
+from unittest                                                                      import TestCase
+from osbot_fast_api.api.routes.Fast_API__Routes                                    import Fast_API__Routes
+from osbot_utils.type_safe.Type_Safe                                               import Type_Safe
+from osbot_utils.utils.Misc                                                        import list_set
+from osbot_utils.utils.Objects                                                     import base_classes
+from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Info                  import Routes__Info
+from mgraph_ai_service_semantic_text.service.info.schemas.Schema__Server__Versions import Schema__Server__Versions
+from mgraph_ai_service_semantic_text.utils.Version                                 import version__mgraph_ai_service_semantic_text
 
 
 class test_Routes__Info(TestCase):

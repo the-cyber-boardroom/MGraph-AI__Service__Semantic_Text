@@ -5,7 +5,7 @@ from mgraph_ai_service_semantic_text.utils.Version                    import ver
 
 
 
-class Service__Fast_API(Serverless__Fast_API):
+class Semantic_Text__Service__Fast_API(Serverless__Fast_API):
 
     def fast_api__title(self):                                       # todo: move this to the Fast_API class
         return FAST_API__TITLE
