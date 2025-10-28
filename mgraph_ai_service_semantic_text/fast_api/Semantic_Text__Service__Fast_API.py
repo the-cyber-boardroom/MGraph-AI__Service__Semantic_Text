@@ -1,11 +1,12 @@
-from osbot_fast_api_serverless.fast_api.Serverless__Fast_API import Serverless__Fast_API
-from mgraph_ai_service_semantic_text.config                           import FAST_API__TITLE
-from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Info     import Routes__Info
-from mgraph_ai_service_semantic_text.utils.Version                    import version__mgraph_ai_service_semantic_text
+from osbot_fast_api_serverless.fast_api.Serverless__Fast_API    import Serverless__Fast_API
+from osbot_fast_api_serverless.fast_api.routes.Routes__Info     import Routes__Info
+from mgraph_ai_service_semantic_text.config                     import FAST_API__TITLE
+from mgraph_ai_service_semantic_text.utils.Version              import version__mgraph_ai_service_semantic_text
 
 
 
 class Semantic_Text__Service__Fast_API(Serverless__Fast_API):
+    enable_api_key = False                                           # todo: update to new version of Serverless__Fast_API and use the new config object
 
     def fast_api__title(self):                                       # todo: move this to the Fast_API class
         return FAST_API__TITLE

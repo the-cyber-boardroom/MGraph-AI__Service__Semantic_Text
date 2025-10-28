@@ -1,7 +1,7 @@
 from osbot_utils.type_safe.Type_Safe                                                import Type_Safe
-from osbot_utils.type_safe.primitives.safe_str.cryptography.hashes.Safe_Str__Hash   import Safe_Str__Hash
-from osbot_utils.type_safe.primitives.safe_str.text.Safe_Str__Text                  import Safe_Str__Text
-from osbot_utils.type_safe.primitives.safe_uint.Safe_UInt                           import Safe_UInt
+from osbot_utils.type_safe.primitives.core.Safe_UInt                                import Safe_UInt
+from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Text        import Safe_Str__Text
+from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash  import Safe_Str__Hash
 from osbot_utils.type_safe.type_safe_core.decorators.type_safe                      import type_safe
 from osbot_utils.utils.Misc                                                         import str_md5
 

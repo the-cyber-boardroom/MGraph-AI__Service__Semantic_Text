@@ -25,7 +25,7 @@ class test_Semantic_Text__Engine__Random(TestCase):
         with self.random_engine as _:
             result = _.classify_text(text='abc')
             assert type(result) is Schema__Semantic_Text__Classification
-            assert result.obj() == __( text                 = 'abc'                    ,
-                                       text__hash           = '900150983c'             ,        # the hash for 'abc' is always '900150983c'
-                                       text__classification = __(positivity = __SKIP__),
-                                       engine_mode          = 'random'                 )
+            assert result.obj() == __( text                 = 'abc'                                                         ,
+                                       text__hash           = '900150983c'                                                  ,        # the hash for 'abc' is always '900150983c'
+                                       text__classification = __(Enum__Text__Classification__Criteria_POSITIVITY = __SKIP__),
+                                       engine_mode          = 'random'                                                      )

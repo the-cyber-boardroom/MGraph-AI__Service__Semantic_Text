@@ -19,8 +19,8 @@ class test_Semantic_Text__Service(TestCase):
         with self.semantic_text_service as _:
             result = _.classify_text('abc')
             assert type(result) is Schema__Semantic_Text__Classification
-            assert result.obj() ==  __(text                 = 'abc'                    ,
-                                       text__hash           = '900150983c'             ,        # the hash for 'abc' is always '900150983c'
-                                       text__classification = __(positivity = __SKIP__),
-                                       engine_mode          = 'random'                 )
+            assert result.obj() ==  __(text                 = 'abc'                                                         ,
+                                       text__hash           = '900150983c'                                                  ,        # the hash for 'abc' is always '900150983c'
+                                       text__classification = __(Enum__Text__Classification__Criteria_POSITIVITY = __SKIP__),
+                                       engine_mode          = 'random'                                                      )
 

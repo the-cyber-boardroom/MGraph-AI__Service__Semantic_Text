@@ -1,16 +1,14 @@
 import re
 import types
 import pytest
-from unittest                                            import TestCase
-from osbot_utils.utils.Json                              import str_to_json
-from tests.unit.Service__Fast_API__Test_Objs             import setup_local_stack
-from mgraph_ai_service_semantic_text.fast_api.lambda_handler      import run
+from unittest                                                import TestCase
+from osbot_utils.utils.Json                                  import str_to_json
+from mgraph_ai_service_semantic_text.fast_api.lambda_handler import run
 
 
 class test_lambda_handler(TestCase):
     @classmethod
     def setUpClass(cls):
-        setup_local_stack()
         cls.handler = staticmethod(run)
 
     def test__setUpClass(self):
@@ -29,7 +27,6 @@ class test_lambda_handler(TestCase):
                                            'sourceIp' : '127.0.0.1'}}}
 
         response = self.handler(event=event)
-        assert type(response) is dict
-        assert response.get('statusCode') == 401
-
+        assert type(response)                                   is dict
+        assert response.get('statusCode')                       == 401
         assert str_to_json(response.get('body')).get('message') == 'Client API key is missing, you need to set it on a header or cookie'
