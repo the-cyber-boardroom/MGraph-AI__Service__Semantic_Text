@@ -11,7 +11,7 @@ class Text__Grouping__Service(Type_Safe):                                       
     @type_safe
     def group_by_length(self,                                                       # Group hashes by text length into N equal-sized buckets
                         hash_mapping: Dict[Safe_Str__Hash, str]                     # Hash → text mapping
-                       ) -> Dict[int, List[Safe_Str__Hash]]:                        # Group index → list of hashes
+                   ) -> Dict[int, List[Safe_Str__Hash]]:                            # Group index → list of hashes
         if not hash_mapping:
             return {}
 
@@ -47,19 +47,20 @@ class Text__Grouping__Service(Type_Safe):                                       
         for group_idx, hashes in groups.items():
             lengths = [len(hash_mapping[h]) for h in hashes]
 
-            stats[group_idx] = {
-                "count"       : len(hashes)                                                                                       ,
-                "min_length"  : min(lengths) if lengths else 0                                                                   ,
-                "max_length"  : max(lengths) if lengths else 0                                                                   ,
-                "avg_length"  : sum(lengths) / len(lengths) if lengths else 0                                                    ,
-                "sample_texts": [hash_mapping[h][:50] + "..." if len(hash_mapping[h]) > 50 else hash_mapping[h]
-                                for h in hashes[:3]]                                                                              # First 3 as samples
-            }
+            # todo: refactor the dict below into a Type_Safe class
+            stats[group_idx] = { "count"       : len(hashes)                                                                                      ,
+                                 "min_length"  : min(lengths) if lengths else 0                                                                   ,
+                                 "max_length"  : max(lengths) if lengths else 0                                                                   ,
+                                 "avg_length"  : sum(lengths) / len(lengths) if lengths else 0                                                    ,
+                                 "sample_texts": [hash_mapping[h][:50] + "..." if len(hash_mapping[h]) > 50 else hash_mapping[h]
+                                                  for h in hashes[:3]]                                                                            } # First 3 as samples
 
         return stats
 
     @type_safe
-    def get_group_letter(self, group_index: int) -> str:                           # Convert group index to letter (0='a', 1='b', etc.)
+    def get_group_letter(self,                                                      # Convert group index to letter (0='a', 1='b', etc.)
+                         group_index: int
+                    ) -> str:                                                       # todo: see if we shouldn't be using an Safe_Str__* class here
         if group_index < 26:
             return chr(ord('a') + group_index)
         else:

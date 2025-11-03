@@ -1,4 +1,4 @@
-from typing                                                                                            import Dict
+from typing                                                                                            import Dict, Optional
 from osbot_utils.type_safe.Type_Safe                                                                   import Type_Safe
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                                   import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Text                           import Safe_Str__Text
@@ -12,4 +12,4 @@ class Schema__Text__Transformation__Response(Type_Safe):                    # Te
     success                 : bool                                          # Whether transformation succeeded
     total_hashes            : Safe_UInt                                     # Total number of hashes in input
     transformed_hashes      : Safe_UInt                                     # Number of hashes that were transformed
-    error_message           : Safe_Str__Text                                # Error message if failed
+    error_message           : Optional[Safe_Str__Text]   = None             # Error message if failed

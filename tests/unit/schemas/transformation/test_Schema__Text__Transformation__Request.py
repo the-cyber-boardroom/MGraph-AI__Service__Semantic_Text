@@ -36,14 +36,15 @@ class test_Schema__Text__Transformation__Request(TestCase):
     def test_json_round_trip(self):                                                 # Test JSON serialization round-trip
         hash_mapping = { Safe_Str__Hash("abc1234567") : "Test text" }
 
-        with Schema__Text__Transformation__Request(
-            hash_mapping          = hash_mapping                                    ,
-            transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  ,
-            randomness_percentage = Safe_Float(0.3)
-        ) as _:
+        with Schema__Text__Transformation__Request(hash_mapping          = hash_mapping                                    ,
+                                                   transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  ,
+                                                   randomness_percentage = Safe_Float(0.3)  ) as _:
             json_data = _.json()
             restored  = Schema__Text__Transformation__Request(**json_data)
 
             assert restored.transformation_mode   == Enum__Text__Transformation__Mode.HASHES_RANDOM
             assert restored.randomness_percentage == 0.3
-            assert "abc123" in restored.hash_mapping
+            assert "abc1234567" in restored.hash_mapping
+            assert restored.obj() == __(randomness_percentage   = 0.3                       ,
+                                        hash_mapping            = __(abc1234567='Test text'),
+                                        transformation_mode     = 'hashes-random'           )
