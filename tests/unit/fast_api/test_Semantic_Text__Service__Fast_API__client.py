@@ -5,6 +5,7 @@ from osbot_fast_api_serverless.fast_api.routes.Routes__Info                     
 from osbot_utils.utils.Env                                                      import get_env
 from starlette.testclient                                                       import TestClient
 from mgraph_ai_service_semantic_text.fast_api.Semantic_Text__Service__Fast_API  import Semantic_Text__Service__Fast_API
+from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Text_Transformation import ROUTES_PATHS__TEXT_TRANSFORMATION
 from tests.unit.Semantic_Text__Service__Fast_API__Test_Objs                     import setup__service_fast_api_test_objs, Semantic_Text__Service__Fast_API__Test_Objs, TEST_API_KEY__NAME
 
 
@@ -47,4 +48,5 @@ class test_Semantic_Text__Service__Fast_API__client(TestCase):
         assert response__with_auth.json()    == ROUTES_INFO__HEALTH__RETURN_VALUE
 
     def test__config_fast_api_routes(self):
-        assert self.fast_api.routes_paths() == sorted(ROUTES_PATHS__INFO)
+        assert self.fast_api.routes_paths() == sorted(ROUTES_PATHS__INFO               +
+                                                      ROUTES_PATHS__TEXT_TRANSFORMATION)

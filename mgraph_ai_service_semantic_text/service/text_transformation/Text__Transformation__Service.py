@@ -31,41 +31,35 @@ class Text__Transformation__Service(Type_Safe):                                 
     @type_safe
     def transform(self,                                                             # Transform hash mapping according to request
                   request: Schema__Text__Transformation__Request                    # Transformation request
-                 ) -> Schema__Text__Transformation__Response:                       # Transformation response
+             ) -> Schema__Text__Transformation__Response:                           # Transformation response
         try:
-            engine            = self._get_engine(request.transformation_mode)
+            engine                       = self._get_engine(request.transformation_mode)
             engine.randomness_percentage = request.randomness_percentage
+            transformed_mapping          = engine.transform(request.hash_mapping)
+            total_hashes                 = Safe_UInt(len(request.hash_mapping))
+            transformed_hashes           = Safe_UInt(self._count_transformed_hashes(request.hash_mapping, transformed_mapping))
 
-            transformed_mapping = engine.transform(request.hash_mapping)
-
-            total_hashes       = Safe_UInt(len(request.hash_mapping))
-            transformed_hashes = Safe_UInt(self._count_transformed_hashes(request.hash_mapping, transformed_mapping))
-
-            return Schema__Text__Transformation__Response(
-                transformed_mapping = transformed_mapping                                                           ,
-                transformation_mode = request.transformation_mode                                                   ,
-                success             = True                                                                          ,
-                total_hashes        = total_hashes                                                                  ,
-                transformed_hashes  = transformed_hashes                                                            )
+            return Schema__Text__Transformation__Response(transformed_mapping = transformed_mapping         ,
+                                                          transformation_mode = request.transformation_mode ,
+                                                          success             = True                        ,
+                                                          total_hashes        = total_hashes                ,
+                                                          transformed_hashes  = transformed_hashes          )
 
         except Exception as e:
-            return Schema__Text__Transformation__Response(
-                transformed_mapping = request.hash_mapping                                                          ,
-                transformation_mode = request.transformation_mode                                                   ,
-                success             = False                                                                         ,
-                total_hashes        = Safe_UInt(len(request.hash_mapping))                                          ,
-                transformed_hashes  = Safe_UInt(0)                                                                  ,
-                error_message       = f"Transformation failed: {str(e)}"                                            )
+            return Schema__Text__Transformation__Response(transformed_mapping = request.hash_mapping                 ,
+                                                          transformation_mode = request.transformation_mode          ,
+                                                          success             = False                                ,
+                                                          total_hashes        = Safe_UInt(len(request.hash_mapping)) ,
+                                                          transformed_hashes  = Safe_UInt(0)                         ,
+                                                          error_message       = f"Transformation failed: {str(e)}"   )
 
     @type_safe
     def _get_engine(self,                                                           # Get transformation engine for mode
                     mode: Enum__Text__Transformation__Mode                          # Transformation mode
-                   ) -> Text__Transformation__Engine:                               # Transformation engine
-        engines = {
-            Enum__Text__Transformation__Mode.XXX_RANDOM    : self.engine__xxx_random    ,
-            Enum__Text__Transformation__Mode.HASHES_RANDOM : self.engine__hashes_random ,
-            Enum__Text__Transformation__Mode.ABCDE_BY_SIZE : self.engine__abcde_by_size ,
-        }
+               ) -> Text__Transformation__Engine:                                   # Transformation engine
+        engines = { Enum__Text__Transformation__Mode.XXX_RANDOM    : self.engine__xxx_random    ,
+                    Enum__Text__Transformation__Mode.HASHES_RANDOM : self.engine__hashes_random ,
+                    Enum__Text__Transformation__Mode.ABCDE_BY_SIZE : self.engine__abcde_by_size }
 
         engine = engines.get(mode)
         if not engine:
@@ -73,11 +67,12 @@ class Text__Transformation__Service(Type_Safe):                                 
 
         return engine
 
+    # todo: see what Safe_Str_* should be used instead of str in original_mapping and original_mapping
     @type_safe
     def _count_transformed_hashes(self,                                             # Count how many hashes were actually transformed
                                   original_mapping    : Dict[Safe_Str__Hash, str],  # Original hash mapping
                                   transformed_mapping : Dict[Safe_Str__Hash, str]   # Transformed hash mapping
-                                 ) -> int:                                          # Number of transformed hashes
+                             ) -> Safe_UInt:                                        # Number of transformed hashes
         count = 0
         for hash_key, original_text in original_mapping.items():
             if hash_key in transformed_mapping and transformed_mapping[hash_key] != original_text:
