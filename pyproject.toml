@@ -9,8 +9,9 @@ homepage    = "https://github.com/the-cyber-boardroom/MGraph-AI__Service__Semant
 repository  = "https://github.com/the-cyber-boardroom/MGraph-AI__Service__Semantic_Text"
 
 [tool.poetry.dependencies]
-python                     = "^3.12"
-osbot-fast-api-serverless  = "*"
+python                         = "^3.12"
+osbot-fast-api-serverless      = "*"
+mgraph-ai-service-cache-client = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
