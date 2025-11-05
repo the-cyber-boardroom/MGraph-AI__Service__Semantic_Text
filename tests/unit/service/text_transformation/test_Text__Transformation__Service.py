@@ -1,13 +1,11 @@
-from enum import Enum
-from unittest                                                                                             import TestCase
-
 import pytest
+from enum                                                                                                 import Enum
+from unittest                                                                                             import TestCase
 from osbot_utils.testing.__                                                                               import __
 from osbot_utils.type_safe.Type_Safe                                                                      import Type_Safe
 from osbot_utils.type_safe.primitives.core.Safe_Float                                                     import Safe_Float
-from osbot_utils.type_safe.primitives.core.Safe_UInt                                                      import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                        import Safe_Str__Hash
-from osbot_utils.type_safe.type_safe_core.decorators.type_safe import type_safe
+from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                            import type_safe
 from osbot_utils.utils.Objects                                                                            import base_classes
 from mgraph_ai_service_semantic_text.service.text_transformation.Text__Transformation__Service            import Text__Transformation__Service
 from mgraph_ai_service_semantic_text.service.text_transformation.Text__Grouping__Service                  import Text__Grouping__Service
