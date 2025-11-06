@@ -7,7 +7,7 @@ from mgraph_ai_service_semantic_text.utils.Version import version__mgraph_ai_ser
 from osbot_utils.helpers.duration.decorators.capture_duration                           import capture_duration
 from osbot_utils.testing.Temp_Env_Vars                                                  import Temp_Env_Vars
 from osbot_utils.testing.__                                                             import __
-from osbot_utils.utils.Env                                                              import get_env
+from osbot_utils.utils.Env import get_env, in_github_action
 from osbot_utils.utils.Http                                                             import GET_json
 from tests.unit.Semantic_Text__Service__Fast_API__Test_Objs                             import get__cache_service__fast_api_server
 
@@ -28,7 +28,10 @@ class test_Semantic_Text__Cache(TestCase):
 
             cls.temp_env_vars = Temp_Env_Vars(env_vars=env_vars).set_vars()
             cls.semantic_text_cache = Semantic_Text__Cache().setup()
-        assert setup_duration.seconds < 0.5                             # full setup and start servers should be less than 0.5 seconds (on laptop battery it is about 0.3 ms :) )
+        if in_github_action():
+            assert setup_duration.seconds < 1.5                             # full setup and start servers in GitHub should be less than 1.5 seconds (usually it is about 0.5 )
+        else:
+            assert setup_duration.seconds < 0.5                             # full setup and start servers should be less than 0.5 seconds (on laptop battery it is about 0.3 ms :) )
 
     @classmethod
     def tearDownClass(cls):                                                     # Stop both servers
