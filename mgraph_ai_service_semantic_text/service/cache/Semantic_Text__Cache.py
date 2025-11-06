@@ -24,3 +24,4 @@ class Semantic_Text__Cache(Type_Safe):
         cache_config      = Service__Fast_API__Client__Config(**auth__kwargs)
         self.cache_client = Service__Fast_API__Client        (config=cache_config)
         return self
+

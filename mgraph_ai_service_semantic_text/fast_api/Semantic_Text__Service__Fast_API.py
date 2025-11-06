@@ -1,8 +1,9 @@
-from osbot_fast_api_serverless.fast_api.Serverless__Fast_API    import Serverless__Fast_API
-from osbot_fast_api_serverless.fast_api.routes.Routes__Info     import Routes__Info
-from mgraph_ai_service_semantic_text.config                     import FAST_API__TITLE
+from osbot_fast_api.api.routes.Routes__Set_Cookie                                import Routes__Set_Cookie
+from osbot_fast_api_serverless.fast_api.Serverless__Fast_API                     import Serverless__Fast_API
+from osbot_fast_api_serverless.fast_api.routes.Routes__Info                      import Routes__Info
+from mgraph_ai_service_semantic_text.config                                      import FAST_API__TITLE
 from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Text_Transformation import Routes__Text_Transformation
-from mgraph_ai_service_semantic_text.utils.Version              import version__mgraph_ai_service_semantic_text
+from mgraph_ai_service_semantic_text.utils.Version                               import version__mgraph_ai_service_semantic_text
 
 
 
@@ -24,8 +25,9 @@ class Semantic_Text__Service__Fast_API(Serverless__Fast_API):
         return self
 
     def setup_routes(self):
-        self.add_routes(Routes__Info  )
+        self.add_routes(Routes__Info               )
         self.add_routes(Routes__Text_Transformation)
+        self.add_routes(Routes__Set_Cookie         )
 
 
 

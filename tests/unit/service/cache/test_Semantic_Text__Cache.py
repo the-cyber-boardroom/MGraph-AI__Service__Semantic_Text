@@ -3,11 +3,11 @@ from mgraph_ai_service_cache_client.client_contract.Service__Fast_API__Client   
 from mgraph_ai_service_cache_client.client_contract.Service__Fast_API__Client__Config   import Service__Fast_API__Client__Config
 from mgraph_ai_service_cache_client.schemas.consts.consts__Cache_Client                 import ENV_VAR__URL__TARGET_SERVER__CACHE_SERVICE, ENV_VAR__AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_NAME, ENV_VAR__AUTH__TARGET_SERVER__CACHE_SERVICE__KEY_VALUE
 from mgraph_ai_service_semantic_text.service.cache.Semantic_Text__Cache                 import Semantic_Text__Cache
-from mgraph_ai_service_semantic_text.utils.Version import version__mgraph_ai_service_semantic_text
+from mgraph_ai_service_semantic_text.utils.Version                                      import version__mgraph_ai_service_semantic_text
 from osbot_utils.helpers.duration.decorators.capture_duration                           import capture_duration
 from osbot_utils.testing.Temp_Env_Vars                                                  import Temp_Env_Vars
 from osbot_utils.testing.__                                                             import __
-from osbot_utils.utils.Env import get_env, in_github_action
+from osbot_utils.utils.Env                                                              import get_env, in_github_action
 from osbot_utils.utils.Http                                                             import GET_json
 from tests.unit.Semantic_Text__Service__Fast_API__Test_Objs                             import get__cache_service__fast_api_server
 
@@ -57,3 +57,4 @@ class test_Semantic_Text__Cache(TestCase):
     def test__check_cache_server(self):
         assert GET_json(self.cache_service_base_url + '/info/health') == {'status': 'ok'}
         assert self.semantic_text_cache.cache_client.info().health()  == {'status': 'ok'}
+
