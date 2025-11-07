@@ -33,3 +33,4 @@ class Semantic_Text__Cache(Type_Safe):
 
     def namespaces(self):
         return self.cache_client.admin_storage().folders(path='/')
+
