@@ -1,7 +1,10 @@
 # for main app
 osbot-fast-api-serverless
-mgraph_ai_service_cache
 mgraph-ai-service-cache-client
+
+# for integration tests
+mgraph_ai_service_cache
+mgraph_ai_service_html
 
 # for pytest
 pytest

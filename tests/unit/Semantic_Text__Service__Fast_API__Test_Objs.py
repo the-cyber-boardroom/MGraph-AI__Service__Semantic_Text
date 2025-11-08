@@ -2,6 +2,7 @@ from typing                                                                     
 from fastapi                                                                    import FastAPI
 from mgraph_ai_service_cache.fast_api.Cache_Service__Fast_API                   import Cache_Service__Fast_API
 from mgraph_ai_service_cache_client.schemas.consts.const__Storage               import ENV_VAR__CACHE__SERVICE__STORAGE_MODE
+from mgraph_ai_service_html.html__fast_api.Html_Service__Fast_API               import Html_Service__Fast_API
 from osbot_fast_api.api.Fast_API                                                import ENV_VAR__FAST_API__AUTH__API_KEY__NAME, ENV_VAR__FAST_API__AUTH__API_KEY__VALUE
 from osbot_fast_api.utils.Fast_API_Server                                       import Fast_API_Server
 from osbot_fast_api_serverless.fast_api.Serverless__Fast_API__Config            import Serverless__Fast_API__Config
@@ -36,6 +37,14 @@ def setup__service_fast_api_test_objs():
                 set_env(ENV_VAR__FAST_API__AUTH__API_KEY__NAME , TEST_API_KEY__NAME)
                 set_env(ENV_VAR__FAST_API__AUTH__API_KEY__VALUE, TEST_API_KEY__VALUE)
         return service_fast_api_test_objs
+
+def get__service__html__client():
+    config       = Serverless__Fast_API__Config(enable_api_key=False)        # note: see if we need to add a singleton here, since this runs in 0.08 seconds :)
+    html_service = Html_Service__Fast_API(config=config).setup()
+    return html_service.client()
+
+
+# todo: move code below to Fast_API class
 
 
 T = TypeVar("T", bound="FastAPI__Service__Test_Objs")                      # Generic type for service test objs
