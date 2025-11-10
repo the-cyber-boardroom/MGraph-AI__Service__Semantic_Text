@@ -22,7 +22,7 @@ class test_Routes__Semantic_Classification(TestCase):
     def test__setUpClass(self):
         with self.routes as _:
             assert type(_)                        is Routes__Semantic_Classification
-            assert _.routes_paths()               == ['/single/filter', '/single/rate']
+            assert _.routes_paths()               == ['/multi/filter', '/multi/rate', '/single/filter', '/single/rate']
             assert _.tag                          == 'semantic-classification'
             assert type(_.classification_service) is Classification__Filter__Service
             assert _.app                          == self.app
@@ -33,8 +33,7 @@ class test_Routes__Semantic_Classification(TestCase):
                                                                                    wrapper_creator = __(converter=__()),
                                                                                    route_parser    = __()             ),
                                                         classification_service = __(semantic_text_service    = __(semantic_text__engine = __(engine_mode='text_hash',
-                                                                                    semantic_text_hashes     = __(hash_size=10),
-                                                                                    classification__criteria = 'positivity'))),
+                                                                                    semantic_text_hashes     = __(hash_size=10)))),
                                                         app                    = 'FastAPI'                 ,
                                                         prefix                 = '/semantic-classification',
                                                         filter_tag             = True                      )

@@ -5,5 +5,5 @@ from mgraph_ai_service_semantic_text.service.schemas.enums.Enum__Text__Classific
 
 
 class Schema__Classification__Request(Type_Safe):                              # Request to classify hash mapping by criteria
-    hash_mapping            : Dict[Safe_Str__Hash, str]                        # Hash → original text mapping
+    hash_mapping             : Dict[Safe_Str__Hash, str]                       # Hash → original text mapping
     classification_criteria : Enum__Text__Classification__Criteria             # Criteria to classify by (e.g., positivity)

@@ -1,6 +1,7 @@
 from unittest                                                                                    import TestCase
 from osbot_utils.testing.__                                                                      import __, __SKIP__
 from mgraph_ai_service_semantic_text.service.schemas.Schema__Semantic_Text__Classification       import Schema__Semantic_Text__Classification
+from mgraph_ai_service_semantic_text.service.schemas.enums.Enum__Text__Classification__Criteria  import Enum__Text__Classification__Criteria
 from mgraph_ai_service_semantic_text.service.schemas.safe_float.Safe_Float__Text__Classification import Safe_Float__Text__Classification
 from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine__Random import Semantic_Text__Engine__Random
 
@@ -23,9 +24,9 @@ class test_Semantic_Text__Engine__Random(TestCase):
 
     def test_classify_text(self):
         with self.random_engine as _:
-            result = _.classify_text(text='abc')
+            result = _.classify_text(text='abc', classification_criteria=Enum__Text__Classification__Criteria.POSITIVITY)
             assert type(result) is Schema__Semantic_Text__Classification
-            assert result.obj() == __( text                 = 'abc'                                                         ,
-                                       text__hash           = '900150983c'                                                  ,        # the hash for 'abc' is always '900150983c'
-                                       text__classification = __(Enum__Text__Classification__Criteria_POSITIVITY = __SKIP__),
-                                       engine_mode          = 'random'                                                      )
+            assert result.obj() == __( text                 = 'abc'                   ,
+                                       text__hash           = '900150983c'            ,        # the hash for 'abc' is always '900150983c'
+                                       text__classification = __(positivity = __SKIP__),
+                                       engine_mode          = 'random'                )

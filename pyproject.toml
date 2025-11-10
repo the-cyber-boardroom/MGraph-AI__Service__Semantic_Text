@@ -16,3 +16,6 @@ mgraph-ai-service-cache-client = "*"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+# sometimes this works (to speed up the installation of a dependency recently added to pip
+# poetry update osbot-utils --no-cache

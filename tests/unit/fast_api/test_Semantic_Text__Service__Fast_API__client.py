@@ -1,14 +1,14 @@
-from unittest                                                                    import TestCase
-from fastapi                                                                     import FastAPI
-from osbot_fast_api.api.Fast_API                                                 import ENV_VAR__FAST_API__AUTH__API_KEY__NAME, ENV_VAR__FAST_API__AUTH__API_KEY__VALUE
-from osbot_fast_api.api.schemas.consts.consts__Fast_API                          import EXPECTED_ROUTES__SET_COOKIE
-from osbot_fast_api_serverless.fast_api.routes.Routes__Info                      import ROUTES_INFO__HEALTH__RETURN_VALUE, ROUTES_PATHS__INFO
-from osbot_utils.utils.Env                                                       import get_env
-from starlette.testclient                                                        import TestClient
-from mgraph_ai_service_semantic_text.fast_api.Semantic_Text__Service__Fast_API   import Semantic_Text__Service__Fast_API
-from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Semantic_Classification import ROUTES_PATHS__SEMANTIC_CLASSIFICATION
-from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Text_Transformation import ROUTES_PATHS__TEXT_TRANSFORMATION
-from tests.unit.Semantic_Text__Service__Fast_API__Test_Objs                      import setup__service_fast_api_test_objs, Semantic_Text__Service__Fast_API__Test_Objs, TEST_API_KEY__NAME
+from unittest                                                                           import TestCase
+from fastapi                                                                            import FastAPI
+from osbot_fast_api.api.Fast_API                                                        import ENV_VAR__FAST_API__AUTH__API_KEY__NAME, ENV_VAR__FAST_API__AUTH__API_KEY__VALUE
+from osbot_fast_api.api.schemas.consts.consts__Fast_API                                 import EXPECTED_ROUTES__SET_COOKIE
+from osbot_fast_api_serverless.fast_api.routes.Routes__Info                             import ROUTES_INFO__HEALTH__RETURN_VALUE, ROUTES_PATHS__INFO
+from osbot_utils.utils.Env                                                              import get_env
+from starlette.testclient                                                               import TestClient
+from mgraph_ai_service_semantic_text.fast_api.Semantic_Text__Service__Fast_API          import Semantic_Text__Service__Fast_API
+from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Semantic_Classification    import ROUTES_PATHS__SEMANTIC_CLASSIFICATION
+from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Text_Transformation        import ROUTES_PATHS__TEXT_TRANSFORMATION
+from tests.unit.Semantic_Text__Service__Fast_API__Test_Objs                             import setup__service_fast_api_test_objs, Semantic_Text__Service__Fast_API__Test_Objs, TEST_API_KEY__NAME
 
 
 class test_Semantic_Text__Service__Fast_API__client(TestCase):
