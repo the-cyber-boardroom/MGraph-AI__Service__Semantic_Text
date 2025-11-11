@@ -3,9 +3,8 @@ from osbot_fast_api.utils.Fast_API__Server_Info                              imp
 from osbot_fast_api_serverless.services.info.Service_Info                    import Service_Info
 from osbot_fast_api_serverless.services.info.schemas.Enum__Service_Status    import Enum__Service_Status
 from osbot_fast_api_serverless.services.info.schemas.Schema__Service__Status import Schema__Service__Status
-from osbot_fast_api_serverless.utils.Version import version__osbot_fast_api_serverless
+from osbot_fast_api_serverless.utils.Version                                 import version__osbot_fast_api_serverless
 from osbot_utils.utils.Misc                                                  import list_set
-from mgraph_ai_service_semantic_text.utils.Version                           import version__mgraph_ai_service_semantic_text
 
 
 class test_Server_Info(TestCase):
