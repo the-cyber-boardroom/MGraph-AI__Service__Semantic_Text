@@ -1,8 +1,8 @@
-from unittest                                                                                       import TestCase
-from osbot_utils.testing.__                                                                     import __
-from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash              import Safe_Str__Hash
-from mgraph_ai_service_semantic_text.service.schemas.enums.Enum__Text__Classification__Criteria import Enum__Text__Classification__Criteria
-from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Request     import Schema__Classification__Request
+from unittest                                                                               import TestCase
+from osbot_utils.testing.__                                                                 import __
+from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash          import Safe_Str__Hash
+from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria     import Enum__Text__Classification__Criteria
+from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Request import Schema__Classification__Request
 
 
 class test_Schema__Classification__Request(TestCase):

@@ -3,7 +3,7 @@ from fastapi                                                                    
 from osbot_utils.testing.__                                                                               import __
 from osbot_utils.type_safe.primitives.core.Safe_Float                                                     import Safe_Float
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                        import Safe_Str__Hash
-from mgraph_ai_service_semantic_text.service.schemas.enums.Enum__Text__Classification__Criteria           import Enum__Text__Classification__Criteria
+from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria                   import Enum__Text__Classification__Criteria
 from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Semantic_Classification                      import Routes__Semantic_Classification
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Request               import Schema__Classification__Request
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Filter_Request        import Schema__Classification__Filter_Request

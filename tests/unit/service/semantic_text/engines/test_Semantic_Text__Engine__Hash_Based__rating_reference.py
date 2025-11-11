@@ -2,8 +2,8 @@ from unittest                                                                   
 from osbot_utils.testing.__                                                                          import __
 from osbot_utils.type_safe.Type_Safe                                                                 import Type_Safe
 from osbot_utils.utils.Objects                                                                       import base_types
-from mgraph_ai_service_semantic_text.service.schemas.enums.Enum__Text__Classification__Criteria      import Enum__Text__Classification__Criteria
-from mgraph_ai_service_semantic_text.service.schemas.enums.Enum__Text__Classification__Engine_Mode   import Enum__Text__Classification__Engine_Mode
+from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria      import Enum__Text__Classification__Criteria
+from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Engine_Mode   import Enum__Text__Classification__Engine_Mode
 from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine             import Semantic_Text__Engine
 from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine__Hash_Based import Semantic_Text__Engine__Hash_Based
 
