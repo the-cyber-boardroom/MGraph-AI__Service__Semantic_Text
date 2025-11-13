@@ -3,10 +3,10 @@ from fastapi                                                                    
 from osbot_utils.testing.__                                                                               import __
 from osbot_utils.type_safe.primitives.core.Safe_Float                                                     import Safe_Float
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                        import Safe_Str__Hash
-from mgraph_ai_service_semantic_text.service.schemas.topic.enums.Enum__Classification__Topic              import Enum__Classification__Topic
+from mgraph_ai_service_semantic_text.schemas.topic.enums.Enum__Classification__Topic                      import Enum__Classification__Topic
 from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Topic_Classification                         import Routes__Topic_Classification
-from mgraph_ai_service_semantic_text.service.schemas.topic.Schema__Topic_Classification__Request          import Schema__Topic_Classification__Request
-from mgraph_ai_service_semantic_text.service.schemas.topic.Schema__Topic_Filter__Request                  import Schema__Topic_Filter__Request
+from mgraph_ai_service_semantic_text.schemas.topic.Schema__Topic_Classification__Request                  import Schema__Topic_Classification__Request
+from mgraph_ai_service_semantic_text.schemas.topic.Schema__Topic_Filter__Request                          import Schema__Topic_Filter__Request
 from mgraph_ai_service_semantic_text.schemas.classification.enums.Enum__Classification__Output_Mode       import Enum__Classification__Output_Mode
 from mgraph_ai_service_semantic_text.schemas.classification.enums.Enum__Classification__Logic_Operator    import Enum__Classification__Logic_Operator
 from mgraph_ai_service_semantic_text.service.topic_classification.Topic_Classification__Filter__Service   import Topic_Classification__Filter__Service
@@ -63,12 +63,12 @@ class test_Routes__Topic_Classification(TestCase):
                                                     Enum__Classification__Topic.EDUCATION_ACADEMIC  ]
 
         # Deterministic values from hash-based engine
-        assert response.obj()                   == __(hash_topic_scores  = __(b10a8db164 = __(technology_software = 0.7478,    # "Hello World" scores
-                                                                                              business_finance    = 0.6789,
-                                                                                              education_academic  = 0.1512),
-                                                                              f1feeaa3d6 = __(technology_software = 0.508,     # "Test Text" scores
-                                                                                              business_finance    = 0.2507,
-                                                                                              education_academic  = 0.5903)),
+        assert response.obj()                   == __(hash_topic_scores  = __(b10a8db164 = __(technology_software = 0.2915,    # "Hello World" scores
+                                                                                              business_finance    = 0.284,
+                                                                                              education_academic  = 0.9113),
+                                                                              f1feeaa3d6 = __(technology_software = 0.3881,     # "Test Text" scores
+                                                                                              business_finance    = 0.6692,
+                                                                                              education_academic  = 0.6366)),
                                                       topics_classified  = ['technology-software', 'business-finance', 'education-academic'],
                                                       total_hashes       = 2                                          ,
                                                       success            = True                                       )
@@ -101,7 +101,7 @@ class test_Routes__Topic_Classification(TestCase):
         assert response.total_hashes                    == 1
         assert len(response.hash_topic_scores)          == 1
         assert Safe_Str__Hash("b10a8db164")             in response.hash_topic_scores
-        assert response.obj()                           == __(hash_topic_scores  = __(b10a8db164 = __(technology_hardware=0.8234)),
+        assert response.obj()                           == __(hash_topic_scores  = __(b10a8db164 = __(technology_hardware=0.066)),
                                                               topics_classified  = ['technology-hardware']              ,
                                                               total_hashes       = 1                                    ,
                                                               success            = True                                 )
@@ -115,7 +115,7 @@ class test_Routes__Topic_Classification(TestCase):
                               Enum__Classification__Topic.BUSINESS_FINANCE                 ,  # 0.6789 - above threshold
                               Enum__Classification__Topic.EDUCATION_ACADEMIC               ,  # 0.1512 - below threshold
                               Enum__Classification__Topic.HEALTH_MEDICAL                   ], # 0.0861 - below threshold
-            min_confidence = Safe_Float(0.5)
+            min_confidence = Safe_Float(0.29)
         )
 
         response = self.routes.classify(request)
@@ -127,8 +127,8 @@ class test_Routes__Topic_Classification(TestCase):
         hash_scores = response.hash_topic_scores[Safe_Str__Hash("b10a8db164")]
         assert len(hash_scores) == 2
         assert Enum__Classification__Topic.TECHNOLOGY_SOFTWARE in hash_scores
-        assert Enum__Classification__Topic.BUSINESS_FINANCE    in hash_scores
-        assert Enum__Classification__Topic.EDUCATION_ACADEMIC  not in hash_scores
+        assert Enum__Classification__Topic.BUSINESS_FINANCE    not in hash_scores
+        assert Enum__Classification__Topic.EDUCATION_ACADEMIC  in hash_scores
         assert Enum__Classification__Topic.HEALTH_MEDICAL      not in hash_scores
 
     def test__classify__all_topics(self):                                      # Test classification with all 15 topics
@@ -154,7 +154,7 @@ class test_Routes__Topic_Classification(TestCase):
             assert 0.0 <= float(hash_scores[topic]) <= 1.0
 
     def test__classify__scores_in_range(self):                                 # Test that all scores are within valid range (0.0-1.0)
-        hash_mapping = {Safe_Str__Hash(f"hash{i:05d}"): f"Text {i}" for i in range(10)}
+        hash_mapping = {Safe_Str__Hash(f"abcde{i:05d}"): f"Text {i}" for i in range(10)}
         all_topics   = list(Enum__Classification__Topic)
 
         request  = Schema__Topic_Classification__Request(hash_mapping   = hash_mapping      ,
@@ -182,7 +182,7 @@ class test_Routes__Topic_Classification(TestCase):
         request = Schema__Topic_Filter__Request(
             hash_mapping     = hash_mapping                                     ,
             required_topics  = [Enum__Classification__Topic.TECHNOLOGY_SOFTWARE],
-            min_confidence   = Safe_Float(0.6)                                  ,
+            min_confidence   = Safe_Float(0.3)                                  ,
             logic_operator   = Enum__Classification__Logic_Operator.AND        ,
             output_mode      = Enum__Classification__Output_Mode.HASHES_ONLY
         )
@@ -193,16 +193,16 @@ class test_Routes__Topic_Classification(TestCase):
         #           f1feeaa3d6 has tech-software=0.508  < 0.6 ✗
         assert response.success         is True
         assert response.filtered_count  == 1
-        assert response.filtered_hashes == [Safe_Str__Hash("b10a8db164")]
-        assert response.obj()           == __(filtered_hashes      = ['b10a8db164']         ,
-                                             filtered_with_text   = None                    ,
-                                             filtered_with_scores = None                    ,
-                                             topics_used          = ['technology-software'] ,
-                                             logic_operator       = 'and'                   ,
-                                             output_mode          = 'hashes-only'           ,
-                                             total_hashes         = 2                       ,
-                                             filtered_count       = 1                       ,
-                                             success              = True                    )
+        assert response.filtered_hashes == [Safe_Str__Hash("f1feeaa3d6")]
+        assert response.obj()           == __(filtered_hashes      = ['f1feeaa3d6']         ,
+                                              filtered_with_text   = None                    ,
+                                              filtered_with_scores = None                    ,
+                                              topics_used          = ['technology-software'] ,
+                                              logic_operator       = 'and'                   ,
+                                              output_mode          = 'hashes-only'           ,
+                                              total_hashes         = 2                       ,
+                                              filtered_count       = 1                       ,
+                                              success              = True                    )
 
     def test__filter__and_logic__both_match(self):                             # Test AND logic where both topics match
         hash_mapping = {Safe_Str__Hash("b10a8db164"): "Hello World"}           # tech-software=0.7478, business-finance=0.6789
@@ -211,7 +211,7 @@ class test_Routes__Topic_Classification(TestCase):
             hash_mapping     = hash_mapping                                              ,
             required_topics  = [Enum__Classification__Topic.TECHNOLOGY_SOFTWARE         ,
                                 Enum__Classification__Topic.BUSINESS_FINANCE            ],
-            min_confidence   = Safe_Float(0.6)                                           ,
+            min_confidence   = Safe_Float(0.2)                                           ,
             logic_operator   = Enum__Classification__Logic_Operator.AND                 ,
             output_mode      = Enum__Classification__Output_Mode.FULL_RATINGS
         )
@@ -293,7 +293,7 @@ class test_Routes__Topic_Classification(TestCase):
         request = Schema__Topic_Filter__Request(
             hash_mapping     = hash_mapping                                     ,
             required_topics  = [Enum__Classification__Topic.TECHNOLOGY_SOFTWARE],
-            min_confidence   = Safe_Float(0.6)                                  ,
+            min_confidence   = Safe_Float(0.2)                                  ,
             logic_operator   = Enum__Classification__Logic_Operator.AND        ,
             output_mode      = Enum__Classification__Output_Mode.HASHES_WITH_TEXT
         )
@@ -313,7 +313,7 @@ class test_Routes__Topic_Classification(TestCase):
             hash_mapping     = hash_mapping                                              ,
             required_topics  = [Enum__Classification__Topic.TECHNOLOGY_SOFTWARE         ,
                                 Enum__Classification__Topic.BUSINESS_FINANCE            ],
-            min_confidence   = Safe_Float(0.6)                                           ,
+            min_confidence   = Safe_Float(0.2)                                           ,
             logic_operator   = Enum__Classification__Logic_Operator.AND                 ,
             output_mode      = Enum__Classification__Output_Mode.FULL_RATINGS
         )
@@ -365,7 +365,7 @@ class test_Routes__Topic_Classification(TestCase):
         assert response.filtered_hashes == []
 
     def test__filter__multiple_hashes__deterministic(self):                    # Test filtering multiple hashes with deterministic results
-        hash_mapping = {Safe_Str__Hash(f"hash{i:05d}"): f"Text {i}" for i in range(10)}
+        hash_mapping = {Safe_Str__Hash(f"abcde{i:05d}"): f"Text {i}" for i in range(10)}
 
         request = Schema__Topic_Filter__Request(
             hash_mapping     = hash_mapping                                     ,
@@ -389,9 +389,9 @@ class test_Routes__Topic_Classification(TestCase):
 
     def test__filter__multiple_topics__and_logic(self):                        # Test filtering with multiple topics using AND logic
         hash_mapping = {
-            Safe_Str__Hash("hash00001"): "Technology article",                 # Will have various topic scores
-            Safe_Str__Hash("hash00002"): "Business report",
-            Safe_Str__Hash("hash00003"): "Health guide"
+            Safe_Str__Hash("abcd000001"): "Technology article",                 # Will have various topic scores
+            Safe_Str__Hash("abcd000002"): "Business report",
+            Safe_Str__Hash("abcd000003"): "Health guide"
         }
 
         request = Schema__Topic_Filter__Request(

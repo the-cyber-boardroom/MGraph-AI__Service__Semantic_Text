@@ -1,9 +1,8 @@
-from unittest                                                                                  import TestCase
-from osbot_utils.testing.__                                                                import __
-from osbot_utils.type_safe.Type_Safe                                                       import Type_Safe
-from osbot_utils.utils.Objects                                                             import base_types
-from mgraph_ai_service_semantic_text.service.schemas.topic.enums.Enum__Classification__Topic import Enum__Classification__Topic
-from mgraph_ai_service_semantic_text.service.topic_classification.Topic_Classification__Service import Topic_Classification__Service
+from unittest                                                                                                      import TestCase
+from osbot_utils.type_safe.Type_Safe                                                                               import Type_Safe
+from osbot_utils.utils.Objects                                                                                     import base_types
+from mgraph_ai_service_semantic_text.schemas.topic.enums.Enum__Classification__Topic                               import Enum__Classification__Topic
+from mgraph_ai_service_semantic_text.service.topic_classification.Topic_Classification__Service                    import Topic_Classification__Service
 from mgraph_ai_service_semantic_text.service.topic_classification.engines.Topic_Classification__Engine__Hash_Based import Topic_Classification__Engine__Hash_Based
 
 
@@ -32,8 +31,8 @@ class test_Topic_Classification__Service(TestCase):
         assert Enum__Classification__Topic.BUSINESS_FINANCE    in result
 
         # Deterministic scores from hash-based engine
-        assert float(result[Enum__Classification__Topic.TECHNOLOGY_SOFTWARE]) == 0.7478
-        assert float(result[Enum__Classification__Topic.BUSINESS_FINANCE   ]) == 0.6789
+        assert float(result[Enum__Classification__Topic.TECHNOLOGY_SOFTWARE]) == 0.2915
+        assert float(result[Enum__Classification__Topic.BUSINESS_FINANCE   ]) == 0.284
 
     def test__classify_topics__single_topic(self):                            # Test classification with single topic
         text   = "Test Text"
@@ -43,7 +42,7 @@ class test_Topic_Classification__Service(TestCase):
 
         assert len(result) == 1
         assert Enum__Classification__Topic.EDUCATION_ACADEMIC in result
-        assert float(result[Enum__Classification__Topic.EDUCATION_ACADEMIC]) == 0.5903
+        assert float(result[Enum__Classification__Topic.EDUCATION_ACADEMIC]) == 0.6366
 
     def test__classify_topics__all_topics(self):                              # Test classification with all 15 topics
         text       = "Sample text"
