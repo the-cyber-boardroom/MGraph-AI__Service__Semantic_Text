@@ -8,6 +8,7 @@ from starlette.testclient                                                       
 from mgraph_ai_service_semantic_text.fast_api.Semantic_Text__Service__Fast_API          import Semantic_Text__Service__Fast_API
 from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Semantic_Classification    import ROUTES_PATHS__SEMANTIC_CLASSIFICATION
 from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Text_Transformation        import ROUTES_PATHS__TEXT_TRANSFORMATION
+from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Topic_Classification       import ROUTES_PATHS__TOPIC_CLASSIFICATION
 from tests.unit.Semantic_Text__Service__Fast_API__Test_Objs                             import setup__service_fast_api_test_objs, Semantic_Text__Service__Fast_API__Test_Objs, TEST_API_KEY__NAME
 
 
@@ -50,7 +51,8 @@ class test_Semantic_Text__Service__Fast_API__client(TestCase):
         assert response__with_auth.json()    == ROUTES_INFO__HEALTH__RETURN_VALUE
 
     def test__config_fast_api_routes(self):
-        assert self.fast_api.routes_paths() == sorted(ROUTES_PATHS__INFO                   +
-                                                      EXPECTED_ROUTES__SET_COOKIE          +        # refactor to ROUTES_PATHS__SET_COOKIE
-                                                      ROUTES_PATHS__TEXT_TRANSFORMATION    +
-                                                      ROUTES_PATHS__SEMANTIC_CLASSIFICATION)
+        assert self.fast_api.routes_paths() == sorted(ROUTES_PATHS__INFO                    +
+                                                      EXPECTED_ROUTES__SET_COOKIE           +        # refactor to ROUTES_PATHS__SET_COOKIE
+                                                      ROUTES_PATHS__TEXT_TRANSFORMATION     +
+                                                      ROUTES_PATHS__SEMANTIC_CLASSIFICATION +
+                                                      ROUTES_PATHS__TOPIC_CLASSIFICATION    )

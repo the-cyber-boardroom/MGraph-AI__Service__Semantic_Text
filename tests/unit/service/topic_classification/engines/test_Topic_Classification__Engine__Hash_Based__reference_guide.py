@@ -1,9 +1,9 @@
-from unittest                                                                                                      import TestCase
-from osbot_utils.type_safe.Type_Safe                                                                               import Type_Safe
-from osbot_utils.utils.Objects                                                                                     import base_types
-from mgraph_ai_service_semantic_text.schemas.topic.enums.Enum__Classification__Topic                               import Enum__Classification__Topic
-from mgraph_ai_service_semantic_text.service.topic_classification.engines.Topic_Classification__Engine import Topic_Classification__Engine
-from mgraph_ai_service_semantic_text.service.topic_classification.engines.Topic_Classification__Engine__Hash_Based import Topic_Classification__Engine__Hash_Based
+from unittest                                                                                                       import TestCase
+from osbot_utils.type_safe.Type_Safe                                                                                import Type_Safe
+from osbot_utils.utils.Objects                                                                                      import base_types
+from mgraph_ai_service_semantic_text.schemas.topic.enums.Enum__Classification__Topic                                import Enum__Classification__Topic
+from mgraph_ai_service_semantic_text.service.topic_classification.engines.Topic_Classification__Engine              import Topic_Classification__Engine
+from mgraph_ai_service_semantic_text.service.topic_classification.engines.Topic_Classification__Engine__Hash_Based  import Topic_Classification__Engine__Hash_Based
 
 
 class test_Topic_Classification__Engine__Hash_Based__reference_guide(TestCase):
