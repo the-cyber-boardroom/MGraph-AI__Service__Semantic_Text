@@ -1,0 +1,12 @@
+from typing                                                                                         import Optional
+from osbot_utils.type_safe.Type_Safe                                                                import Type_Safe
+from osbot_utils.type_safe.primitives.core.Safe_Float                                               import Safe_Float
+from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria             import Enum__Text__Classification__Criteria
+from mgraph_ai_service_semantic_text.schemas.classification.enums.Enum__Classification__Filter_Mode import Enum__Classification__Filter_Mode
+
+
+class Schema__Classification__Criterion_Filter(Type_Safe):                     # Single criterion filter condition for multi-criteria filtering
+    criterion       : Enum__Text__Classification__Criteria                     # Criterion to filter by (e.g., positivity, negativity)
+    filter_mode     : Enum__Classification__Filter_Mode                        # How to compare ratings (above/below/between/equals)
+    threshold       : Safe_Float                                               # Primary threshold value for filtering
+    threshold_max   : Optional[Safe_Float] = None                              # Maximum threshold (only for BETWEEN mode)
