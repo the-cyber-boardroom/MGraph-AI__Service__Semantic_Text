@@ -1,6 +1,7 @@
 from fastapi                                                                                                        import HTTPException
 from osbot_fast_api.api.routes.Fast_API__Routes                                                                     import Fast_API__Routes
 from osbot_fast_api.api.schemas.safe_str.Safe_Str__Fast_API__Route__Tag                                             import Safe_Str__Fast_API__Route__Tag
+from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Engine_Mode                          import Enum__Text__Classification__Engine_Mode
 from mgraph_ai_service_semantic_text.service.semantic_text.classification.Classification__Filter__Service           import Classification__Filter__Service
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Request                         import Schema__Classification__Request
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Response                        import Schema__Classification__Response
@@ -10,39 +11,37 @@ from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classificati
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Multi_Criteria_Response         import Schema__Classification__Multi_Criteria_Response
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Multi_Criteria_Filter_Request   import Schema__Classification__Multi_Criteria_Filter_Request
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Multi_Criteria_Filter_Response  import Schema__Classification__Multi_Criteria_Filter_Response
+from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine__Factory import Semantic_Text__Engine__Factory
 
+TAG__ROUTES_SEMANTIC_CLASSIFICATION = 'semantic-classification'
+ROUTES_PATHS__SEMANTIC_CLASSIFICATION = [    f'/{TAG__ROUTES_SEMANTIC_CLASSIFICATION}' + '/{engine_mode}/rate'          ,
+                                             f'/{TAG__ROUTES_SEMANTIC_CLASSIFICATION}' + '/{engine_mode}/filter'        ,
+                                             f'/{TAG__ROUTES_SEMANTIC_CLASSIFICATION}' + '/{engine_mode}/multi/rate'    ,
+                                             f'/{TAG__ROUTES_SEMANTIC_CLASSIFICATION}' + '/{engine_mode}/multi/filter'  ]
 
-TAG__ROUTES_SEMANTIC_CLASSIFICATION   = 'semantic-classification'
-ROUTES_PATHS__SEMANTIC_CLASSIFICATION = [f'/{TAG__ROUTES_SEMANTIC_CLASSIFICATION}' + '/single/rate'   ,  # Level 1: Rate all hashes
-                                         f'/{TAG__ROUTES_SEMANTIC_CLASSIFICATION}' + '/single/filter' ,  # Level 1: Filter by threshold
-                                         f'/{TAG__ROUTES_SEMANTIC_CLASSIFICATION}' + '/multi/rate'    ,  # Level 2: Rate by multiple criteria
-                                         f'/{TAG__ROUTES_SEMANTIC_CLASSIFICATION}' + '/multi/filter'  ]  # Level 2: Filter by multiple criteria
+class Routes__Semantic_Classification(Fast_API__Routes):
+    tag                    : Safe_Str__Fast_API__Route__Tag = TAG__ROUTES_SEMANTIC_CLASSIFICATION
+    classification_service : Classification__Filter__Service
+    engine_factory         : Semantic_Text__Engine__Factory
 
+    def engine_mode__rate(self,
+                          engine_mode: Enum__Text__Classification__Engine_Mode,                 # Path param
+                          request: Schema__Classification__Request
+                     ) -> Schema__Classification__Response:
 
-class Routes__Semantic_Classification(Fast_API__Routes):                                            # FastAPI routes for semantic text classification
-    tag                    : Safe_Str__Fast_API__Route__Tag    = TAG__ROUTES_SEMANTIC_CLASSIFICATION   # OpenAPI tag
-    classification_service : Classification__Filter__Service                                        # Classification filter service
-
-    # ========================================
-    # Level 1: Single Criterion (Positivity)
-    # ========================================
-
-    def single__rate(self,                                                  # Rate all hashes by single criterion
-                     request: Schema__Classification__Request               # Classification request
-                ) -> Schema__Classification__Response:                      # Classification response with ratings
-
-        response = self.classification_service.classify_all(request)
+        response = self.classification_service.classify_all(request, engine_mode)
 
         if not response.success:
             raise HTTPException(status_code=500, detail="Classification failed")
 
         return response
 
-    def single__filter(self,                                                    # Filter hashes by criterion threshold
-                       request: Schema__Classification__Filter_Request          # Filter request
-                  ) -> Schema__Classification__Filter_Response:                 # Filtered results
+    def engine_mode__filter(self,
+                            engine_mode: Enum__Text__Classification__Engine_Mode,              # Path param
+                            request    : Schema__Classification__Filter_Request
+                       ) -> Schema__Classification__Filter_Response:
 
-        response = self.classification_service.filter_by_criteria(request)
+        response = self.classification_service.filter_by_criteria(request, engine_mode)
 
         if not response.success:
             raise HTTPException(status_code=500, detail="Filter failed")
@@ -54,11 +53,12 @@ class Routes__Semantic_Classification(Fast_API__Routes):                        
     # Level 2: Multiple Criteria
     # ========================================
 
-    def multi__rate(self,                                                               # Rate all hashes by multiple criteria
-                    request: Schema__Classification__Multi_Criteria_Request             # Multi-criteria classification request
-               ) -> Schema__Classification__Multi_Criteria_Response:                    # Multi-criteria classification response
+    def engine_mode__multi__rate(self,                                                               # Rate all hashes by multiple criteria
+                                 engine_mode: Enum__Text__Classification__Engine_Mode,               # Engine to use
+                                 request: Schema__Classification__Multi_Criteria_Request
+                            ) -> Schema__Classification__Multi_Criteria_Response:
 
-        response = self.classification_service.classify_all__multi_criteria(request)
+        response = self.classification_service.classify_all__multi_criteria(request, engine_mode)
 
         if not response.success:
             raise HTTPException(status_code=500, detail="Multi-criteria classification failed")
@@ -66,11 +66,12 @@ class Routes__Semantic_Classification(Fast_API__Routes):                        
         return response
 
 
-    def multi__filter(self,                                                             # Filter hashes by multiple criteria with AND/OR logic
-                      request: Schema__Classification__Multi_Criteria_Filter_Request    # Multi-criteria filter request
-                 ) -> Schema__Classification__Multi_Criteria_Filter_Response:           # Multi-criteria filtered results
+    def engine_mode__multi__filter(self,                                                             # Filter hashes by multiple criteria with AND/OR logic
+                                   engine_mode: Enum__Text__Classification__Engine_Mode         ,    # Engine to use
+                                   request: Schema__Classification__Multi_Criteria_Filter_Request
+                              ) -> Schema__Classification__Multi_Criteria_Filter_Response:
 
-        response = self.classification_service.filter_by_multi_criteria(request)
+        response = self.classification_service.filter_by_multi_criteria(request, engine_mode)
 
         if not response.success:
             raise HTTPException(status_code=500, detail="Multi-criteria filter failed")
@@ -78,7 +79,7 @@ class Routes__Semantic_Classification(Fast_API__Routes):                        
         return response
 
     def setup_routes(self):                                                    # Register all route handlers
-        self.add_route_post(self.single__rate  )                               # Level 1: Rate endpoint
-        self.add_route_post(self.single__filter)                               # Level 1: Filter endpoint
-        self.add_route_post(self.multi__rate   )                               # Level 2: Multi-criteria rate endpoint
-        self.add_route_post(self.multi__filter )                               # Level 2: Multi-criteria filter endpoint
+        self.add_route_post(self.engine_mode__rate          )                  # Rate endpoint
+        self.add_route_post(self.engine_mode__filter        )                  # Filter endpoint
+        self.add_route_post(self.engine_mode__multi__rate   )                  # Multi-criteria rate endpoint
+        self.add_route_post(self.engine_mode__multi__filter )                  # Multi-criteria filter endpoint

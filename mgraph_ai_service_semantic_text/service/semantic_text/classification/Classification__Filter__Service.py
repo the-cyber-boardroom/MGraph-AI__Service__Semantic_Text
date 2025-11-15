@@ -3,9 +3,10 @@ from osbot_utils.type_safe.Type_Safe                                            
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                                                import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                                  import Safe_Str__Hash
 from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                                      import type_safe
-from mgraph_ai_service_semantic_text.service.semantic_text.Semantic_Text__Service                                   import Semantic_Text__Service
-from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria                     import Enum__Text__Classification__Criteria
-from mgraph_ai_service_semantic_text.schemas.safe_float.Safe_Float__Text__Classification                    import Safe_Float__Text__Classification
+from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Engine_Mode                          import Enum__Text__Classification__Engine_Mode
+#from mgraph_ai_service_semantic_text.service.semantic_text.Semantic_Text__Service                                   import Semantic_Text__Service
+from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria                             import Enum__Text__Classification__Criteria
+from mgraph_ai_service_semantic_text.schemas.safe_float.Safe_Float__Text__Classification                            import Safe_Float__Text__Classification
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Request                         import Schema__Classification__Request
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Response                        import Schema__Classification__Response
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Filter_Request                  import Schema__Classification__Filter_Request
@@ -18,66 +19,64 @@ from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classificati
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Multi_Criteria_Filter_Response  import Schema__Classification__Multi_Criteria_Filter_Response
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Criterion_Filter                import Schema__Classification__Criterion_Filter
 from mgraph_ai_service_semantic_text.schemas.classification.enums.Enum__Classification__Logic_Operator              import Enum__Classification__Logic_Operator
+from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine__Factory                   import Semantic_Text__Engine__Factory
 
 
-class Classification__Filter__Service(Type_Safe):                              # Service for filtering hashes based on classification criteria
-    semantic_text_service : Semantic_Text__Service = None                      # Service that provides text classifications
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.semantic_text_service = Semantic_Text__Service().setup()          # todo: at the moment this will use Semantic_Text__Engine__Random, when ready we will need to support multiple modes
-
+class Classification__Filter__Service(Type_Safe):
+    engine_factory : Semantic_Text__Engine__Factory                         # Type_Safe will call Semantic_Text__Engine__Factory() and assigned it to engine_factory
 
     @type_safe
-    def classify_all(self,                                                     # Classify all hashes in mapping
-                     request: Schema__Classification__Request                  # Classification request
-                ) -> Schema__Classification__Response:                         # Classification response with all ratings
-        hash_ratings            = {}
-        classification_criteria = request.classification_criteria
+    def classify_all(self,
+                     request    : Schema__Classification__Request        ,
+                     engine_mode: Enum__Text__Classification__Engine_Mode
+                ) -> Schema__Classification__Response:
 
+        engine  = self.engine_factory.get_engine(engine_mode)
+
+        hash_ratings = {}                                                   # Classify all hashes (returns 4 scores per hash)
         for hash_key, text_value in request.hash_mapping.items():
-            classification = self.semantic_text_service.classify_text(text_value, classification_criteria=classification_criteria)
-            rating         = classification.text__classification.get(request.classification_criteria)
+            scores = engine.classify_text(text_value)                       # Returns all 4 scores
+            hash_ratings[hash_key] = scores
 
-            if rating is not None:
-                hash_ratings[hash_key] = rating
-
-        return Schema__Classification__Response(hash_ratings            = hash_ratings                        ,
-                                                classification_criteria = request.classification_criteria      ,
-                                                total_hashes            = Safe_UInt(len(request.hash_mapping)) ,
-                                                success                 = True                                 )
+        return Schema__Classification__Response(hash_ratings = hash_ratings             ,
+                                                total_hashes = len(request.hash_mapping),
+                                                success      = True                     )
 
     @type_safe
     def filter_by_criteria(self,                                               # Filter hashes based on criteria threshold
                            request: Schema__Classification__Filter_Request     # Filter request
                       ) -> Schema__Classification__Filter_Response:            # Filtered results
-        # First, get all classifications
-        classify_request = Schema__Classification__Request(hash_mapping            = request.hash_mapping           ,
+
+        classify_request = Schema__Classification__Request(hash_mapping            = request.hash_mapping           ,       # First, get all classifications
                                                            classification_criteria = request.classification_criteria)
 
         classify_response = self.classify_all(classify_request)
 
         if not classify_response.success:
             return Schema__Classification__Filter_Response(filtered_hashes         = []                                              ,
-                                                          classification_criteria = request.classification_criteria                 ,
-                                                          output_mode             = request.output_mode                              ,
-                                                          total_hashes            = Safe_UInt(len(request.hash_mapping))             ,
-                                                          filtered_count          = Safe_UInt(0)                                     ,
-                                                          success                 = False                                            )
+                                                           classification_criteria = request.classification_criteria                 ,
+                                                           output_mode             = request.output_mode                              ,
+                                                           total_hashes            = Safe_UInt(len(request.hash_mapping))             ,
+                                                           filtered_count          = Safe_UInt(0)                                     ,
+                                                           success                 = False                                            )
 
-        # Apply filter based on filter_mode
-        filtered_hashes = self._apply_filter(classify_response.hash_ratings  ,
-                                            request.filter_mode              ,
-                                            request.threshold                ,
-                                            request.threshold_max            )
+        # Extract the specific criterion scores and apply filter
+        # criterion_ratings = {}
+        # for hash_key, all_scores in classify_response.hash_ratings.items():
+        #     criterion_ratings[hash_key] = all_scores[request.classification_criteria]         # todo: see if we need this
+
+        filtered_hashes = self._apply_filter(classify_response.hash_ratings   ,                 # todo: and this        criterion_ratings,
+                                             request.filter_mode              ,
+                                             request.threshold                ,
+                                             request.threshold_max            )
 
         # Build response based on output_mode
-        return self._build_filter_response(filtered_hashes               ,
-                                          request.hash_mapping           ,
-                                          classify_response.hash_ratings ,
-                                          request.classification_criteria,
-                                          request.output_mode            ,
-                                          classify_response.total_hashes )
+        return self._build_filter_response(filtered_hashes                ,
+                                           request.hash_mapping           ,
+                                           classify_response.hash_ratings ,
+                                           request.classification_criteria,
+                                           request.output_mode            ,
+                                           classify_response.total_hashes )
 
     @type_safe
     def _apply_filter(self,                                                    # Apply filter logic to ratings
@@ -142,63 +141,54 @@ class Classification__Filter__Service(Type_Safe):                              #
     # ========================================
 
     @type_safe
-    def classify_all__multi_criteria(self,                                                      # Classify all hashes by multiple criteria
-                                     request: Schema__Classification__Multi_Criteria_Request   # Multi-criteria classification request
-                                ) -> Schema__Classification__Multi_Criteria_Response:          # Multi-criteria classification response
+    def classify_all__multi_criteria(self,
+                                     request: Schema__Classification__Multi_Criteria_Request,
+                                     engine_mode: Enum__Text__Classification__Engine_Mode  # ✅ Add
+                                ) -> Schema__Classification__Multi_Criteria_Response:
+
+        engine = self.engine_factory.get_engine(engine_mode)
+
         hash_ratings = {}
-
         for hash_key, text_value in request.hash_mapping.items():
-            criteria_ratings = {}
+            all_scores = engine.classify_text(text_value)
+            hash_ratings[hash_key] = all_scores
 
-            for criterion in request.classification_criteria:
-                classification = self.semantic_text_service.classify_text(text                    = text_value,
-                                                                          classification_criteria = criterion)
-
-                rating = classification.text__classification.get(criterion)
-                if rating is not None:
-                    criteria_ratings[criterion] = rating
-
-            if criteria_ratings:
-                hash_ratings[hash_key] = criteria_ratings
-
-        return Schema__Classification__Multi_Criteria_Response(hash_ratings            = hash_ratings                         ,
-                                                               classification_criteria = request.classification_criteria      ,
-                                                               total_hashes            = Safe_UInt(len(request.hash_mapping)) ,
-                                                               success                 = True                                 )
+        return Schema__Classification__Multi_Criteria_Response(hash_ratings = hash_ratings             ,
+                                                               total_hashes = len(request.hash_mapping),
+                                                               success      = True                     )
 
     @type_safe
-    def filter_by_multi_criteria(self,                                         # Filter hashes based on multiple criteria with AND/OR logic
-                                  request: Schema__Classification__Multi_Criteria_Filter_Request  # Multi-criteria filter request
-                             ) -> Schema__Classification__Multi_Criteria_Filter_Response:  # Multi-criteria filtered results
-        # First, get all classifications for all criteria
-        criteria_list = [filter.criterion for filter in request.criterion_filters]
-        classify_request = Schema__Classification__Multi_Criteria_Request(hash_mapping            = request.hash_mapping,
-                                                                          classification_criteria = criteria_list     )
+    def filter_by_multi_criteria(self,
+                                request    : Schema__Classification__Multi_Criteria_Filter_Request,
+                                engine_mode : Enum__Text__Classification__Engine_Mode
+                           ) -> Schema__Classification__Multi_Criteria_Filter_Response:
 
-        classify_response = self.classify_all__multi_criteria(classify_request)
+        criteria_list    = [f.criterion for f in request.criterion_filters]                                            # Get all classifications
+        classify_request = Schema__Classification__Multi_Criteria_Request(hash_mapping=request.hash_mapping)
+        classify_response = self.classify_all__multi_criteria(classify_request, engine_mode)
 
         if not classify_response.success:
-            return Schema__Classification__Multi_Criteria_Filter_Response(filtered_hashes   = []                                              ,
-                                                                          criteria_used     = criteria_list                                   ,
-                                                                          logic_operator    = request.logic_operator                          ,
-                                                                          output_mode       = request.output_mode                             ,
-                                                                          total_hashes      = Safe_UInt(len(request.hash_mapping))            ,
-                                                                          filtered_count    = Safe_UInt(0)                                    ,
-                                                                          success           = False                                           )
+            return Schema__Classification__Multi_Criteria_Filter_Response(filtered_hashes       = []                       ,
+                                                                          filtered_with_text    = None                     ,
+                                                                          filtered_with_ratings = None                     ,
+                                                                          criteria_used         = criteria_list            ,
+                                                                          logic_operator        = request.logic_operator   ,
+                                                                          output_mode           = request.output_mode      ,
+                                                                          total_hashes          = len(request.hash_mapping),
+                                                                          filtered_count        = 0                        ,
+                                                                          success               = False                    )
 
-        # Apply filters with AND/OR logic
-        filtered_hashes = self._apply_multi_criteria_filter(classify_response.hash_ratings,
-                                                            request.criterion_filters      ,
-                                                            request.logic_operator         )
+        filtered_hashes = self._apply_multi_criteria_filter(classify_response.hash_ratings,             # Apply filters with AND/OR logic
+                                                            request.criterion_filters     ,
+                                                            request.logic_operator        )
 
-        # Build response based on output_mode
-        return self._build_multi_criteria_filter_response(filtered_hashes               ,
-                                                          request.hash_mapping           ,
-                                                          classify_response.hash_ratings ,
-                                                          criteria_list                  ,
-                                                          request.logic_operator         ,
-                                                          request.output_mode            ,
-                                                          classify_response.total_hashes )
+        return self._build_multi_criteria_filter_response(filtered_hashes                   ,           # Build response
+                                                          request.hash_mapping              ,
+                                                          classify_response.hash_ratings    ,
+                                                          criteria_list                     ,
+                                                          request.logic_operator            ,
+                                                          request.output_mode               ,
+                                                          classify_response.total_hashes    )
 
     @type_safe
     def _apply_multi_criteria_filter(self,                                     # Apply multiple criterion filters with AND/OR logic
