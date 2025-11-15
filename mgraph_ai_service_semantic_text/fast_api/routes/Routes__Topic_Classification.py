@@ -1,7 +1,6 @@
-from fastapi                                                                                                        import HTTPException
-from osbot_fast_api.api.routes.Fast_API__Routes                                                                     import Fast_API__Routes
-from osbot_fast_api.api.schemas.safe_str.Safe_Str__Fast_API__Route__Tag                                             import Safe_Str__Fast_API__Route__Tag
-
+from fastapi                                                                                            import HTTPException
+from osbot_fast_api.api.routes.Fast_API__Routes                                                         import Fast_API__Routes
+from osbot_fast_api.api.schemas.safe_str.Safe_Str__Fast_API__Route__Tag                                 import Safe_Str__Fast_API__Route__Tag
 from mgraph_ai_service_semantic_text.schemas.topic.Schema__Topic_Classification__Request                import Schema__Topic_Classification__Request
 from mgraph_ai_service_semantic_text.schemas.topic.Schema__Topic_Classification__Response               import Schema__Topic_Classification__Response
 from mgraph_ai_service_semantic_text.schemas.topic.Schema__Topic_Filter__Request                        import Schema__Topic_Filter__Request

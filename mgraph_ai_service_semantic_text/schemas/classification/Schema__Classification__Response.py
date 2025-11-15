@@ -6,8 +6,8 @@ from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__C
 from mgraph_ai_service_semantic_text.schemas.safe_float.Safe_Float__Text__Classification import Safe_Float__Text__Classification
 
 
-class Schema__Classification__Response(Type_Safe):                                      # Response with classification ratings for all hashes
-    hash_ratings            : Dict[Safe_Str__Hash, Safe_Float__Text__Classification]    # Hash → rating mapping
-    classification_criteria : Enum__Text__Classification__Criteria                      # Criteria used for classification
-    total_hashes            : Safe_UInt                                                 # Total number of hashes classified
-    success                 : bool                                                      # Whether classification succeeded
+class Schema__Classification__Response(Type_Safe):                                      # Response with all 4 classification scores for each hash
+    hash_ratings : Dict[Safe_Str__Hash, Dict[Enum__Text__Classification__Criteria,
+                                             Safe_Float__Text__Classification    ]]      # Hash → {criterion → score} mapping (all 4 scores)
+    total_hashes : Safe_UInt                                                             # Total number of hashes classified
+    success      : bool                                                                  # Whether classification succeeded
