@@ -1,34 +1,35 @@
-from osbot_utils.utils.Misc                                                                 import random_number
-from osbot_utils.type_safe.type_safe_core.decorators.type_safe                              import type_safe
-from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Text                import Safe_Str__Text
-from mgraph_ai_service_semantic_text.schemas.Schema__Semantic_Text__Classification          import Schema__Semantic_Text__Classification
-from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria     import Enum__Text__Classification__Criteria
-from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Engine_Mode  import Enum__Text__Classification__Engine_Mode
-from mgraph_ai_service_semantic_text.schemas.safe_float.Safe_Float__Text__Classification    import Safe_Float__Text__Classification
-from mgraph_ai_service_semantic_text.service.semantic_text.Semantic_Text__Hashes            import Semantic_Text__Hashes
-from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine    import Semantic_Text__Engine
+from typing                                                                                         import Dict
+from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                      import type_safe
+from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Text                        import Safe_Str__Text
+from osbot_utils.utils.Misc                                                                         import random_number
+from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria             import Enum__Text__Classification__Criteria
+from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Engine_Mode          import Enum__Text__Classification__Engine_Mode
+from mgraph_ai_service_semantic_text.schemas.safe_float.Safe_Float__Text__Classification            import Safe_Float__Text__Classification
+from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine            import Semantic_Text__Engine
 
 
-# todo: Semantic_Text__Engine__Text_Hash (uses classification from text_hash)
-
-class Semantic_Text__Engine__Random(Semantic_Text__Engine):
-
-    engine_mode              : Enum__Text__Classification__Engine_Mode  = Enum__Text__Classification__Engine_Mode.RANDOM
-    semantic_text_hashes     : Semantic_Text__Hashes
+class Semantic_Text__Engine__Random(Semantic_Text__Engine):                                                 # Pure random classification engine
+    engine_mode : Enum__Text__Classification__Engine_Mode = Enum__Text__Classification__Engine_Mode.RANDOM  # Random mode
 
     @type_safe
-    def classify_text(self,
-                      text                    : Safe_Str__Text,                                 # todo: review the use of Safe_Ste__Text (I think it will be too restrictive, specially when we are using non-random data)
-                      classification_criteria : Enum__Text__Classification__Criteria
-                 ) -> Schema__Semantic_Text__Classification:
-        classification_value = self.random_classification()
-        text_hash            = self.semantic_text_hashes.hash__for_text(text)                   # todo: double check if we always need to calculate this (specially since in some case we will already know the hash)
-        kwargs = dict(text                 = text,
-                      text__hash           = text_hash,
-                      text__classification = {classification_criteria: classification_value},   # todo: review this text__classification assigment since at the moment we are only going to have a dict with one element (unless we make classification_criteria a list)
-                      engine_mode          = self.engine_mode)
-        return Schema__Semantic_Text__Classification(**kwargs)
+    def classify_text(self                 ,                                                                # Generate random sentiment scores
+                      text : Safe_Str__Text
+                 ) -> Dict[Enum__Text__Classification__Criteria, Safe_Float__Text__Classification]:         # All 4 normalized scores (sum to 1.0)
 
-    def random_classification(self) -> Safe_Float__Text__Classification:
-        value = random_number(0,100) / 100
-        return Safe_Float__Text__Classification(value)
+        scores = self.generate_scores()                                                                     # Generate 4 random scores that sum to 1.0
+
+        return scores
+
+    def generate_scores(self                                                                                # Generate 4 random scores
+                   ) -> Dict[Enum__Text__Classification__Criteria, Safe_Float__Text__Classification]:       # 4 scores summing to 1.0
+
+        criteria_list = [Enum__Text__Classification__Criteria.POSITIVE ,        # Map samples to criteria in consistent order
+                         Enum__Text__Classification__Criteria.NEGATIVE ,
+                         Enum__Text__Classification__Criteria.NEUTRAL  ,
+                         Enum__Text__Classification__Criteria.MIXED    ]
+
+        scores = {}
+        for criterion in criteria_list:
+            value = random_number(0,100) / 100
+            scores[criterion] = Safe_Float__Text__Classification(value)
+        return scores
