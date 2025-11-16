@@ -18,33 +18,33 @@ class test_Schema__Classification__Multi_Criteria_Request(TestCase):
 
         with Schema__Classification__Multi_Criteria_Request(
             hash_mapping            = hash_mapping                                                          ,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY]
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE]
         ) as _:
             assert len(_.hash_mapping)            == 1
             assert len(_.classification_criteria) == 1
             assert _.hash_mapping[Safe_Str__Hash("abc1234567")] == "Hello World"
-            assert _.classification_criteria[0]   == Enum__Text__Classification__Criteria.POSITIVITY
+            assert _.classification_criteria[0]   == Enum__Text__Classification__Criteria.POSITIVE
 
     def test__with_multiple_criteria(self):                                    # Test with multiple criteria
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Test"}
 
         with Schema__Classification__Multi_Criteria_Request(
             hash_mapping            = hash_mapping                                                          ,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                       Enum__Text__Classification__Criteria.NEGATIVITY,
-                                       Enum__Text__Classification__Criteria.BIAS]
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
+                                       Enum__Text__Classification__Criteria.NEGATIVE,
+                                       Enum__Text__Classification__Criteria.NEUTRAL]
         ) as _:
             assert len(_.classification_criteria) == 3
-            assert Enum__Text__Classification__Criteria.POSITIVITY in _.classification_criteria
-            assert Enum__Text__Classification__Criteria.NEGATIVITY in _.classification_criteria
-            assert Enum__Text__Classification__Criteria.BIAS       in _.classification_criteria
+            assert Enum__Text__Classification__Criteria.POSITIVE in _.classification_criteria
+            assert Enum__Text__Classification__Criteria.NEGATIVE in _.classification_criteria
+            assert Enum__Text__Classification__Criteria.NEUTRAL       in _.classification_criteria
 
     def test__obj(self):                                                       # Test .obj() serialization
         hash_mapping = {Safe_Str__Hash("abc1234567"): "test"}
         request      = Schema__Classification__Multi_Criteria_Request(
             hash_mapping            = hash_mapping                                                          ,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                       Enum__Text__Classification__Criteria.NEGATIVITY]
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
+                                       Enum__Text__Classification__Criteria.NEGATIVE]
         )
 
         assert request.obj() == __(hash_mapping            = __(abc1234567='test')              ,
@@ -55,15 +55,15 @@ class test_Schema__Classification__Multi_Criteria_Request(TestCase):
 
         with Schema__Classification__Multi_Criteria_Request(
             hash_mapping            = hash_mapping                                                          ,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                       Enum__Text__Classification__Criteria.URGENCY]
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
+                                       Enum__Text__Classification__Criteria.MIXED]
         ) as _:
             json_data = _.json()
             restored  = Schema__Classification__Multi_Criteria_Request(**json_data)
 
             assert len(restored.classification_criteria) == 2
-            assert Enum__Text__Classification__Criteria.POSITIVITY in restored.classification_criteria
-            assert Enum__Text__Classification__Criteria.URGENCY    in restored.classification_criteria
+            assert Enum__Text__Classification__Criteria.POSITIVE in restored.classification_criteria
+            assert Enum__Text__Classification__Criteria.MIXED    in restored.classification_criteria
             assert "abc1234567"                                    in restored.hash_mapping
 
     def test__all_criteria(self):                                              # Test with all available criteria
@@ -71,10 +71,10 @@ class test_Schema__Classification__Multi_Criteria_Request(TestCase):
 
         request = Schema__Classification__Multi_Criteria_Request(
             hash_mapping            = hash_mapping                                                          ,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                       Enum__Text__Classification__Criteria.NEGATIVITY,
-                                       Enum__Text__Classification__Criteria.BIAS,
-                                       Enum__Text__Classification__Criteria.URGENCY]
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
+                                       Enum__Text__Classification__Criteria.NEGATIVE,
+                                       Enum__Text__Classification__Criteria.NEUTRAL,
+                                       Enum__Text__Classification__Criteria.MIXED]
         )
 
         assert len(request.classification_criteria) == 4

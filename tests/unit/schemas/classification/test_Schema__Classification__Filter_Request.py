@@ -24,12 +24,12 @@ class test_Schema__Classification__Filter_Request(TestCase):
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Hello World"}
 
         with Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                    classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                    classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                     filter_mode             = Enum__Classification__Filter_Mode.ABOVE        ,
                                                     threshold               = Safe_Float(0.5)                                ,
                                                     output_mode             = Enum__Classification__Output_Mode.HASHES_ONLY ) as _:
             assert len(_.hash_mapping)            == 1
-            assert _.classification_criteria      == Enum__Text__Classification__Criteria.POSITIVITY
+            assert _.classification_criteria      == Enum__Text__Classification__Criteria.POSITIVE
             assert _.filter_mode                  == Enum__Classification__Filter_Mode.ABOVE
             assert _.threshold                    == 0.5
             assert _.threshold_max                is None
@@ -39,7 +39,7 @@ class test_Schema__Classification__Filter_Request(TestCase):
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Test"}
 
         with Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                    classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                    classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                     filter_mode             = Enum__Classification__Filter_Mode.BETWEEN      ,
                                                     threshold               = Safe_Float(0.3)                                ,
                                                     threshold_max           = Safe_Float(0.7)                                ) as _:
@@ -50,7 +50,7 @@ class test_Schema__Classification__Filter_Request(TestCase):
     def test__obj(self):                                                       # Test .obj() serialization
         hash_mapping = {Safe_Str__Hash("abc1234567"): "test"}
         request      = Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                              classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                              classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                               filter_mode             = Enum__Classification__Filter_Mode.ABOVE        ,
                                                               threshold               = Safe_Float(0.5)                                )
 
@@ -66,7 +66,7 @@ class test_Schema__Classification__Filter_Request(TestCase):
 
         for output_mode in Enum__Classification__Output_Mode:
             request = Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                             classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                             classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                              filter_mode             = Enum__Classification__Filter_Mode.ABOVE        ,
                                                              threshold               = Safe_Float(0.5)                                ,
                                                              output_mode             = output_mode                                    )

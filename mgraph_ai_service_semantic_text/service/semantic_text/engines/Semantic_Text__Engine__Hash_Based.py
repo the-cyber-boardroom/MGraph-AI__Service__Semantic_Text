@@ -1,5 +1,7 @@
 from hashlib                                                                                        import md5
 from typing                                                                                         import Dict
+
+from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict import Type_Safe__Dict
 from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                      import type_safe
 from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Text                        import Safe_Str__Text
 from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria             import Enum__Text__Classification__Criteria
@@ -16,20 +18,21 @@ class Semantic_Text__Engine__Hash_Based(Semantic_Text__Engine):                #
                       text : Safe_Str__Text
                  ) -> Dict[Enum__Text__Classification__Criteria, Safe_Float__Text__Classification]:  # All 4 normalized scores
 
-        raw_scores = {}                                                         # Generate raw hash-based score for each criterion
+        raw_scores = Type_Safe__Dict(expected_key_type   = Enum__Text__Classification__Criteria,
+                                     expected_value_type = Safe_Float__Text__Classification    )
 
-        for criterion in Enum__Text__Classification__Criteria:
-            raw_scores[criterion] = self._hash_score_for_criterion(text, criterion)
+        for criterion in Enum__Text__Classification__Criteria:                                       # Generate raw hash-based score for each criterion
+            raw_scores[criterion] = self.hash_score_for_criterion(text, criterion)
 
         normalized_scores = self._normalize_scores(raw_scores)                 # Normalize scores to sum to ~1.0
 
         return normalized_scores
 
     @type_safe
-    def _hash_score_for_criterion(self                ,                        # Generate deterministic hash-based score for specific criterion
-                                   text      : Safe_Str__Text                  ,
+    def hash_score_for_criterion(self                ,                              # Generate deterministic hash-based score for specific criterion
+                                   text      : Safe_Str__Text                      ,
                                    criterion : Enum__Text__Classification__Criteria
-                              ) -> float:                                       # Raw score (unnormalized)
+                              ) -> Safe_Float__Text__Classification:                 # Raw score (unnormalized)
 
         combined  = f"{text}_{criterion.value}"                                # Combine text + criterion for unique rating per criterion
         full_hash = md5(combined.encode()).hexdigest()                         # Get MD5 hash (32 hex characters)
@@ -40,7 +43,7 @@ class Semantic_Text__Engine__Hash_Based(Semantic_Text__Engine):                #
 
     @type_safe
     def _normalize_scores(self                              ,                  # Normalize raw scores to sum to 1.0 (probability distribution)
-                          raw_scores : Dict[Enum__Text__Classification__Criteria, float]
+                          raw_scores : Dict[Enum__Text__Classification__Criteria, Safe_Float__Text__Classification]
                      ) -> Dict[Enum__Text__Classification__Criteria, Safe_Float__Text__Classification]:  # Normalized scores
 
         total = sum(raw_scores.values())                                       # Calculate total for normalization
@@ -50,7 +53,8 @@ class Semantic_Text__Engine__Hash_Based(Semantic_Text__Engine):                #
             return {criterion: Safe_Float__Text__Classification(equal_value)
                     for criterion in Enum__Text__Classification__Criteria}
 
-        normalized = {}
+        normalized = Type_Safe__Dict(expected_key_type   = Enum__Text__Classification__Criteria,
+                                     expected_value_type = Safe_Float__Text__Classification    )
         for criterion, score in raw_scores.items():                            # Normalize each score
             normalized_value = score / total
             normalized[criterion] = Safe_Float__Text__Classification(normalized_value)

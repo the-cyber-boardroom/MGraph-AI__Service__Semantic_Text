@@ -20,13 +20,13 @@ class test_Schema__Classification__Multi_Criteria_Response(TestCase):
     def test__with_single_hash_single_criterion(self):                         # Test with one hash and one criterion
         hash_ratings = {
             Safe_Str__Hash("b10a8db164"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.7478)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.7478)
             }
         }
 
         with Schema__Classification__Multi_Criteria_Response(
             hash_ratings            = hash_ratings,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY],
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE],
             total_hashes            = Safe_UInt(1),
             success                 = True
         ) as _:
@@ -36,23 +36,23 @@ class test_Schema__Classification__Multi_Criteria_Response(TestCase):
             assert _.success is True
 
             ratings = _.hash_ratings[Safe_Str__Hash("b10a8db164")]
-            assert Enum__Text__Classification__Criteria.POSITIVITY in ratings
-            assert float(ratings[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.7478
+            assert Enum__Text__Classification__Criteria.POSITIVE in ratings
+            assert float(ratings[Enum__Text__Classification__Criteria.POSITIVE]) == 0.7478
 
     def test__with_single_hash_multiple_criteria(self):                        # Test with one hash and multiple criteria
         hash_ratings = {
             Safe_Str__Hash("b10a8db164"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.7478),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.1102),
-                Enum__Text__Classification__Criteria.BIAS:       Safe_Float__Text__Classification(0.2316)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.7478),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.1102),
+                Enum__Text__Classification__Criteria.NEUTRAL:       Safe_Float__Text__Classification(0.2316)
             }
         }
 
         with Schema__Classification__Multi_Criteria_Response(
             hash_ratings            = hash_ratings,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                       Enum__Text__Classification__Criteria.NEGATIVITY,
-                                       Enum__Text__Classification__Criteria.BIAS],
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
+                                       Enum__Text__Classification__Criteria.NEGATIVE,
+                                       Enum__Text__Classification__Criteria.NEUTRAL],
             total_hashes            = Safe_UInt(1),
             success                 = True
         ) as _:
@@ -61,26 +61,26 @@ class test_Schema__Classification__Multi_Criteria_Response(TestCase):
 
             ratings = _.hash_ratings[Safe_Str__Hash("b10a8db164")]
             assert len(ratings) == 3
-            assert float(ratings[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.7478
-            assert float(ratings[Enum__Text__Classification__Criteria.NEGATIVITY]) == 0.1102
-            assert float(ratings[Enum__Text__Classification__Criteria.BIAS      ]) == 0.2316
+            assert float(ratings[Enum__Text__Classification__Criteria.POSITIVE]) == 0.7478
+            assert float(ratings[Enum__Text__Classification__Criteria.NEGATIVE]) == 0.1102
+            assert float(ratings[Enum__Text__Classification__Criteria.NEUTRAL      ]) == 0.2316
 
     def test__with_multiple_hashes(self):                                      # Test with multiple hashes
         hash_ratings = {
             Safe_Str__Hash("b10a8db164"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.7478),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.1102)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.7478),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.1102)
             },
             Safe_Str__Hash("f1feeaa3d6"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.5080),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.3946)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.5080),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.3946)
             }
         }
 
         with Schema__Classification__Multi_Criteria_Response(
             hash_ratings            = hash_ratings,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                       Enum__Text__Classification__Criteria.NEGATIVITY],
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
+                                       Enum__Text__Classification__Criteria.NEGATIVE],
             total_hashes            = Safe_UInt(2),
             success                 = True
         ) as _:
@@ -88,23 +88,23 @@ class test_Schema__Classification__Multi_Criteria_Response(TestCase):
             assert _.total_hashes == 2
 
             ratings1 = _.hash_ratings[Safe_Str__Hash("b10a8db164")]
-            assert float(ratings1[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.7478
-            assert float(ratings1[Enum__Text__Classification__Criteria.NEGATIVITY]) == 0.1102
+            assert float(ratings1[Enum__Text__Classification__Criteria.POSITIVE]) == 0.7478
+            assert float(ratings1[Enum__Text__Classification__Criteria.NEGATIVE]) == 0.1102
 
             ratings2 = _.hash_ratings[Safe_Str__Hash("f1feeaa3d6")]
-            assert float(ratings2[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.5080
-            assert float(ratings2[Enum__Text__Classification__Criteria.NEGATIVITY]) == 0.3946
+            assert float(ratings2[Enum__Text__Classification__Criteria.POSITIVE]) == 0.5080
+            assert float(ratings2[Enum__Text__Classification__Criteria.NEGATIVE]) == 0.3946
 
     def test__obj(self):                                                       # Test .obj() serialization
         hash_ratings = {
             Safe_Str__Hash("b10a8db164"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.7478)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.7478)
             }
         }
 
         response = Schema__Classification__Multi_Criteria_Response(
             hash_ratings            = hash_ratings,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY],
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE],
             total_hashes            = Safe_UInt(1),
             success                 = True
         )
@@ -117,15 +117,15 @@ class test_Schema__Classification__Multi_Criteria_Response(TestCase):
     def test__json(self):                                                      # Test .json() serialization
         hash_ratings = {
             Safe_Str__Hash("b10a8db164"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.7478),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.1102)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.7478),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.1102)
             }
         }
 
         response = Schema__Classification__Multi_Criteria_Response(
             hash_ratings            = hash_ratings,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                       Enum__Text__Classification__Criteria.NEGATIVITY],
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
+                                       Enum__Text__Classification__Criteria.NEGATIVE],
             total_hashes            = Safe_UInt(1),
             success                 = True
         )
@@ -142,7 +142,7 @@ class test_Schema__Classification__Multi_Criteria_Response(TestCase):
     def test__empty_response(self):                                            # Test with empty hash ratings
         response = Schema__Classification__Multi_Criteria_Response(
             hash_ratings            = {},
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY],
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE],
             total_hashes            = Safe_UInt(0),
             success                 = True
         )
@@ -155,19 +155,19 @@ class test_Schema__Classification__Multi_Criteria_Response(TestCase):
     def test__all_criteria(self):                                              # Test with all 4 criteria
         hash_ratings = {
             Safe_Str__Hash("1ba249ca59"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.9569),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.1469),
-                Enum__Text__Classification__Criteria.BIAS:       Safe_Float__Text__Classification(0.2887),
-                Enum__Text__Classification__Criteria.URGENCY:    Safe_Float__Text__Classification(0.7091)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.9569),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.1469),
+                Enum__Text__Classification__Criteria.NEUTRAL:       Safe_Float__Text__Classification(0.2887),
+                Enum__Text__Classification__Criteria.MIXED:    Safe_Float__Text__Classification(0.7091)
             }
         }
 
         response = Schema__Classification__Multi_Criteria_Response(
             hash_ratings            = hash_ratings,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                       Enum__Text__Classification__Criteria.NEGATIVITY,
-                                       Enum__Text__Classification__Criteria.BIAS,
-                                       Enum__Text__Classification__Criteria.URGENCY],
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
+                                       Enum__Text__Classification__Criteria.NEGATIVE,
+                                       Enum__Text__Classification__Criteria.NEUTRAL,
+                                       Enum__Text__Classification__Criteria.MIXED],
             total_hashes            = Safe_UInt(1),
             success                 = True
         )

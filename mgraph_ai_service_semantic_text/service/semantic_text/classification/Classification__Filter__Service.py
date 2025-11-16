@@ -1,10 +1,11 @@
 from typing                                                                                                         import Dict, List
+
+from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text import Safe_Str__Comprehend__Text
 from osbot_utils.type_safe.Type_Safe                                                                                import Type_Safe
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                                                import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                                  import Safe_Str__Hash
 from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                                      import type_safe
 from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Engine_Mode                          import Enum__Text__Classification__Engine_Mode
-#from mgraph_ai_service_semantic_text.service.semantic_text.Semantic_Text__Service                                   import Semantic_Text__Service
 from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria                             import Enum__Text__Classification__Criteria
 from mgraph_ai_service_semantic_text.schemas.safe_float.Safe_Float__Text__Classification                            import Safe_Float__Text__Classification
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Request                         import Schema__Classification__Request
@@ -21,6 +22,8 @@ from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classificati
 from mgraph_ai_service_semantic_text.schemas.classification.enums.Enum__Classification__Logic_Operator              import Enum__Classification__Logic_Operator
 from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine__Factory                   import Semantic_Text__Engine__Factory
 
+
+FLOAT__CLASSIFICATION__FILTER__EQUALS__TOLERANCE = 0.001                    # todo see if this tolerance is good enough of if we shoul increase it
 
 class Classification__Filter__Service(Type_Safe):
     engine_factory : Semantic_Text__Engine__Factory                         # Type_Safe will call Semantic_Text__Engine__Factory() and assigned it to engine_factory
@@ -43,14 +46,16 @@ class Classification__Filter__Service(Type_Safe):
                                                 success      = True                     )
 
     @type_safe
-    def filter_by_criteria(self,                                               # Filter hashes based on criteria threshold
-                           request: Schema__Classification__Filter_Request     # Filter request
-                      ) -> Schema__Classification__Filter_Response:            # Filtered results
+    def filter_by_criteria(self,                                                    # Filter hashes based on criteria threshold
+                           request    : Schema__Classification__Filter_Request  ,   # Filter request
+                           engine_mode: Enum__Text__Classification__Engine_Mode
+                      ) -> Schema__Classification__Filter_Response:                 # Filtered results
 
-        classify_request = Schema__Classification__Request(hash_mapping            = request.hash_mapping           ,       # First, get all classifications
-                                                           classification_criteria = request.classification_criteria)
+        classify_request = Schema__Classification__Request(hash_mapping=request.hash_mapping)                           # First, get all classifications
 
-        classify_response = self.classify_all(classify_request)
+
+        classify_response = self.classify_all(request     = classify_request,
+                                              engine_mode = engine_mode     )
 
         if not classify_response.success:
             return Schema__Classification__Filter_Response(filtered_hashes         = []                                              ,
@@ -60,12 +65,11 @@ class Classification__Filter__Service(Type_Safe):
                                                            filtered_count          = Safe_UInt(0)                                     ,
                                                            success                 = False                                            )
 
-        # Extract the specific criterion scores and apply filter
-        # criterion_ratings = {}
-        # for hash_key, all_scores in classify_response.hash_ratings.items():
-        #     criterion_ratings[hash_key] = all_scores[request.classification_criteria]         # todo: see if we need this
+        criterion_ratings = {}                                                                  # Extract the specific criterion scores and apply filter
+        for hash_key, all_scores in classify_response.hash_ratings.items():
+            criterion_ratings[hash_key] = all_scores[request.classification_criteria]           #
 
-        filtered_hashes = self._apply_filter(classify_response.hash_ratings   ,                 # todo: and this        criterion_ratings,
+        filtered_hashes = self._apply_filter(criterion_ratings                ,
                                              request.filter_mode              ,
                                              request.threshold                ,
                                              request.threshold_max            )
@@ -73,7 +77,7 @@ class Classification__Filter__Service(Type_Safe):
         # Build response based on output_mode
         return self._build_filter_response(filtered_hashes                ,
                                            request.hash_mapping           ,
-                                           classify_response.hash_ratings ,
+                                           classify_response.hash_ratings ,                         # Pass full ratings for FULL_RATINGS mode
                                            request.classification_criteria,
                                            request.output_mode            ,
                                            classify_response.total_hashes )
@@ -99,7 +103,7 @@ class Classification__Filter__Service(Type_Safe):
                     filtered.append(hash_key)
 
             elif filter_mode == Enum__Classification__Filter_Mode.EQUALS:
-                if abs(rating_value - threshold) < 0.001:                      # Float comparison tolerance
+                if abs(rating_value - threshold) < FLOAT__CLASSIFICATION__FILTER__EQUALS__TOLERANCE:                      # Float comparison tolerance
                     filtered.append(hash_key)
 
             elif filter_mode == Enum__Classification__Filter_Mode.BETWEEN:
@@ -111,11 +115,12 @@ class Classification__Filter__Service(Type_Safe):
 
     @type_safe
     def _build_filter_response(self,                                           # Build response based on output mode
-                               filtered_hashes          : List[Safe_Str__Hash]                                 ,
-                               hash_mapping             : Dict[Safe_Str__Hash, str]                            ,
-                               hash_ratings             : Dict[Safe_Str__Hash, Safe_Float__Text__Classification],
-                               classification_criteria  : Enum__Text__Classification__Criteria                 ,
-                               output_mode              : Enum__Classification__Output_Mode                    ,
+                               filtered_hashes          : List[Safe_Str__Hash]                                            ,
+                               hash_mapping             : Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text                ],
+                               hash_ratings             : Dict[Safe_Str__Hash, Dict[Enum__Text__Classification__Criteria  ,
+                                                                                    Safe_Float__Text__Classification    ]],
+                               classification_criteria  : Enum__Text__Classification__Criteria                            ,
+                               output_mode              : Enum__Classification__Output_Mode                               ,
                                total_hashes             : Safe_UInt
                           ) -> Schema__Classification__Filter_Response:        # Complete filter response
         filtered_with_text    = None
@@ -127,14 +132,14 @@ class Classification__Filter__Service(Type_Safe):
         if output_mode == Enum__Classification__Output_Mode.FULL_RATINGS:
             filtered_with_ratings = {h: hash_ratings[h] for h in filtered_hashes if h in hash_ratings}
 
-        return Schema__Classification__Filter_Response(filtered_hashes         = filtered_hashes           ,
-                                                      filtered_with_text      = filtered_with_text        ,
-                                                      filtered_with_ratings   = filtered_with_ratings     ,
-                                                      classification_criteria = classification_criteria   ,
-                                                      output_mode             = output_mode               ,
-                                                      total_hashes            = total_hashes              ,
+        return Schema__Classification__Filter_Response(filtered_hashes        = filtered_hashes                ,
+                                                      filtered_with_text      = filtered_with_text             ,
+                                                      filtered_with_ratings   = filtered_with_ratings          ,
+                                                      classification_criteria = classification_criteria        ,
+                                                      output_mode             = output_mode                    ,
+                                                      total_hashes            = total_hashes                   ,
                                                       filtered_count          = Safe_UInt(len(filtered_hashes)),
-                                                      success                 = True                      )
+                                                      success                 = True                           )
 
     # ========================================
     # Level 2: Multiple Criteria Methods

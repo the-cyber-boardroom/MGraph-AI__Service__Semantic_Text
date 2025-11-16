@@ -22,11 +22,11 @@ class test_Schema__Classification__Response(TestCase):
                         Safe_Str__Hash("def1234567"): Safe_Float__Text__Classification(0.3)}
 
         with Schema__Classification__Response(hash_ratings            = hash_ratings                                   ,
-                                              classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                              classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                               total_hashes            = Safe_UInt(2)                                   ,
                                               success                 = True                                           ) as _:
             assert _.success                 is True
-            assert _.classification_criteria == Enum__Text__Classification__Criteria.POSITIVITY
+            assert _.classification_criteria == Enum__Text__Classification__Criteria.POSITIVE
             assert _.total_hashes            == 2
             assert len(_.hash_ratings)       == 2
             assert _.hash_ratings[Safe_Str__Hash("abc1234567")] == 0.8
@@ -36,7 +36,7 @@ class test_Schema__Classification__Response(TestCase):
         hash_ratings = {Safe_Str__Hash("abc1234567"): Safe_Float__Text__Classification(0.5)}
 
         with Schema__Classification__Response(hash_ratings            = hash_ratings                                   ,
-                                              classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                              classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                               total_hashes            = Safe_UInt(1)                                   ,
                                               success                 = True                                           ) as _:
             assert _.obj() == __(hash_ratings            = __(abc1234567 = 0.5)                   ,
@@ -48,14 +48,14 @@ class test_Schema__Classification__Response(TestCase):
         hash_ratings = {Safe_Str__Hash("abc1234567"): Safe_Float__Text__Classification(0.7)}
 
         with Schema__Classification__Response(hash_ratings            = hash_ratings                                   ,
-                                              classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                              classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                               total_hashes            = Safe_UInt(1)                                   ,
                                               success                 = True                                           ) as _:
             json_data = _.json()
             restored  = Schema__Classification__Response(**json_data)
 
             assert restored.success                 == True
-            assert restored.classification_criteria == Enum__Text__Classification__Criteria.POSITIVITY
+            assert restored.classification_criteria == Enum__Text__Classification__Criteria.POSITIVE
             assert restored.total_hashes            == 1
             assert "abc1234567"                    in restored.hash_ratings
             assert float(restored.hash_ratings[Safe_Str__Hash("abc1234567")]) == 0.7

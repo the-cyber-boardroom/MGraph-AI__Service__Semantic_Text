@@ -26,7 +26,7 @@ class test_Schema__Classification__Filter_Response(TestCase):
         filtered_hashes = [Safe_Str__Hash("abc1234567"), Safe_Str__Hash("def1234567")]
 
         with Schema__Classification__Filter_Response(filtered_hashes         = filtered_hashes                              ,
-                                                     classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                     classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                      output_mode             = Enum__Classification__Output_Mode.HASHES_ONLY ,
                                                      total_hashes            = Safe_UInt(10)                                 ,
                                                      filtered_count          = Safe_UInt(2)                                  ,
@@ -45,7 +45,7 @@ class test_Schema__Classification__Filter_Response(TestCase):
 
         with Schema__Classification__Filter_Response(filtered_hashes         = filtered_hashes                              ,
                                                      filtered_with_text      = filtered_with_text                           ,
-                                                     classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                     classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                      output_mode             = Enum__Classification__Output_Mode.HASHES_WITH_TEXT,
                                                      total_hashes            = Safe_UInt(5)                                  ,
                                                      filtered_count          = Safe_UInt(1)                                  ,
@@ -64,7 +64,7 @@ class test_Schema__Classification__Filter_Response(TestCase):
         with Schema__Classification__Filter_Response(filtered_hashes         = filtered_hashes                              ,
                                                      filtered_with_text      = filtered_with_text                           ,
                                                      filtered_with_ratings   = filtered_with_ratings                        ,
-                                                     classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                     classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                      output_mode             = Enum__Classification__Output_Mode.FULL_RATINGS,
                                                      total_hashes            = Safe_UInt(3)                                  ,
                                                      filtered_count          = Safe_UInt(1)                                  ,
@@ -78,7 +78,7 @@ class test_Schema__Classification__Filter_Response(TestCase):
         filtered_hashes = [Safe_Str__Hash("abc1234567")]
 
         with Schema__Classification__Filter_Response(filtered_hashes         = filtered_hashes                              ,
-                                                     classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                     classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                      output_mode             = Enum__Classification__Output_Mode.HASHES_ONLY ,
                                                      total_hashes            = Safe_UInt(5)                                  ,
                                                      filtered_count          = Safe_UInt(1)                                  ,
@@ -94,7 +94,7 @@ class test_Schema__Classification__Filter_Response(TestCase):
 
     def test__empty_results(self):                                             # Test with no filtered results
         with Schema__Classification__Filter_Response(filtered_hashes         = []                                            ,
-                                                     classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                     classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                      output_mode             = Enum__Classification__Output_Mode.HASHES_ONLY ,
                                                      total_hashes            = Safe_UInt(10)                                 ,
                                                      filtered_count          = Safe_UInt(0)                                  ,

@@ -17,15 +17,15 @@ class test_Schema__Classification__Request(TestCase):
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Hello World"}
 
         with Schema__Classification__Request(hash_mapping            = hash_mapping                                    ,
-                                             classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY) as _:
+                                             classification_criteria = Enum__Text__Classification__Criteria.POSITIVE) as _:
             assert len(_.hash_mapping)            == 1
             assert _.hash_mapping[Safe_Str__Hash("abc1234567")] == "Hello World"
-            assert _.classification_criteria      == Enum__Text__Classification__Criteria.POSITIVITY
+            assert _.classification_criteria      == Enum__Text__Classification__Criteria.POSITIVE
 
     def test__obj(self):                                                       # Test .obj() serialization
         hash_mapping = {Safe_Str__Hash("abc1234567"): "test"}
         request      = Schema__Classification__Request(hash_mapping            = hash_mapping                                    ,
-                                                       classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY)
+                                                       classification_criteria = Enum__Text__Classification__Criteria.POSITIVE)
 
         assert request.obj() == __(hash_mapping            = __(abc1234567='test')                ,
                                    classification_criteria = 'positivity'                         )
@@ -34,10 +34,10 @@ class test_Schema__Classification__Request(TestCase):
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Test text"}
 
         with Schema__Classification__Request(hash_mapping            = hash_mapping                                    ,
-                                            classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY) as _:
+                                            classification_criteria = Enum__Text__Classification__Criteria.POSITIVE) as _:
             json_data = _.json()
             restored  = Schema__Classification__Request(**json_data)
 
-            assert restored.classification_criteria == Enum__Text__Classification__Criteria.POSITIVITY
+            assert restored.classification_criteria == Enum__Text__Classification__Criteria.POSITIVE
             assert "abc1234567"                    in restored.hash_mapping
             assert restored.hash_mapping[Safe_Str__Hash("abc1234567")] == "Test text"

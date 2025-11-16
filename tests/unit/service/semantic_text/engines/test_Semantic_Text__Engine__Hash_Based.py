@@ -11,7 +11,7 @@ class test_Semantic_Text__Engine__Hash_Based(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.hash_engine              = Semantic_Text__Engine__Hash_Based()
-        cls.classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY
+        cls.classification_criteria = Enum__Text__Classification__Criteria.POSITIVE
 
     def test__init__(self):
         with self.hash_engine as _:
@@ -33,8 +33,8 @@ class test_Semantic_Text__Engine__Hash_Based(TestCase):
             result2 = _.classify_text(text='Hello World', classification_criteria=self.classification_criteria)
             result3 = _.classify_text(text='Hello World', classification_criteria=self.classification_criteria)
 
-            assert result1.text__classification[Enum__Text__Classification__Criteria.POSITIVITY] == result2.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]       # All three should be identical
-            assert result2.text__classification[Enum__Text__Classification__Criteria.POSITIVITY] == result3.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
+            assert result1.text__classification[Enum__Text__Classification__Criteria.POSITIVE] == result2.text__classification[Enum__Text__Classification__Criteria.POSITIVE]       # All three should be identical
+            assert result2.text__classification[Enum__Text__Classification__Criteria.POSITIVE] == result3.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
             assert result1.obj() == __(text__hash           = 'b10a8db164'  ,
                                        text                 = 'Hello World' ,
                                        text__classification = __(positivity=0.7478),
@@ -71,9 +71,9 @@ class test_Semantic_Text__Engine__Hash_Based(TestCase):
             result2 = _.classify_text(text='Negative', classification_criteria=self.classification_criteria)
             result3 = _.classify_text(text='Neutral' , classification_criteria=self.classification_criteria)
 
-            rating1 = result1.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
-            rating2 = result2.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
-            rating3 = result3.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
+            rating1 = result1.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
+            rating2 = result2.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
+            rating3 = result3.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
 
             # All should be different
             assert rating1 != rating2
@@ -108,13 +108,13 @@ class test_Semantic_Text__Engine__Hash_Based(TestCase):
 
         text = 'The same text'
 
-        result_positivity = self.hash_engine.classify_text(text=text, classification_criteria=Enum__Text__Classification__Criteria.POSITIVITY)
-        result_negativity = self.hash_engine.classify_text(text=text, classification_criteria=Enum__Text__Classification__Criteria.NEGATIVITY)
-        result_bias       = self.hash_engine.classify_text(text=text, classification_criteria=Enum__Text__Classification__Criteria.BIAS      )
+        result_positivity = self.hash_engine.classify_text(text=text, classification_criteria=Enum__Text__Classification__Criteria.POSITIVE)
+        result_negativity = self.hash_engine.classify_text(text=text, classification_criteria=Enum__Text__Classification__Criteria.NEGATIVE)
+        result_bias       = self.hash_engine.classify_text(text=text, classification_criteria=Enum__Text__Classification__Criteria.NEUTRAL      )
 
-        rating_positivity = result_positivity.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
-        rating_negativity = result_negativity.text__classification[Enum__Text__Classification__Criteria.NEGATIVITY]
-        rating_bias       = result_bias      .text__classification[Enum__Text__Classification__Criteria.BIAS      ]
+        rating_positivity = result_positivity.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
+        rating_negativity = result_negativity.text__classification[Enum__Text__Classification__Criteria.NEGATIVE]
+        rating_bias       = result_bias      .text__classification[Enum__Text__Classification__Criteria.NEUTRAL      ]
 
         # Same text, different criteria should produce different ratings
         assert rating_positivity != rating_negativity
@@ -132,14 +132,14 @@ class test_Semantic_Text__Engine__Hash_Based(TestCase):
 
             for text in test_texts:
                 result = _.classify_text(text=text, classification_criteria=self.classification_criteria)
-                rating = result.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
+                rating = result.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
                 assert 0.0 <= float(rating) <= 1.0, f"Rating {rating} for text '{text}' is out of range"
 
     def test_classify_text__empty_string(self):                                # Test with empty string
         with self.hash_engine as _:
             result = _.classify_text(text='', classification_criteria=self.classification_criteria)
             assert type(result) is Schema__Semantic_Text__Classification
-            rating = result.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
+            rating = result.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
             assert 0.0 <= float(rating) <= 1.0
 
     def test_classify_text__special_characters(self):                          # Test with special characters
@@ -148,8 +148,8 @@ class test_Semantic_Text__Engine__Hash_Based(TestCase):
             result2 = _.classify_text(text='Hello!', classification_criteria=self.classification_criteria)
 
             # Should be deterministic even with special chars
-            rating1 = result1.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
-            rating2 = result2.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
+            rating1 = result1.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
+            rating2 = result2.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
             assert rating1 == rating2
 
     def test_classify_text__unicode(self):                                     # Test with unicode characters
@@ -158,8 +158,8 @@ class test_Semantic_Text__Engine__Hash_Based(TestCase):
             result2 = _.classify_text(text='Hello 世界', classification_criteria=self.classification_criteria)
 
             # Should be deterministic with unicode
-            rating1 = result1.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
-            rating2 = result2.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
+            rating1 = result1.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
+            rating2 = result2.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
             assert rating1 == rating2
             assert rating1 == 0.343
 
@@ -169,9 +169,9 @@ class test_Semantic_Text__Engine__Hash_Based(TestCase):
             result2 = _.classify_text(text='HelloWorld'  , classification_criteria=self.classification_criteria)
             result3 = _.classify_text(text='Hello  World', classification_criteria=self.classification_criteria)
 
-            rating1 = result1.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
-            rating2 = result2.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
-            rating3 = result3.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
+            rating1 = result1.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
+            rating2 = result2.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
+            rating3 = result3.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
 
             # All should be different (whitespace matters)
             assert rating1 != rating2
@@ -187,9 +187,9 @@ class test_Semantic_Text__Engine__Hash_Based(TestCase):
             result2 = _.classify_text(text='Hello', classification_criteria=self.classification_criteria)
             result3 = _.classify_text(text='HELLO', classification_criteria=self.classification_criteria)
 
-            rating1 = result1.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
-            rating2 = result2.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
-            rating3 = result3.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]
+            rating1 = result1.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
+            rating2 = result2.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
+            rating3 = result3.text__classification[Enum__Text__Classification__Criteria.POSITIVE]
 
             # All should be different (case matters)
             assert rating1 != rating2

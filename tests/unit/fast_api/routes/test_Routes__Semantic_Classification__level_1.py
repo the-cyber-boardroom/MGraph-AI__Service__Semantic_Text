@@ -47,14 +47,14 @@ class test_Routes__Semantic_Classification(TestCase):
                         Safe_Str__Hash("def1234567"): "Test Text"}
 
         request = Schema__Classification__Request(hash_mapping            = hash_mapping                                    ,
-                                                  classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY)
+                                                  classification_criteria = Enum__Text__Classification__Criteria.POSITIVE)
 
         response = self.routes.single__rate(request)
 
         assert response.success                 is True
         assert response.total_hashes            == 2
         assert len(response.hash_ratings)       == 2
-        assert response.classification_criteria == Enum__Text__Classification__Criteria.POSITIVITY
+        assert response.classification_criteria == Enum__Text__Classification__Criteria.POSITIVE
         assert response.obj()                   == __(hash_ratings            = __(abc1234567 = 0.7478,  # Deterministic!
                                                                                    def1234567 = 0.508),
                                                        classification_criteria = 'positivity'   ,
@@ -63,7 +63,7 @@ class test_Routes__Semantic_Classification(TestCase):
 
     def test__classify__single__rate__empty(self):                             # Test rating with empty mapping
         request = Schema__Classification__Request(hash_mapping            = {}                                              ,
-                                                  classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY)
+                                                  classification_criteria = Enum__Text__Classification__Criteria.POSITIVE)
 
         response = self.routes.single__rate(request)
 
@@ -79,7 +79,7 @@ class test_Routes__Semantic_Classification(TestCase):
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Only text"}
 
         request = Schema__Classification__Request(hash_mapping            = hash_mapping                                    ,
-                                                  classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY)
+                                                  classification_criteria = Enum__Text__Classification__Criteria.POSITIVE)
 
         response = self.routes.single__rate(request)
 
@@ -96,7 +96,7 @@ class test_Routes__Semantic_Classification(TestCase):
         hash_mapping = {Safe_Str__Hash(f"a{i:09d}"): f"Text {i}" for i in range(10)}
 
         request = Schema__Classification__Request(hash_mapping            = hash_mapping                                    ,
-                                                  classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY)
+                                                  classification_criteria = Enum__Text__Classification__Criteria.POSITIVE)
 
         response = self.routes.single__rate(request)
 
@@ -129,7 +129,7 @@ class test_Routes__Semantic_Classification(TestCase):
                         Safe_Str__Hash("def1234567"): "Another text"}
 
         request = Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                          filter_mode             = Enum__Classification__Filter_Mode.ABOVE        ,
                                                          threshold               = Safe_Float(0.4)                                ,
                                                          output_mode             = Enum__Classification__Output_Mode.HASHES_ONLY )
@@ -156,7 +156,7 @@ class test_Routes__Semantic_Classification(TestCase):
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Test content"}
 
         request = Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                          filter_mode             = Enum__Classification__Filter_Mode.ABOVE        ,
                                                          threshold               = Safe_Float(0.0)                                ,
                                                          output_mode             = Enum__Classification__Output_Mode.HASHES_WITH_TEXT)
@@ -182,7 +182,7 @@ class test_Routes__Semantic_Classification(TestCase):
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Test"}
 
         request = Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                          filter_mode             = Enum__Classification__Filter_Mode.ABOVE        ,
                                                          threshold               = Safe_Float(0.0)                                ,
                                                          output_mode             = Enum__Classification__Output_Mode.FULL_RATINGS)
@@ -209,7 +209,7 @@ class test_Routes__Semantic_Classification(TestCase):
                         Safe_Str__Hash("def1234567"): "Text B"}
 
         request = Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                          filter_mode             = Enum__Classification__Filter_Mode.BELOW        ,
                                                          threshold               = Safe_Float(0.5)                                ,
                                                          output_mode             = Enum__Classification__Output_Mode.HASHES_ONLY )
@@ -237,7 +237,7 @@ class test_Routes__Semantic_Classification(TestCase):
                         Safe_Str__Hash("ccc1234567"): "Text C"}
 
         request = Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                          filter_mode             = Enum__Classification__Filter_Mode.BETWEEN      ,
                                                          threshold               = Safe_Float(0.3)                                ,
                                                          threshold_max           = Safe_Float(0.7)                                ,
@@ -265,7 +265,7 @@ class test_Routes__Semantic_Classification(TestCase):
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Text"}
 
         request = Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                          filter_mode             = Enum__Classification__Filter_Mode.EQUALS       ,
                                                          threshold               = Safe_Float(0.5)                                ,
                                                          output_mode             = Enum__Classification__Output_Mode.HASHES_ONLY )
@@ -287,7 +287,7 @@ class test_Routes__Semantic_Classification(TestCase):
 
     def test__single__filter__empty_mapping(self):                             # Test filter with empty mapping
         request = Schema__Classification__Filter_Request(hash_mapping            = {}                                              ,
-                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                          filter_mode             = Enum__Classification__Filter_Mode.ABOVE        ,
                                                          threshold               = Safe_Float(0.5)                                ,
                                                          output_mode             = Enum__Classification__Output_Mode.HASHES_ONLY )
@@ -312,7 +312,7 @@ class test_Routes__Semantic_Classification(TestCase):
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Test"}
 
         request = Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                          filter_mode             = Enum__Classification__Filter_Mode.ABOVE        ,
                                                          threshold               = Safe_Float(0.0)                                ,
                                                          output_mode             = Enum__Classification__Output_Mode.HASHES_ONLY )
@@ -335,7 +335,7 @@ class test_Routes__Semantic_Classification(TestCase):
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Test"}
 
         request = Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                          filter_mode             = Enum__Classification__Filter_Mode.ABOVE        ,
                                                          threshold               = Safe_Float(1.0)                                ,
                                                          output_mode             = Enum__Classification__Output_Mode.HASHES_ONLY )
@@ -362,7 +362,7 @@ class test_Routes__Semantic_Classification(TestCase):
         hash_mapping = {Safe_Str__Hash(f"a{i:09d}"): f"Text {i}" for i in range(20)}
 
         request = Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY,
+                                                         classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
                                                          filter_mode             = Enum__Classification__Filter_Mode.ABOVE        ,
                                                          threshold               = Safe_Float(0.5)                                ,
                                                          output_mode             = Enum__Classification__Output_Mode.FULL_RATINGS)

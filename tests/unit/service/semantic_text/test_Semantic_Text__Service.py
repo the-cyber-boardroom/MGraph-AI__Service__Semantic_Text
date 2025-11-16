@@ -2,7 +2,6 @@ from unittest                                                                   
 from osbot_utils.testing.__                                                                          import __, __SKIP__
 from mgraph_ai_service_semantic_text.schemas.Schema__Semantic_Text__Classification                   import Schema__Semantic_Text__Classification
 from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria              import Enum__Text__Classification__Criteria
-from mgraph_ai_service_semantic_text.service.semantic_text.Semantic_Text__Service                    import Semantic_Text__Service
 from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine__Hash_Based import Semantic_Text__Engine__Hash_Based
 
 
@@ -10,7 +9,7 @@ class test_Semantic_Text__Service(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.classification_criteria = Enum__Text__Classification__Criteria.POSITIVITY
+        cls.classification_criteria = Enum__Text__Classification__Criteria.POSITIVE
         cls.semantic_text_service    = Semantic_Text__Service().setup()
 
     def test__init__(self):

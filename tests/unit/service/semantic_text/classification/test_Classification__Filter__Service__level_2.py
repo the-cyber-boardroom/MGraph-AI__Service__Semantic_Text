@@ -2,9 +2,8 @@ from unittest                                                                   
 from osbot_utils.testing.__                                                                                         import __
 from osbot_utils.type_safe.primitives.core.Safe_Float                                                               import Safe_Float
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                                  import Safe_Str__Hash
-from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria                     import Enum__Text__Classification__Criteria
-from mgraph_ai_service_semantic_text.schemas.safe_float.Safe_Float__Text__Classification                    import Safe_Float__Text__Classification
-from mgraph_ai_service_semantic_text.service.semantic_text.Semantic_Text__Service                                   import Semantic_Text__Service
+from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria                             import Enum__Text__Classification__Criteria
+from mgraph_ai_service_semantic_text.schemas.safe_float.Safe_Float__Text__Classification                            import Safe_Float__Text__Classification
 from mgraph_ai_service_semantic_text.service.semantic_text.classification.Classification__Filter__Service           import Classification__Filter__Service
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Multi_Criteria_Request          import Schema__Classification__Multi_Criteria_Request
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Multi_Criteria_Response         import Schema__Classification__Multi_Criteria_Response
@@ -19,13 +18,11 @@ class test_Classification__Filter__Service__level_2(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.semantic_text_service    = Semantic_Text__Service().setup()
-        cls.classification_service   = Classification__Filter__Service(semantic_text_service=cls.semantic_text_service)
+        cls.classification_service   = Classification__Filter__Service()
 
     def test__init(self):
         with self.classification_service as _:
             assert type(_)                    is Classification__Filter__Service
-            assert type(_.semantic_text_service) is Semantic_Text__Service
 
     # ========================================
     # classify_all__multi_criteria Tests
@@ -37,9 +34,9 @@ class test_Classification__Filter__Service__level_2(TestCase):
 
         request = Schema__Classification__Multi_Criteria_Request(
             hash_mapping            = hash_mapping,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                       Enum__Text__Classification__Criteria.NEGATIVITY,
-                                       Enum__Text__Classification__Criteria.BIAS]
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
+                                       Enum__Text__Classification__Criteria.NEGATIVE,
+                                       Enum__Text__Classification__Criteria.NEUTRAL ]
         )
 
         response = self.classification_service.classify_all__multi_criteria(request)
@@ -50,13 +47,13 @@ class test_Classification__Filter__Service__level_2(TestCase):
         assert len(response.hash_ratings) == 1
 
         ratings = response.hash_ratings[Safe_Str__Hash("b10a8db164")]
-        assert Enum__Text__Classification__Criteria.POSITIVITY in ratings
-        assert Enum__Text__Classification__Criteria.NEGATIVITY in ratings
-        assert Enum__Text__Classification__Criteria.BIAS in ratings
+        assert Enum__Text__Classification__Criteria.POSITIVE in ratings
+        assert Enum__Text__Classification__Criteria.NEGATIVE in ratings
+        assert Enum__Text__Classification__Criteria.NEUTRAL in ratings
 
-        assert float(ratings[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.7478
-        assert float(ratings[Enum__Text__Classification__Criteria.NEGATIVITY]) == 0.1102
-        assert float(ratings[Enum__Text__Classification__Criteria.BIAS]) == 0.2316
+        assert float(ratings[Enum__Text__Classification__Criteria.POSITIVE]) == 0.7478
+        assert float(ratings[Enum__Text__Classification__Criteria.NEGATIVE]) == 0.1102
+        assert float(ratings[Enum__Text__Classification__Criteria.NEUTRAL]) == 0.2316
 
         assert ratings.obj() == __(positivity = 0.7478,
                                    negativity = 0.1102,
@@ -73,7 +70,7 @@ class test_Classification__Filter__Service__level_2(TestCase):
     def test__classify_all__multi_criteria__empty(self):                       # Test with empty mapping
         request = Schema__Classification__Multi_Criteria_Request(
             hash_mapping            = {},
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY]
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE]
         )
 
         response = self.classification_service.classify_all__multi_criteria(request)
@@ -88,7 +85,7 @@ class test_Classification__Filter__Service__level_2(TestCase):
 
         request = Schema__Classification__Multi_Criteria_Request(
             hash_mapping            = hash_mapping,
-            classification_criteria = [Enum__Text__Classification__Criteria.URGENCY]
+            classification_criteria = [Enum__Text__Classification__Criteria.MIXED]
         )
 
         response = self.classification_service.classify_all__multi_criteria(request)
@@ -99,7 +96,7 @@ class test_Classification__Filter__Service__level_2(TestCase):
 
         ratings = response.hash_ratings[Safe_Str__Hash("0cbc6611f5")]
         assert len(ratings) == 1
-        assert float(ratings[Enum__Text__Classification__Criteria.URGENCY]) == 0.7786
+        assert float(ratings[Enum__Text__Classification__Criteria.MIXED]) == 0.7786
 
         assert response.obj() == __(hash_ratings             = __(_0cbc6611f5 = __(urgency = 0.7786))   ,
                                     classification_criteria  = ['urgency']                              ,
@@ -111,19 +108,19 @@ class test_Classification__Filter__Service__level_2(TestCase):
 
         hash_mapping = {Safe_Str__Hash("1ba249ca59"): "Sample text"}                    # From reference: Sample text → pos:0.9569, neg:0.1469, bias:0.2887, urg:0.7091
         request      = Schema__Classification__Multi_Criteria_Request(hash_mapping            = hash_mapping,
-                                                                      classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                                                                                 Enum__Text__Classification__Criteria.NEGATIVITY,
-                                                                                                 Enum__Text__Classification__Criteria.BIAS      ,                                                                                            Enum__Text__Classification__Criteria.URGENCY   ])
+                                                                      classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
+                                                                                                 Enum__Text__Classification__Criteria.NEGATIVE,
+                                                                                                 Enum__Text__Classification__Criteria.NEUTRAL      ,                                                                                            Enum__Text__Classification__Criteria.MIXED   ])
         response     = self.classification_service.classify_all__multi_criteria(request)
         ratings      = response.hash_ratings[Safe_Str__Hash("1ba249ca59")]
 
         assert response.success                                                is True
         assert len(response.hash_ratings)                                      == 1
         assert len(ratings)                                                    == 4
-        assert float(ratings[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.9569
-        assert float(ratings[Enum__Text__Classification__Criteria.NEGATIVITY]) == 0.1469
-        assert float(ratings[Enum__Text__Classification__Criteria.BIAS      ]) == 0.2887
-        assert float(ratings[Enum__Text__Classification__Criteria.URGENCY   ]) == 0.7091
+        assert float(ratings[Enum__Text__Classification__Criteria.POSITIVE]) == 0.9569
+        assert float(ratings[Enum__Text__Classification__Criteria.NEGATIVE]) == 0.1469
+        assert float(ratings[Enum__Text__Classification__Criteria.NEUTRAL      ]) == 0.2887
+        assert float(ratings[Enum__Text__Classification__Criteria.MIXED   ]) == 0.7091
 
         assert request.obj()  == __(hash_mapping             = __(_1ba249ca59 = 'Sample text')                 ,
                                     classification_criteria  = ['positivity', 'negativity', 'bias', 'urgency'])
@@ -146,8 +143,8 @@ class test_Classification__Filter__Service__level_2(TestCase):
 
         request = Schema__Classification__Multi_Criteria_Request(
             hash_mapping            = hash_mapping,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                       Enum__Text__Classification__Criteria.NEGATIVITY]
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
+                                       Enum__Text__Classification__Criteria.NEGATIVE]
         )
 
         response = self.classification_service.classify_all__multi_criteria(request)
@@ -171,10 +168,10 @@ class test_Classification__Filter__Service__level_2(TestCase):
         hash_mapping = {Safe_Str__Hash("eb5deeca9c"): "Text B"}                 # From reference: Text B → pos:0.8374, neg:0.7441
 
         criterion_filters = [
-            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.POSITIVITY ,
+            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.POSITIVE ,
                                                      filter_mode = Enum__Classification__Filter_Mode.ABOVE         ,
                                                      threshold   = Safe_Float(0.7)                                 ),
-            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.NEGATIVITY ,
+            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.NEGATIVE ,
                                                      filter_mode = Enum__Classification__Filter_Mode.ABOVE         ,
                                                      threshold   = Safe_Float(0.7)                                 )]
 
@@ -210,10 +207,10 @@ class test_Classification__Filter__Service__level_2(TestCase):
                         Safe_Str__Hash("58537f27d7") : "High negative"}
 
         criterion_filters = [
-            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.POSITIVITY ,
+            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.POSITIVE ,
                                                      filter_mode = Enum__Classification__Filter_Mode.ABOVE         ,
                                                      threshold   = Safe_Float(0.7)                                  ),
-            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.NEGATIVITY ,
+            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.NEGATIVE ,
                                                      filter_mode = Enum__Classification__Filter_Mode.ABOVE         ,
                                                      threshold   = Safe_Float(0.7)                                  )
         ]
@@ -247,7 +244,7 @@ class test_Classification__Filter__Service__level_2(TestCase):
         # From reference: Text → pos:0.9776
         hash_mapping = {Safe_Str__Hash("9dffbf69ff") : "Text"}
 
-        criterion_filters = [Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.POSITIVITY ,
+        criterion_filters = [Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.POSITIVE ,
                                                                       filter_mode = Enum__Classification__Filter_Mode.ABOVE         ,
                                                                       threshold   = Safe_Float(0.5)                                  )]
 
@@ -282,7 +279,7 @@ class test_Classification__Filter__Service__level_2(TestCase):
         assert response_full.filtered_with_text    is not None
         assert response_full.filtered_with_ratings is not None
         assert float(response_full.filtered_with_ratings[Safe_Str__Hash("9dffbf69ff")]
-                                                        [Enum__Text__Classification__Criteria.POSITIVITY]) == 0.9776
+                                                        [Enum__Text__Classification__Criteria.POSITIVE]) == 0.9776
 
         assert request_text.obj() == __(output_mode        = 'hashes-with-text'                 ,
                                         hash_mapping        = __(_9dffbf69ff = 'Text')          ,
@@ -329,14 +326,14 @@ class test_Classification__Filter__Service__level_2(TestCase):
 
     def test___apply_and_filter__all_match(self):                              # Test AND filter where all hashes match all criteria
         # From reference: Text B → pos:0.8374, neg:0.7441
-        hash_ratings = { Safe_Str__Hash("eb5deeca9c"): { Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.8374),
-                                                         Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.7441) } }
+        hash_ratings = { Safe_Str__Hash("eb5deeca9c"): { Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.8374),
+                                                         Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.7441) } }
 
         criterion_filters = [
-            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.POSITIVITY,
+            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.POSITIVE,
                                                      filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                                                      threshold   = Safe_Float(0.7)),
-            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.NEGATIVITY,
+            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.NEGATIVE,
                                                      filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                                                      threshold   = Safe_Float(0.7))]
 
@@ -352,23 +349,23 @@ class test_Classification__Filter__Service__level_2(TestCase):
         # Text 1 → pos:0.7402, neg:0.0745 (only pos > 0.6)
         hash_ratings = {
             Safe_Str__Hash("20c8b16b2a"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.7645),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.7672)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.7645),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.7672)
             },
             Safe_Str__Hash("161a6b3572"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.7402),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.0745)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.7402),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.0745)
             }
         }
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                 threshold   = Safe_Float(0.6)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.NEGATIVITY,
+                criterion   = Enum__Text__Classification__Criteria.NEGATIVE,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                 threshold   = Safe_Float(0.6)
             )
@@ -386,19 +383,19 @@ class test_Classification__Filter__Service__level_2(TestCase):
         # From reference: Positive text → pos:0.4332, neg:0.5403
         hash_ratings = {
             Safe_Str__Hash("b5ead10d6e"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.4332),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.5403)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.4332),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.5403)
             }
         }
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                 threshold   = Safe_Float(0.6)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.NEGATIVITY,
+                criterion   = Enum__Text__Classification__Criteria.NEGATIVE,
                 filter_mode = Enum__Classification__Filter_Mode.BELOW,
                 threshold   = Safe_Float(0.5)
             )
@@ -419,23 +416,23 @@ class test_Classification__Filter__Service__level_2(TestCase):
         # Text B → pos:0.8374, neg:0.7441
         hash_ratings = {
             Safe_Str__Hash("b840f6f2ae"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.4814),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.5114)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.4814),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.5114)
             },
             Safe_Str__Hash("eb5deeca9c"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.8374),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.7441)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.8374),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.7441)
             }
         }
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                 threshold   = Safe_Float(0.4)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.NEGATIVITY,
+                criterion   = Enum__Text__Classification__Criteria.NEGATIVE,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                 threshold   = Safe_Float(0.4)
             )
@@ -450,19 +447,19 @@ class test_Classification__Filter__Service__level_2(TestCase):
         # From reference: Low both → pos:0.1844, neg:0.3436
         hash_ratings = {
             Safe_Str__Hash("b0a2013306"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.1844),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.3436)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.1844),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.3436)
             }
         }
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                 threshold   = Safe_Float(0.7)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.NEGATIVITY,
+                criterion   = Enum__Text__Classification__Criteria.NEGATIVE,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                 threshold   = Safe_Float(0.7)
             )
@@ -559,7 +556,7 @@ class test_Classification__Filter__Service__level_2(TestCase):
         request = Schema__Classification__Multi_Criteria_Filter_Request(
             hash_mapping      = {},
             criterion_filters = [Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                 threshold   = Safe_Float(0.5)
             )],
@@ -579,17 +576,17 @@ class test_Classification__Filter__Service__level_2(TestCase):
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                 threshold   = Safe_Float(0.6)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.NEGATIVITY,
+                criterion   = Enum__Text__Classification__Criteria.NEGATIVE,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                 threshold   = Safe_Float(0.6)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.BIAS,
+                criterion   = Enum__Text__Classification__Criteria.NEUTRAL,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE,
                 threshold   = Safe_Float(0.6)
             )

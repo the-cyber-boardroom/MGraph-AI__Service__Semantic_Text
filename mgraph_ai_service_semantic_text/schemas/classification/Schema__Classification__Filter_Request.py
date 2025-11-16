@@ -10,7 +10,7 @@ from mgraph_ai_service_semantic_text.schemas.classification.enums.Enum__Classifi
 
 class Schema__Classification__Filter_Request(Type_Safe):                       # Request to filter hashes by classification criteria
     hash_mapping            : Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text] # Hash → original text mapping
-    classification_criteria : Enum__Text__Classification__Criteria             # KEEP THIS: Specific criterion to filter by (positive/negative/neutral/mixed)
+    classification_criteria : Enum__Text__Classification__Criteria             # Specific criterion to filter by (positive/negative/neutral/mixed)
     filter_mode             : Enum__Classification__Filter_Mode                # How to compare ratings (above/below/between/equals)
     threshold               : Safe_Float                                       # Primary threshold value for filtering
     threshold_max           : Optional[Safe_Float]             = None          # Maximum threshold (only for BETWEEN mode)

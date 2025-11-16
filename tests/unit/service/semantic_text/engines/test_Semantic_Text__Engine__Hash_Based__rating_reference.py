@@ -1,6 +1,7 @@
 from unittest                                                                                        import TestCase
 from osbot_utils.testing.__                                                                          import __
 from osbot_utils.type_safe.Type_Safe                                                                 import Type_Safe
+from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict import Type_Safe__Dict
 from osbot_utils.utils.Objects                                                                       import base_types
 from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria      import Enum__Text__Classification__Criteria
 from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Engine_Mode   import Enum__Text__Classification__Engine_Mode
@@ -23,69 +24,52 @@ class test_Semantic_Text__Engine__Hash_Based__rating_reference(TestCase):
 
     def test__init(self):                                                      # Test initialization and setup
         with self.engine as _:
+            assert type(_)                          is Semantic_Text__Engine__Hash_Based
             assert _.engine_mode                    == Enum__Text__Classification__Engine_Mode.TEXT_HASH
-            assert _.semantic_text_hashes           is not None
-            assert _.semantic_text_hashes.hash_size == 10
-            assert _.obj()                          == __(engine_mode='text_hash', semantic_text_hashes=__(hash_size=10))
+            assert _.obj()                          == __(engine_mode='text_hash')
             assert base_types(_)                    == [ Semantic_Text__Engine, Type_Safe, object]
 
     def test__classify_text__basic(self):                                      # Test basic text classification
-        result = self.engine.classify_text(text                     = "Hello World",
-                                           classification_criteria= Enum__Text__Classification__Criteria.POSITIVITY)
+        result = self.engine.classify_text(text = "Hello World")
+        assert type(result) is Type_Safe__Dict
+        assert result.obj() == __(positive = 0.61575136853258       ,          # Deterministic hash
+                                  negative = 0.06092177291188416    ,
+                                  neutral  = 0.2944552357407734     ,
+                                  mixed    = 0.028871622814762493   )
 
-        assert result.text                                      == "Hello World"
-        assert result.text__hash                                == "b10a8db164"                    # Deterministic hash
-        assert result.engine_mode                               == Enum__Text__Classification__Engine_Mode.TEXT_HASH
-        assert len(result.text__classification)                 == 1
-        assert Enum__Text__Classification__Criteria.POSITIVITY  in result.text__classification
+        assert Enum__Text__Classification__Criteria.POSITIVE in result
+        assert float(result[Enum__Text__Classification__Criteria.POSITIVE]) == 0.61575136853258 # Deterministic rating
 
-        # Deterministic rating
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.7478
+        total = result['positive'] + result['negative'] + result['neutral'] + result['mixed']       # the sum of all ratings should be 1
+        assert total == 1
+        # todo: see if we don't need to also have this data
+        # assert result.text                                      == "Hello World"
+        # assert result.text__hash                                == "b10a8db164"                    # Deterministic hash
+        # assert result.engine_mode                               == Enum__Text__Classification__Engine_Mode.TEXT_HASH
+        # assert len(result.text__classification)                 == 1
+        # assert Enum__Text__Classification__Criteria.POSITIVE  in result.text__classification
+        #assert float(result.text__classification[Enum__Text__Classification__Criteria.POSITIVE]) == 0.7478
 
-    def test__classify_text__different_criteria_same_text(self):               # Test that same text gives different ratings for different criteria
-        text = "Test Text"
 
-        result_positivity = self.engine.classify_text(text                     = text,
-                                                      classification_criteria= Enum__Text__Classification__Criteria.POSITIVITY)
-        result_negativity = self.engine.classify_text(text                     = text,
-                                                      classification_criteria= Enum__Text__Classification__Criteria.NEGATIVITY)
-        result_bias       = self.engine.classify_text(text                     = text,
-                                                      classification_criteria= Enum__Text__Classification__Criteria.BIAS)
-        result_urgency    = self.engine.classify_text(text                     = text,
-                                                      classification_criteria= Enum__Text__Classification__Criteria.URGENCY)
 
-        # Same text, same hash
-        assert result_positivity.text__hash == result_negativity.text__hash == result_bias.text__hash == result_urgency.text__hash
-        assert result_positivity.text__hash == "f1feeaa3d6"
 
-        # Different ratings for different criteria
-        pos_rating     = float(result_positivity.text__classification[Enum__Text__Classification__Criteria.POSITIVITY])
-        neg_rating     = float(result_negativity.text__classification[Enum__Text__Classification__Criteria.NEGATIVITY])
-        bias_rating    = float(result_bias      .text__classification[Enum__Text__Classification__Criteria.BIAS      ])
-        urgency_rating = float(result_urgency   .text__classification[Enum__Text__Classification__Criteria.URGENCY   ])
 
-        assert pos_rating     == 0.5080
-        assert neg_rating     == 0.3946
-        assert bias_rating    == 0.9818
-        assert urgency_rating == 0.8035
-
-        # Ratings are different
-        assert pos_rating != neg_rating != bias_rating != urgency_rating
-
-    def test__hash_based_classification__deterministic(self):                  # Test that hash_based_classification is deterministic
+    def test__hash_score_for_criterion__deterministic(self):                  # Test that hash_score_for_criterion is deterministic
         text     = "Sample text"
-        criteria = Enum__Text__Classification__Criteria.POSITIVITY
+        criteria = Enum__Text__Classification__Criteria.POSITIVE
 
         # Call multiple times
-        rating1 = self.engine.hash_based_classification(text, criteria)
-        rating2 = self.engine.hash_based_classification(text, criteria)
-        rating3 = self.engine.hash_based_classification(text, criteria)
+        rating1 = self.engine.hash_score_for_criterion(text, criteria)
+        rating2 = self.engine.hash_score_for_criterion(text, criteria)
+        rating3 = self.engine.hash_score_for_criterion(text, criteria)
 
         # All should be identical
         assert float(rating1) == float(rating2) == float(rating3)
-        assert float(rating1) == 0.9569
+        assert float(rating1) == 0.1136                             # these values are not normalised
+        assert rating1        == 0.1136
 
-    def test__hash_based_classification__range(self):                          # Test that ratings are within valid range
+
+    def test__hash_score_for_criterion__range(self):                          # Test that ratings are within valid range
         test_texts = [
             "Hello World",
             "Test Text",
@@ -98,21 +82,21 @@ class test_Semantic_Text__Engine__Hash_Based__rating_reference(TestCase):
 
         for text in test_texts:
             for criteria in Enum__Text__Classification__Criteria:
-                rating = self.engine.hash_based_classification(text, criteria)
+                rating = self.engine.hash_score_for_criterion(text, criteria)
                 rating_float = float(rating)
 
                 # Must be in range [0.0, 1.0]
                 assert 0.0 <= rating_float <= 1.0, f"Rating {rating_float} out of range for text '{text}' and criteria {criteria}"
 
-    def test__hash_based_classification__distribution(self):                   # Test that ratings are well-distributed
+    def test__hash_score_for_criterion__distribution(self):                   # Test that ratings are well-distributed
         """
         Test that the hash-based classification produces well-distributed ratings
         across the 0.0-1.0 range (not clustered in one area)
         """
         test_texts = [f"Text {i}" for i in range(100)]
-        criteria = Enum__Text__Classification__Criteria.POSITIVITY
+        criteria = Enum__Text__Classification__Criteria.POSITIVE
 
-        ratings = [float(self.engine.hash_based_classification(text, criteria)) for text in test_texts]
+        ratings = [float(self.engine.hash_score_for_criterion(text, criteria)) for text in test_texts]
 
         # Check distribution across quartiles
         q1 = sum(1 for r in ratings if 0.00 <= r < 0.25)
@@ -139,32 +123,20 @@ class test_Semantic_Text__Engine__Hash_Based__rating_reference(TestCase):
         """
 
         # abc1234567 - "Hello World"
-        result = self.engine.classify_text("Hello World", Enum__Text__Classification__Criteria.POSITIVITY)
-        assert result.text__hash == "b10a8db164"
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.7478
-
-        result = self.engine.classify_text("Hello World", Enum__Text__Classification__Criteria.NEGATIVITY)
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.NEGATIVITY]) == 0.1102
-
-        result = self.engine.classify_text("Hello World", Enum__Text__Classification__Criteria.BIAS)
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.BIAS]) == 0.2316
-
-        result = self.engine.classify_text("Hello World", Enum__Text__Classification__Criteria.URGENCY)
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.URGENCY]) == 0.3141
+        result = self.engine.classify_text("Hello World")
+        assert result.obj() == __(positive = 0.61575136853258        ,
+                                  negative = 0.06092177291188416    ,
+                                  neutral  = 0.2944552357407734     ,
+                                  mixed    = 0.028871622814762493   )
 
         # def1234567 - "Test Text"
-        result = self.engine.classify_text("Test Text", Enum__Text__Classification__Criteria.POSITIVITY)
-        assert result.text__hash == "f1feeaa3d6"
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.5080
+        result = self.engine.classify_text("Test Text")
+        assert result.obj() == __(positive = 0.2842339724966105     ,
+                                  negative = 0.25290528762347475    ,
+                                  neutral  = 0.1380980050358319     ,
+                                  mixed    = 0.3247627348440829     )
 
-        result = self.engine.classify_text("Test Text", Enum__Text__Classification__Criteria.NEGATIVITY)
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.NEGATIVITY]) == 0.3946
 
-        result = self.engine.classify_text("Test Text", Enum__Text__Classification__Criteria.BIAS)
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.BIAS]) == 0.9818
-
-        result = self.engine.classify_text("Test Text", Enum__Text__Classification__Criteria.URGENCY)
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.URGENCY]) == 0.8035
 
     def test__rating_reference_guide__level_2_filter_tests(self):              # Reference guide for Level 2 filter test hashes
         """
@@ -175,51 +147,42 @@ class test_Semantic_Text__Engine__Hash_Based__rating_reference(TestCase):
 
         # 1ba249ca59 - "Sample text" (used in test__classify__multi__rate__all_criteria)
         mappings = [
-            ("1ba249ca59", "Sample text", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.9569,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.1469,
-                Enum__Text__Classification__Criteria.BIAS:       0.2887,
-                Enum__Text__Classification__Criteria.URGENCY:    0.7091
+            ("1ba249ca59", "Sample text", { Enum__Text__Classification__Criteria.POSITIVE: 0.05257312106627175,
+                                            Enum__Text__Classification__Criteria.NEGATIVE: 0.4057293594964828 ,
+                                            Enum__Text__Classification__Criteria.NEUTRAL : 0.3871714179933358 ,
+                                            Enum__Text__Classification__Criteria.MIXED   : 0.15452610144390966
             }),
 
             # b5ead10d6e - "Positive text" (used in test__classify__multi__filter__and__basic)
-            ("b5ead10d6e", "Positive text", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.4332,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.5403,
-                Enum__Text__Classification__Criteria.BIAS:       0.4314,
-                Enum__Text__Classification__Criteria.URGENCY:    0.1718
-            }),
+            ("b5ead10d6e", "Positive text", { 'mixed': 0.11676211642020685,
+                                              'negative': 0.3533635353449013,
+                                              'neutral': 0.11800153859304215,
+                                              'positive': 0.41187280964184975}),
 
             # 9204d57da8 - "Another text"
-            ("9204d57da8", "Another text", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.3018,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.7096,
-                Enum__Text__Classification__Criteria.BIAS:       0.3574,
-                Enum__Text__Classification__Criteria.URGENCY:    0.2635
-            }),
+            ("9204d57da8", "Another text", {  'mixed': 0.5798831815839203,
+                                              'negative': 0.10333276069403882,
+                                              'neutral': 0.10238790585809998,
+                                              'positive': 0.2143961518639409}
+),
 
             # 8bfa8e0684 - "Test content"
-            ("8bfa8e0684", "Test content", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.6355,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.4913,
-                Enum__Text__Classification__Criteria.BIAS:       0.3099,
-                Enum__Text__Classification__Criteria.URGENCY:    0.9644
-            }),
+            ("8bfa8e0684", "Test content", {  'mixed': 0.2142907675981606,
+                                              'negative': 0.5133356915458083,
+                                              'neutral': 0.21995047753802618,
+                                              'positive': 0.052423063318004955}),
 
             # c5dd1b2697 - "Sample" (used in test__classify__multi__filter__and__full_ratings)
-            ("c5dd1b2697", "Sample", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.0650,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.5169,
-                Enum__Text__Classification__Criteria.BIAS:       0.5304,
-                Enum__Text__Classification__Criteria.URGENCY:    0.2027
-            }),
-        ]
+            ("c5dd1b2697", "Sample"      , {  'mixed': 0.12681744749596122,
+                                              'negative': 0.21267020540041542,
+                                              'neutral': 0.39464574198015234,
+                                              'positive': 0.26586660512347104})]
 
         for expected_hash, text, expected_ratings in mappings:
-            for criteria, expected_rating in expected_ratings.items():
-                result = self.engine.classify_text(text, criteria)
-                assert result.text__hash == expected_hash
-                assert float(result.text__classification[criteria]) == expected_rating
+            result = self.engine.classify_text(text)
+            assert result == expected_ratings
+
+
 
     def test__rating_reference_guide__or_logic_tests(self):                    # Reference guide for OR logic test hashes
         """
@@ -228,59 +191,44 @@ class test_Semantic_Text__Engine__Hash_Based__rating_reference(TestCase):
 
         mappings = [
             # c3d45f8fe6 - "High positive"
-            ("c3d45f8fe6", "High positive", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.5667,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.6083,
-                Enum__Text__Classification__Criteria.BIAS:       0.0494,
-                Enum__Text__Classification__Criteria.URGENCY:    0.4699
-            }),
+            ("c3d45f8fe6", "High positive", { 'mixed': 0.14332995013459246,
+                                              'negative': 0.2795110542341468,
+                                              'neutral': 0.23216098142182603,
+                                              'positive': 0.3449980142094347}),
 
             # 58537f27d7 - "High negative"
-            ("58537f27d7", "High negative", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.5421,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.7642,
-                Enum__Text__Classification__Criteria.BIAS:       0.8904,
-                Enum__Text__Classification__Criteria.URGENCY:    0.9505
-            }),
+            ("58537f27d7", "High negative", { 'mixed': 0.22024530587522714,
+                                              'negative': 0.3426711084191399,
+                                              'neutral': 0.13056480920654148,
+                                              'positive': 0.3065187764990915}),
 
             # b0a2013306 - "Low both"
-            ("b0a2013306", "Low both", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.1844,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.3436,
-                Enum__Text__Classification__Criteria.BIAS:       0.9567,
-                Enum__Text__Classification__Criteria.URGENCY:    0.2764
-            }),
+            ("b0a2013306", "Low both", { 'mixed': 0.2795038997570643,
+                                          'negative': 0.05108042449814602,
+                                          'neutral': 0.3830072880705792,
+                                          'positive': 0.28640838767421045}),
 
             # b840f6f2ae - "Text A"
-            ("b840f6f2ae", "Text A", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.4814,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.5114,
-                Enum__Text__Classification__Criteria.BIAS:       0.2776,
-                Enum__Text__Classification__Criteria.URGENCY:    0.9335
-            }),
+            ("b840f6f2ae", "Text A", { 'mixed': 0.09479195370625516,
+                                       'negative': 0.32162211812253144,
+                                       'neutral': 0.18664462202626986,
+                                       'positive': 0.3969413061449435}),
 
             # eb5deeca9c - "Text B"
-            ("eb5deeca9c", "Text B", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.8374,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.7441,
-                Enum__Text__Classification__Criteria.BIAS:       0.1535,
-                Enum__Text__Classification__Criteria.URGENCY:    0.0720
-            }),
+            ("eb5deeca9c", "Text B", { 'mixed': 0.26795180722891565,
+                                      'negative': 0.06244406196213425,
+                                      'neutral': 0.05301204819277108,
+                                      'positive': 0.616592082616179}),
 
             # 9dffbf69ff - "Text"
-            ("9dffbf69ff", "Text", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.9776,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.5651,
-                Enum__Text__Classification__Criteria.BIAS:       0.9490,
-                Enum__Text__Classification__Criteria.URGENCY:    0.4436
-            }),
-        ]
+            ("9dffbf69ff", "Text", { 'mixed': 0.05983085203047459,
+                                      'negative': 0.22848955056965123,
+                                      'neutral': 0.11148388900538198,
+                                      'positive': 0.6001957083944922})]
 
         for expected_hash, text, expected_ratings in mappings:
-            for criteria, expected_rating in expected_ratings.items():
-                result = self.engine.classify_text(text, criteria)
-                assert result.text__hash == expected_hash
-                assert float(result.text__classification[criteria]) == expected_rating
+            result = self.engine.classify_text(text)
+            assert result == expected_ratings
 
     def test__rating_reference_guide__filter_mode_tests(self):                 # Reference guide for filter mode test hashes
         """
@@ -288,29 +236,27 @@ class test_Semantic_Text__Engine__Hash_Based__rating_reference(TestCase):
         """
 
         # aaa0000012 - "Test text" (BETWEEN mode test)
-        result = self.engine.classify_text("Test text", Enum__Text__Classification__Criteria.POSITIVITY)
-        assert result.text__hash == "aaaf7028b8"
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.5506
-        # NOTE: 0.5506 is NOT between 0.7 and 0.8, so test should adjust thresholds!
-
-        result = self.engine.classify_text("Test text", Enum__Text__Classification__Criteria.NEGATIVITY)
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.NEGATIVITY]) == 0.2981
+        result = self.engine.classify_text("Test text")
+        assert result.obj() == __( positive=0.26393868216095934,
+                                   negative=0.08311699015123418,
+                                   neutral=0.32785263938682163,
+                                   mixed=0.3250916883009849)
 
         # aaa0000013 - "Balanced text" (mixed ABOVE/BELOW modes test)
-        result = self.engine.classify_text("Balanced text", Enum__Text__Classification__Criteria.POSITIVITY)
-        assert result.text__hash == "c298542a7f"
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.7643
-        # Check: 0.7643 > 0.6 ✓
+        result = self.engine.classify_text("Balanced text")
+        assert result.obj() == __( positive=0.11932369381438536,
+                                   negative=0.43003649466438765,
+                                   neutral=0.4421397884233381,
+                                   mixed=0.008500023097888852)
 
-        result = self.engine.classify_text("Balanced text", Enum__Text__Classification__Criteria.NEGATIVITY)
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.NEGATIVITY]) == 0.7631
-        # Check: 0.7631 < 0.8 ✓
-        # Both conditions pass!
 
         # aaa0000014 - "Test"
-        result = self.engine.classify_text("Test", Enum__Text__Classification__Criteria.POSITIVITY)
-        assert result.text__hash == "0cbc6611f5"
-        assert float(result.text__classification[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.4636
+        result = self.engine.classify_text("Test")
+        assert result.obj() == __( positive=0.4257015636325981,
+                                   negative=0.10598529564046806,
+                                   neutral=0.22108315211763488,
+                                   mixed=0.24722998860929896)
+
 
     def test__rating_reference_guide__deterministic_multiple_hashes(self):     # Reference guide for deterministic multi-hash tests
         """
@@ -320,55 +266,38 @@ class test_Semantic_Text__Engine__Hash_Based__rating_reference(TestCase):
         """
 
         mappings = [
-            ("20c8b16b2a", "Text 0", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.7645,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.7672,
-                Enum__Text__Classification__Criteria.BIAS:       0.4079,
-                Enum__Text__Classification__Criteria.URGENCY:    0.0894
-            }),
+            ("20c8b16b2a", "Text 0", { 'mixed': 0.20708697653014266,
+  'negative': 0.09700874367234238,
+  'neutral': 0.14974689369535205,
+  'positive': 0.5461573861021629}),
 
-            ("161a6b3572", "Text 1", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.7402,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.0745,
-                Enum__Text__Classification__Criteria.BIAS:       0.4710,
-                Enum__Text__Classification__Criteria.URGENCY:    0.4165
-            }),
+            ("161a6b3572", "Text 1",{ 'mixed': 0.29291380222104707,
+  'negative': 0.23966155473294554,
+  'neutral': 0.39481755684822845,
+  'positive': 0.07260708619777895}),
 
-            ("48e47cee20", "Text 2", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.4943,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.9681,
-                Enum__Text__Classification__Criteria.BIAS:       0.0333,
-                Enum__Text__Classification__Criteria.URGENCY:    0.9308
-            }),
+            ("48e47cee20", "Text 2", { 'mixed': 0.38793757450959143,
+  'negative': 0.2363715183700011,
+  'neutral': 0.3004768613850656,
+  'positive': 0.07521404573534193}),
 
-            ("0d96bbc2ec", "Text 3", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.3426,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.2576,
-                Enum__Text__Classification__Criteria.BIAS:       0.8054,
-                Enum__Text__Classification__Criteria.URGENCY:    0.1874
-            }),
+            ("0d96bbc2ec", "Text 3", { 'mixed': 0.30304736434654095,
+  'negative': 0.17302413962981208,
+  'neutral': 0.32292912942501234,
+  'positive': 0.20099936659863465}
+),
 
-            ("c133c1f81c", "Text 4", {
-                Enum__Text__Classification__Criteria.POSITIVITY: 0.6403,
-                Enum__Text__Classification__Criteria.NEGATIVITY: 0.9734,
-                Enum__Text__Classification__Criteria.BIAS:       0.9142,
-                Enum__Text__Classification__Criteria.URGENCY:    0.1743
-            }),
+            ("c133c1f81c", "Text 4", { 'mixed': 0.23492981007431873,
+  'negative': 0.2594549958711808,
+  'neutral': 0.13835672997522708,
+  'positive': 0.3672584640792733}
+),
         ]
 
         for expected_hash, text, expected_ratings in mappings:
-            for criteria, expected_rating in expected_ratings.items():
-                result = self.engine.classify_text(text, criteria)
-                assert result.text__hash == expected_hash
-                assert float(result.text__classification[criteria]) == expected_rating
+            result = self.engine.classify_text(text)
 
-        # FILTER ANALYSIS for: positivity > 0.6 AND negativity > 0.6
-        # a000000000: pos=0.7645 > 0.6 ✓, neg=0.7672 > 0.6 ✓ → MATCH
-        # a000000001: pos=0.7402 > 0.6 ✓, neg=0.0745 > 0.6 ✗ → NO MATCH
-        # a000000002: pos=0.4943 > 0.6 ✗, neg=0.9681 > 0.6 ✓ → NO MATCH
-        # a000000003: pos=0.3426 > 0.6 ✗, neg=0.2576 > 0.6 ✗ → NO MATCH
-        # a000000004: pos=0.6403 > 0.6 ✓, neg=0.9734 > 0.6 ✓ → MATCH
-        # Expected matches: a000000000, a000000004 (count: 2)
+            assert result == expected_ratings
 
     def test__rating_reference_guide__summary_table(self):                     # Summary table of all ratings for quick reference
         """
@@ -378,39 +307,37 @@ class test_Semantic_Text__Engine__Hash_Based__rating_reference(TestCase):
         used throughout the test suite. Use this for quick lookups.
         """
 
-        all_mappings = [("b10a8db164", "Hello World"  , 0.7478, 0.1102, 0.2316, 0.3141),
-                        ("f1feeaa3d6", "Test Text"    , 0.5080, 0.3946, 0.9818, 0.8035),
-                        ("1ba249ca59", "Sample text"  , 0.9569, 0.1469, 0.2887, 0.7091),
-                        ("b5ead10d6e", "Positive text", 0.4332, 0.5403, 0.4314, 0.1718),
-                        ("9204d57da8", "Another text" , 0.3018, 0.7096, 0.3574, 0.2635),
-                        ("8bfa8e0684", "Test content" , 0.6355, 0.4913, 0.3099, 0.9644),
-                        ("c5dd1b2697", "Sample"       , 0.0650, 0.5169, 0.5304, 0.2027),
-                        ("c3d45f8fe6", "High positive", 0.5667, 0.6083, 0.0494, 0.4699),
-                        ("58537f27d7", "High negative", 0.5421, 0.7642, 0.8904, 0.9505),
-                        ("b0a2013306", "Low both"     , 0.1844, 0.3436, 0.9567, 0.2764),
-                        ("b840f6f2ae", "Text A"       , 0.4814, 0.5114, 0.2776, 0.9335),
-                        ("eb5deeca9c", "Text B"       , 0.8374, 0.7441, 0.1535, 0.0720),
-                        ("9dffbf69ff", "Text"         , 0.9776, 0.5651, 0.9490, 0.4436),
-                        ("aaaf7028b8", "Test text"    , 0.5506, 0.2981, 0.5889, 0.8154),
-                        ("c298542a7f", "Balanced text", 0.7643, 0.7631, 0.6116, 0.6351),
-                        ("0cbc6611f5", "Test"         , 0.4636, 0.2575, 0.8048, 0.7786),
-                        ("20c8b16b2a", "Text 0"       , 0.7645, 0.7672, 0.4079, 0.0894),
-                        ("161a6b3572", "Text 1"       , 0.7402, 0.0745, 0.4710, 0.4165),
-                        ("48e47cee20", "Text 2"       , 0.4943, 0.9681, 0.0333, 0.9308),
-                        ("0d96bbc2ec", "Text 3"       , 0.3426, 0.2576, 0.8054, 0.1874),
-                        ("c133c1f81c", "Text 4"       , 0.6403, 0.9734, 0.9142, 0.1743)]
+        all_mappings = [("b10a8db164", "Hello World"  , 0.61575136853258     , 0.06092177291188416 , 0.2944552357407734  , 0.028871622814762493 ),
+                        ("f1feeaa3d6", "Test Text"    , 0.2842339724966105   , 0.25290528762347475 , 0.1380980050358319  , 0.3247627348440829   ),
+                        ("1ba249ca59", "Sample text"  , 0.05257312106627175  , 0.4057293594964828  , 0.3871714179933358  , 0.15452610144390966  ),
+                        ("b5ead10d6e", "Positive text", 0.41187280964184975  , 0.3533635353449013  , 0.11800153859304215 , 0.11676211642020685  ),
+                        ("9204d57da8", "Another text" , 0.2143961518639409   , 0.10333276069403882 , 0.10238790585809998 , 0.5798831815839203   ),
+                        ("8bfa8e0684", "Test content" , 0.052423063318004955 , 0.5133356915458083  , 0.21995047753802618 , 0.2142907675981606   ),
+                        ("c5dd1b2697", "Sample"       , 0.26586660512347104  , 0.21267020540041542 , 0.39464574198015234 , 0.12681744749596122  ),
+                        ("c3d45f8fe6", "High positive", 0.3449980142094347   , 0.2795110542341468  , 0.23216098142182603 , 0.14332995013459246  ),
+                        ("58537f27d7", "High negative", 0.3065187764990915   , 0.3426711084191399  , 0.13056480920654148 , 0.22024530587522714  ),
+                        ("b0a2013306", "Low both"     , 0.28640838767421045  , 0.05108042449814602 , 0.3830072880705792  , 0.2795038997570643   ),
+                        ("b840f6f2ae", "Text A"       , 0.3969413061449435   , 0.32162211812253144 , 0.18664462202626986 , 0.09479195370625516  ),
+                        ("eb5deeca9c", "Text B"       , 0.616592082616179    , 0.06244406196213425 , 0.05301204819277108 , 0.26795180722891565  ),
+                        ("9dffbf69ff", "Text"         , 0.6001957083944922   , 0.22848955056965123 , 0.11148388900538198 , 0.05983085203047459  ),
+                        ("aaaf7028b8", "Test text"    , 0.26393868216095934  , 0.08311699015123418 , 0.32785263938682163 , 0.3250916883009849   ),
+                        ("c298542a7f", "Balanced text", 0.11932369381438536  , 0.43003649466438765 , 0.4421397884233381  , 0.008500023097888852 ),
+                        ("0cbc6611f5", "Test"         , 0.4257015636325981   , 0.10598529564046806 , 0.22108315211763488 , 0.24722998860929896  ),
+                        ("20c8b16b2a", "Text 0"       , 0.5461573861021629   , 0.09700874367234238 , 0.14974689369535205 , 0.20708697653014266  ),
+                        ("161a6b3572", "Text 1"       , 0.07260708619777895  , 0.23966155473294554 , 0.39481755684822845 , 0.29291380222104707  ),
+                        ("48e47cee20", "Text 2"       , 0.07521404573534193  , 0.2363715183700011  , 0.3004768613850656  , 0.38793757450959143  ),
+                        ("0d96bbc2ec", "Text 3"       , 0.20099936659863465  , 0.17302413962981208 , 0.32292912942501234 , 0.30304736434654095  ),
+                        ("c133c1f81c", "Text 4"       , 0.3672584640792733   , 0.2594549958711808  , 0.13835672997522708 , 0.23492981007431873  ),
+                    ]
+
 
 
 
         # Verify all mappings
         for hash_id, text, pos, neg, bias, urg in all_mappings:
-            result_pos  = self.engine.classify_text(text, Enum__Text__Classification__Criteria.POSITIVITY)
-            result_neg  = self.engine.classify_text(text, Enum__Text__Classification__Criteria.NEGATIVITY)
-            result_bias = self.engine.classify_text(text, Enum__Text__Classification__Criteria.BIAS      )
-            result_urg  = self.engine.classify_text(text, Enum__Text__Classification__Criteria.URGENCY   )
+            result      = self.engine.classify_text(text)
 
-            assert result_pos.text__hash == hash_id
-            assert float(result_pos  .text__classification[Enum__Text__Classification__Criteria.POSITIVITY]) == pos
-            assert float(result_neg  .text__classification[Enum__Text__Classification__Criteria.NEGATIVITY]) == neg
-            assert float(result_bias .text__classification[Enum__Text__Classification__Criteria.BIAS      ]) == bias
-            assert float(result_urg  .text__classification[Enum__Text__Classification__Criteria.URGENCY   ]) == urg
+            assert result[Enum__Text__Classification__Criteria.POSITIVE] == pos
+            assert result[Enum__Text__Classification__Criteria.NEGATIVE] == neg
+            assert result[Enum__Text__Classification__Criteria.NEUTRAL ] == bias
+            assert result[Enum__Text__Classification__Criteria.MIXED   ] == urg

@@ -44,8 +44,8 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         request = Schema__Classification__Multi_Criteria_Request(
             hash_mapping            = hash_mapping                                     ,
-            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                       Enum__Text__Classification__Criteria.NEGATIVITY,     # values can be provided using the enum value
+            classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
+                                       Enum__Text__Classification__Criteria.NEGATIVE,     # values can be provided using the enum value
                                        'bias'                                         ])    # or as a string :)
 
         response = self.routes.multi__rate(request)
@@ -53,9 +53,9 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
         assert response.success                 is True
         assert response.total_hashes            == 2
         assert len(response.hash_ratings)       == 2
-        assert response.classification_criteria == [Enum__Text__Classification__Criteria.POSITIVITY,
-                                                    Enum__Text__Classification__Criteria.NEGATIVITY,
-                                                    Enum__Text__Classification__Criteria.BIAS      ]
+        assert response.classification_criteria == [Enum__Text__Classification__Criteria.POSITIVE,
+                                                    Enum__Text__Classification__Criteria.NEGATIVE,
+                                                    Enum__Text__Classification__Criteria.NEUTRAL      ]
 
         # Deterministic values from hash-based engine (from reference guide)
         assert response.obj()                   == __(hash_ratings = __(b10a8db164 = __(positivity = 0.7478,
@@ -79,7 +79,7 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
     def test__classify__multi__rate__empty(self):                              # Test with empty mapping
         request = Schema__Classification__Multi_Criteria_Request(hash_mapping            = {}                                                                    ,
-                                                                 classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY])
+                                                                 classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE])
 
         response = self.routes.multi__rate(request)
 
@@ -90,7 +90,7 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
     def test__classify__multi__rate__single_criterion(self):                   # Test with single criterion
         hash_mapping = { Safe_Str__Hash("0cbc6611f5"): "Test"}                 # Using actual hash: Test → 0cbc6611f5
         request      = Schema__Classification__Multi_Criteria_Request(hash_mapping            = hash_mapping                                 ,
-                                                                      classification_criteria = [Enum__Text__Classification__Criteria.URGENCY])
+                                                                      classification_criteria = [Enum__Text__Classification__Criteria.MIXED])
         response     = self.routes.multi__rate(request)
 
         assert response.total_hashes      == 1
@@ -110,10 +110,10 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
         hash_mapping = {Safe_Str__Hash("1ba249ca59"): "Sample text"}           # Using actual hash: Sample text → 1ba249ca59
 
         request = Schema__Classification__Multi_Criteria_Request(hash_mapping            = hash_mapping                                                          ,
-                                                                 classification_criteria = [Enum__Text__Classification__Criteria.POSITIVITY,
+                                                                 classification_criteria = [Enum__Text__Classification__Criteria.POSITIVE,
                                                                                             'negativity'                                   ,
                                                                                             'bias'                                         ,
-                                                                                            Enum__Text__Classification__Criteria.URGENCY   ])
+                                                                                            Enum__Text__Classification__Criteria.MIXED   ])
 
         response = self.routes.multi__rate(request)
 
@@ -123,10 +123,10 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         # All ratings should be present
         ratings = response.hash_ratings[Safe_Str__Hash("1ba249ca59")]
-        assert Enum__Text__Classification__Criteria.POSITIVITY in ratings
-        assert Enum__Text__Classification__Criteria.NEGATIVITY in ratings
-        assert Enum__Text__Classification__Criteria.BIAS       in ratings
-        assert Enum__Text__Classification__Criteria.URGENCY    in ratings
+        assert Enum__Text__Classification__Criteria.POSITIVE in ratings
+        assert Enum__Text__Classification__Criteria.NEGATIVE in ratings
+        assert Enum__Text__Classification__Criteria.NEUTRAL       in ratings
+        assert Enum__Text__Classification__Criteria.MIXED    in ratings
 
         # From reference guide: Sample text → pos:0.9569, neg:0.1469, bias:0.2887, urg:0.7091
         assert ratings.obj()  == __(positivity = 0.9569 ,
@@ -153,12 +153,12 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.6)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.NEGATIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.NEGATIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.BELOW          ,
                 threshold   = Safe_Float(0.6)
             )
@@ -195,12 +195,12 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.5)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.NEGATIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.NEGATIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.5)
             )
@@ -235,12 +235,12 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.5)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.BIAS        ,
+                criterion   = Enum__Text__Classification__Criteria.NEUTRAL        ,
                 filter_mode = Enum__Classification__Filter_Mode.BELOW          ,
                 threshold   = Safe_Float(0.5)
             )
@@ -289,7 +289,7 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.5)
             )
@@ -332,10 +332,10 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
                         Safe_Str__Hash("b0a2013306"): "Low both"     }
 
         criterion_filters = [
-            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.POSITIVITY  ,
+            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.POSITIVE  ,
                                                      filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                                                      threshold   = Safe_Float(0.7)),
-            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.NEGATIVITY  ,
+            Schema__Classification__Criterion_Filter(criterion   = Enum__Text__Classification__Criteria.NEGATIVE  ,
                                                      filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                                                      threshold   = Safe_Float(0.7))]
 
@@ -375,12 +375,12 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.4)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.NEGATIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.NEGATIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.4)
             )
@@ -418,12 +418,12 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.BELOW          ,  # Changed to BELOW for no match
                 threshold   = Safe_Float(0.5)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.NEGATIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.NEGATIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.BELOW          ,  # Changed to BELOW for no match
                 threshold   = Safe_Float(0.5)
             )
@@ -453,7 +453,7 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion     = Enum__Text__Classification__Criteria.POSITIVITY,
+                criterion     = Enum__Text__Classification__Criteria.POSITIVE,
                 filter_mode   = Enum__Classification__Filter_Mode.BETWEEN      ,
                 threshold     = Safe_Float(0.5)                                 ,
                 threshold_max = Safe_Float(0.6)
@@ -490,12 +490,12 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.6)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.NEGATIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.NEGATIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.BELOW          ,
                 threshold   = Safe_Float(0.8)
             )
@@ -532,7 +532,7 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
         request = Schema__Classification__Multi_Criteria_Filter_Request(
             hash_mapping      = {}                                              ,
             criterion_filters = [Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.5)
             )]                                                                  ,
@@ -553,7 +553,7 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.5)
             )
@@ -593,12 +593,12 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.6)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.NEGATIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.NEGATIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.6)
             )
@@ -634,17 +634,17 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         criterion_filters = [
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.POSITIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.POSITIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.6)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.NEGATIVITY  ,
+                criterion   = Enum__Text__Classification__Criteria.NEGATIVE  ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.6)
             ),
             Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.BIAS        ,
+                criterion   = Enum__Text__Classification__Criteria.NEUTRAL        ,
                 filter_mode = Enum__Classification__Filter_Mode.ABOVE          ,
                 threshold   = Safe_Float(0.6)
             )
@@ -702,7 +702,7 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
         assert repr(An_Class(an_dict={An_Enum.A: 42}).json()) == "{'an_dict': {'A': 42}}"
 
     def test__regression__edge_case_on_dict_enum__part_2(self):                # Test enum key conversion in nested dicts
-        hash_rating = { Enum__Text__Classification__Criteria.POSITIVITY : 0.0 }
+        hash_rating = { Enum__Text__Classification__Criteria.POSITIVE : 0.0 }
         hash_ratings = {Safe_Str__Hash('b10a8db164'): hash_rating}
         response = Schema__Classification__Multi_Criteria_Response(hash_ratings=hash_ratings)
 
@@ -716,8 +716,8 @@ class test_Routes__Semantic_Classification__level_2(TestCase):
 
         assert json.dumps(response.hash_ratings) == '{"b10a8db164": {"positivity": 0.0}}'
         assert str(response.hash_ratings)        == ("{Safe_Str__Hash('b10a8db164'): "
-                                                     "{<Enum__Text__Classification__Criteria.POSITIVITY: 'positivity'>: "
+                                                     "{<Enum__Text__Classification__Criteria.POSITIVE: 'positivity'>: "
                                                      'Safe_Float__Text__Classification(0.0)}}')
         assert repr(response.hash_ratings)      == ("{Safe_Str__Hash('b10a8db164'): "
-                                                     "{<Enum__Text__Classification__Criteria.POSITIVITY: 'positivity'>: "
+                                                     "{<Enum__Text__Classification__Criteria.POSITIVE: 'positivity'>: "
                                                      'Safe_Float__Text__Classification(0.0)}}')

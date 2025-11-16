@@ -31,7 +31,7 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
             filtered_hashes       = filtered_hashes,
             filtered_with_text    = None,
             filtered_with_ratings = None,
-            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVITY],
+            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVE],
             logic_operator        = Enum__Classification__Logic_Operator.AND,
             output_mode           = Enum__Classification__Output_Mode.HASHES_ONLY,
             total_hashes          = Safe_UInt(1),
@@ -54,7 +54,7 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
             filtered_hashes       = filtered_hashes,
             filtered_with_text    = filtered_with_text,
             filtered_with_ratings = None,
-            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVITY],
+            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVE],
             logic_operator        = Enum__Classification__Logic_Operator.AND,
             output_mode           = Enum__Classification__Output_Mode.HASHES_WITH_TEXT,
             total_hashes          = Safe_UInt(1),
@@ -73,8 +73,8 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
         filtered_with_text = {Safe_Str__Hash("b10a8db164"): "Hello World"}
         filtered_with_ratings = {
             Safe_Str__Hash("b10a8db164"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.7478),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.1102)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.7478),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.1102)
             }
         }
 
@@ -82,8 +82,8 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
             filtered_hashes       = filtered_hashes,
             filtered_with_text    = filtered_with_text,
             filtered_with_ratings = filtered_with_ratings,
-            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                     Enum__Text__Classification__Criteria.NEGATIVITY],
+            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVE,
+                                     Enum__Text__Classification__Criteria.NEGATIVE],
             logic_operator        = Enum__Classification__Logic_Operator.AND,
             output_mode           = Enum__Classification__Output_Mode.FULL_RATINGS,
             total_hashes          = Safe_UInt(1),
@@ -96,8 +96,8 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
             assert _.output_mode == Enum__Classification__Output_Mode.FULL_RATINGS
 
             ratings = _.filtered_with_ratings[Safe_Str__Hash("b10a8db164")]
-            assert float(ratings[Enum__Text__Classification__Criteria.POSITIVITY]) == 0.7478
-            assert float(ratings[Enum__Text__Classification__Criteria.NEGATIVITY]) == 0.1102
+            assert float(ratings[Enum__Text__Classification__Criteria.POSITIVE]) == 0.7478
+            assert float(ratings[Enum__Text__Classification__Criteria.NEGATIVE]) == 0.1102
 
     def test__with_or_logic(self):                                             # Test OR logic operator
         filtered_hashes = [Safe_Str__Hash("b10a8db164"), Safe_Str__Hash("f1feeaa3d6")]
@@ -106,8 +106,8 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
             filtered_hashes       = filtered_hashes,
             filtered_with_text    = None,
             filtered_with_ratings = None,
-            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                     Enum__Text__Classification__Criteria.URGENCY],
+            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVE,
+                                     Enum__Text__Classification__Criteria.MIXED],
             logic_operator        = Enum__Classification__Logic_Operator.OR,
             output_mode           = Enum__Classification__Output_Mode.HASHES_ONLY,
             total_hashes          = Safe_UInt(3),
@@ -126,9 +126,9 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
             filtered_hashes       = filtered_hashes,
             filtered_with_text    = None,
             filtered_with_ratings = None,
-            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                     Enum__Text__Classification__Criteria.NEGATIVITY,
-                                     Enum__Text__Classification__Criteria.BIAS],
+            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVE,
+                                     Enum__Text__Classification__Criteria.NEGATIVE,
+                                     Enum__Text__Classification__Criteria.NEUTRAL],
             logic_operator        = Enum__Classification__Logic_Operator.AND,
             output_mode           = Enum__Classification__Output_Mode.HASHES_ONLY,
             total_hashes          = Safe_UInt(1),
@@ -136,16 +136,16 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
             success               = True
         ) as _:
             assert len(_.criteria_used) == 3
-            assert Enum__Text__Classification__Criteria.POSITIVITY in _.criteria_used
-            assert Enum__Text__Classification__Criteria.NEGATIVITY in _.criteria_used
-            assert Enum__Text__Classification__Criteria.BIAS in _.criteria_used
+            assert Enum__Text__Classification__Criteria.POSITIVE in _.criteria_used
+            assert Enum__Text__Classification__Criteria.NEGATIVE in _.criteria_used
+            assert Enum__Text__Classification__Criteria.NEUTRAL in _.criteria_used
 
     def test__no_matches(self):                                                # Test with no filtered results
         with Schema__Classification__Multi_Criteria_Filter_Response(
             filtered_hashes       = [],
             filtered_with_text    = None,
             filtered_with_ratings = None,
-            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVITY],
+            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVE],
             logic_operator        = Enum__Classification__Logic_Operator.AND,
             output_mode           = Enum__Classification__Output_Mode.HASHES_ONLY,
             total_hashes          = Safe_UInt(5),
@@ -174,7 +174,7 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
             filtered_hashes       = filtered_hashes,
             filtered_with_text    = filtered_with_text,
             filtered_with_ratings = None,
-            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVITY],
+            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVE],
             logic_operator        = Enum__Classification__Logic_Operator.AND,
             output_mode           = Enum__Classification__Output_Mode.HASHES_WITH_TEXT,
             total_hashes          = Safe_UInt(10),
@@ -193,7 +193,7 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
             filtered_hashes       = filtered_hashes,
             filtered_with_text    = None,
             filtered_with_ratings = None,
-            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVITY],
+            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVE],
             logic_operator        = Enum__Classification__Logic_Operator.AND,
             output_mode           = Enum__Classification__Output_Mode.HASHES_ONLY,
             total_hashes          = Safe_UInt(1),
@@ -219,8 +219,8 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
             filtered_hashes       = filtered_hashes,
             filtered_with_text    = filtered_with_text,
             filtered_with_ratings = None,
-            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                     Enum__Text__Classification__Criteria.NEGATIVITY],
+            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVE,
+                                     Enum__Text__Classification__Criteria.NEGATIVE],
             logic_operator        = Enum__Classification__Logic_Operator.OR,
             output_mode           = Enum__Classification__Output_Mode.HASHES_WITH_TEXT,
             total_hashes          = Safe_UInt(2),
@@ -259,10 +259,10 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
         filtered_hashes = [Safe_Str__Hash("1ba249ca59")]
         filtered_with_ratings = {
             Safe_Str__Hash("1ba249ca59"): {
-                Enum__Text__Classification__Criteria.POSITIVITY: Safe_Float__Text__Classification(0.9569),
-                Enum__Text__Classification__Criteria.NEGATIVITY: Safe_Float__Text__Classification(0.1469),
-                Enum__Text__Classification__Criteria.BIAS:       Safe_Float__Text__Classification(0.2887),
-                Enum__Text__Classification__Criteria.URGENCY:    Safe_Float__Text__Classification(0.7091)
+                Enum__Text__Classification__Criteria.POSITIVE: Safe_Float__Text__Classification(0.9569),
+                Enum__Text__Classification__Criteria.NEGATIVE: Safe_Float__Text__Classification(0.1469),
+                Enum__Text__Classification__Criteria.NEUTRAL:       Safe_Float__Text__Classification(0.2887),
+                Enum__Text__Classification__Criteria.MIXED:    Safe_Float__Text__Classification(0.7091)
             }
         }
 
@@ -270,10 +270,10 @@ class test_Schema__Classification__Multi_Criteria_Filter_Response(TestCase):
             filtered_hashes       = filtered_hashes,
             filtered_with_text    = {Safe_Str__Hash("1ba249ca59"): "Sample text"},
             filtered_with_ratings = filtered_with_ratings,
-            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVITY,
-                                     Enum__Text__Classification__Criteria.NEGATIVITY,
-                                     Enum__Text__Classification__Criteria.BIAS,
-                                     Enum__Text__Classification__Criteria.URGENCY],
+            criteria_used         = [Enum__Text__Classification__Criteria.POSITIVE,
+                                     Enum__Text__Classification__Criteria.NEGATIVE,
+                                     Enum__Text__Classification__Criteria.NEUTRAL,
+                                     Enum__Text__Classification__Criteria.MIXED],
             logic_operator        = Enum__Classification__Logic_Operator.AND,
             output_mode           = Enum__Classification__Output_Mode.FULL_RATINGS,
             total_hashes          = Safe_UInt(1),

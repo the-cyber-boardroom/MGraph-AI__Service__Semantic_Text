@@ -18,30 +18,30 @@ class test_Schema__Classification__Criterion_Filter(TestCase):
 
     def test__with_basic_filter(self):                                         # Test with basic ABOVE filter
         with Schema__Classification__Criterion_Filter(
-            criterion   = Enum__Text__Classification__Criteria.POSITIVITY      ,
+            criterion   = Enum__Text__Classification__Criteria.POSITIVE      ,
             filter_mode = Enum__Classification__Filter_Mode.ABOVE              ,
             threshold   = Safe_Float(0.7)
         ) as _:
-            assert _.criterion     == Enum__Text__Classification__Criteria.POSITIVITY
+            assert _.criterion     == Enum__Text__Classification__Criteria.POSITIVE
             assert _.filter_mode   == Enum__Classification__Filter_Mode.ABOVE
             assert _.threshold     == 0.7
             assert _.threshold_max is None
 
     def test__with_between_filter(self):                                       # Test with BETWEEN filter using threshold_max
         with Schema__Classification__Criterion_Filter(
-            criterion     = Enum__Text__Classification__Criteria.NEGATIVITY    ,
+            criterion     = Enum__Text__Classification__Criteria.NEGATIVE    ,
             filter_mode   = Enum__Classification__Filter_Mode.BETWEEN          ,
             threshold     = Safe_Float(0.3)                                     ,
             threshold_max = Safe_Float(0.7)
         ) as _:
-            assert _.criterion     == Enum__Text__Classification__Criteria.NEGATIVITY
+            assert _.criterion     == Enum__Text__Classification__Criteria.NEGATIVE
             assert _.filter_mode   == Enum__Classification__Filter_Mode.BETWEEN
             assert _.threshold     == 0.3
             assert _.threshold_max == 0.7
 
     def test__obj(self):                                                       # Test .obj() serialization
         filter_obj = Schema__Classification__Criterion_Filter(
-            criterion   = Enum__Text__Classification__Criteria.BIAS            ,
+            criterion   = Enum__Text__Classification__Criteria.NEUTRAL            ,
             filter_mode = Enum__Classification__Filter_Mode.BELOW              ,
             threshold   = Safe_Float(0.5)
         )
@@ -54,7 +54,7 @@ class test_Schema__Classification__Criterion_Filter(TestCase):
     def test__all_filter_modes(self):                                          # Test all filter mode options
         for filter_mode in Enum__Classification__Filter_Mode:
             criterion_filter = Schema__Classification__Criterion_Filter(
-                criterion   = Enum__Text__Classification__Criteria.URGENCY     ,
+                criterion   = Enum__Text__Classification__Criteria.MIXED     ,
                 filter_mode = filter_mode                                       ,
                 threshold   = Safe_Float(0.5)
             )

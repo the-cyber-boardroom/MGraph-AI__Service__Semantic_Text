@@ -11,7 +11,7 @@ from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classificati
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Multi_Criteria_Response         import Schema__Classification__Multi_Criteria_Response
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Multi_Criteria_Filter_Request   import Schema__Classification__Multi_Criteria_Filter_Request
 from mgraph_ai_service_semantic_text.schemas.classification.Schema__Classification__Multi_Criteria_Filter_Response  import Schema__Classification__Multi_Criteria_Filter_Response
-from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine__Factory import Semantic_Text__Engine__Factory
+from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine__Factory                   import Semantic_Text__Engine__Factory
 
 TAG__ROUTES_SEMANTIC_CLASSIFICATION = 'semantic-classification'
 ROUTES_PATHS__SEMANTIC_CLASSIFICATION = [    f'/{TAG__ROUTES_SEMANTIC_CLASSIFICATION}' + '/{engine_mode}/rate'          ,
