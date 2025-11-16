@@ -1,4 +1,5 @@
 from typing                                                                                         import Dict
+from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict                               import Type_Safe__Dict
 from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                      import type_safe
 from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Text                        import Safe_Str__Text
 from osbot_utils.utils.Misc                                                                         import random_number
@@ -31,7 +32,8 @@ class Semantic_Text__Engine__Random(Semantic_Text__Engine):                     
                          Enum__Text__Classification__Criteria.NEUTRAL  ,
                          Enum__Text__Classification__Criteria.MIXED    ]
 
-        scores = {}
+        scores = Type_Safe__Dict(expected_key_type   = Enum__Text__Classification__Criteria,
+                                 expected_value_type = Safe_Float__Text__Classification)
         for i, criterion in enumerate(criteria_list):
             normalized_value = raw_scores[i] / total
             scores[criterion] = Safe_Float__Text__Classification(normalized_value)

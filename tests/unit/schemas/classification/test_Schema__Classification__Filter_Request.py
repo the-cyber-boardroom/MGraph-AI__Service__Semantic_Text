@@ -55,7 +55,7 @@ class test_Schema__Classification__Filter_Request(TestCase):
                                                               threshold               = Safe_Float(0.5)                                )
 
         assert request.obj() == __(hash_mapping            = __(abc1234567='test')                ,
-                                   classification_criteria = 'positivity'                         ,
+                                   classification_criteria = 'positive'                         ,
                                    filter_mode             = 'above'                              ,
                                    threshold               = 0.5                                  ,
                                    threshold_max           = None                                 ,

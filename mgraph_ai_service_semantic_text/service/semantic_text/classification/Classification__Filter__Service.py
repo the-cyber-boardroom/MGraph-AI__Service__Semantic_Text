@@ -1,6 +1,5 @@
 from typing                                                                                                         import Dict, List
-
-from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text import Safe_Str__Comprehend__Text
+from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text                                       import Safe_Str__Comprehend__Text
 from osbot_utils.type_safe.Type_Safe                                                                                import Type_Safe
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                                                import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                                  import Safe_Str__Hash
@@ -294,8 +293,10 @@ class Classification__Filter__Service(Type_Safe):
     @type_safe
     def _build_multi_criteria_filter_response(self,                            # Build multi-criteria filter response based on output mode
                                               filtered_hashes  : List[Safe_Str__Hash]                                                          ,
-                                              hash_mapping     : Dict[Safe_Str__Hash, str]                                                     ,
-                                              hash_ratings     : Dict[Safe_Str__Hash, Dict[Enum__Text__Classification__Criteria, Safe_Float__Text__Classification]],
+                                              hash_mapping     : Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text]                                                  ,
+                                              hash_ratings     : Dict[Safe_Str__Hash,
+                                                                      Dict          [Enum__Text__Classification__Criteria,
+                                                                                     Safe_Float__Text__Classification    ]],
                                               criteria_used    : List[Enum__Text__Classification__Criteria]                                    ,
                                               logic_operator   : Enum__Classification__Logic_Operator                                          ,
                                               output_mode      : Enum__Classification__Output_Mode                                             ,

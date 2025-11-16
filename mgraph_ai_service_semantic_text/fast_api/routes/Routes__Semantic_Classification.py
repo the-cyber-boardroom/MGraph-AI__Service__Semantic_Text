@@ -1,4 +1,5 @@
 from fastapi                                                                                                        import HTTPException
+from osbot_fast_api.api.decorators.route_path                                                                       import route_path
 from osbot_fast_api.api.routes.Fast_API__Routes                                                                     import Fast_API__Routes
 from osbot_fast_api.api.schemas.safe_str.Safe_Str__Fast_API__Route__Tag                                             import Safe_Str__Fast_API__Route__Tag
 from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Engine_Mode                          import Enum__Text__Classification__Engine_Mode
@@ -24,6 +25,7 @@ class Routes__Semantic_Classification(Fast_API__Routes):
     classification_service : Classification__Filter__Service
     engine_factory         : Semantic_Text__Engine__Factory
 
+    @route_path("/{engine_mode}/rate")
     def engine_mode__rate(self,
                           engine_mode: Enum__Text__Classification__Engine_Mode,                 # Path param
                           request: Schema__Classification__Request
@@ -36,6 +38,7 @@ class Routes__Semantic_Classification(Fast_API__Routes):
 
         return response
 
+    @route_path("/{engine_mode}/filter")
     def engine_mode__filter(self,
                             engine_mode: Enum__Text__Classification__Engine_Mode,              # Path param
                             request    : Schema__Classification__Filter_Request
@@ -52,7 +55,7 @@ class Routes__Semantic_Classification(Fast_API__Routes):
     # ========================================
     # Level 2: Multiple Criteria
     # ========================================
-
+    @route_path("/{engine_mode}/multi/rate")
     def engine_mode__multi__rate(self,                                                               # Rate all hashes by multiple criteria
                                  engine_mode: Enum__Text__Classification__Engine_Mode,               # Engine to use
                                  request: Schema__Classification__Multi_Criteria_Request
@@ -65,7 +68,7 @@ class Routes__Semantic_Classification(Fast_API__Routes):
 
         return response
 
-
+    @route_path("/{engine_mode}/multi/filter")
     def engine_mode__multi__filter(self,                                                             # Filter hashes by multiple criteria with AND/OR logic
                                    engine_mode: Enum__Text__Classification__Engine_Mode         ,    # Engine to use
                                    request: Schema__Classification__Multi_Criteria_Filter_Request

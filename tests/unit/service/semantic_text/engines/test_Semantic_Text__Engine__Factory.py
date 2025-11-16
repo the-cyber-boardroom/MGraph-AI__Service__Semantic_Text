@@ -168,7 +168,7 @@ class test_Semantic_Text__Engine__Factory(TestCase):
 
         error_message = str(context.exception)
         assert "Missing required environment variables" in error_message
-        assert "AWS_COMPREHEND" in error_message
+        assert "AWS Comprehend" in error_message
 
         self._setup_aws_comprehend_env_vars()                                  # Restore env vars for other tests
 

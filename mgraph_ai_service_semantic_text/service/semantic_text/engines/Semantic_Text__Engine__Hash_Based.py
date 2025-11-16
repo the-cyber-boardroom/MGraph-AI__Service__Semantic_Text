@@ -1,7 +1,6 @@
 from hashlib                                                                                        import md5
 from typing                                                                                         import Dict
-
-from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict import Type_Safe__Dict
+from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict                               import Type_Safe__Dict
 from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                      import type_safe
 from osbot_utils.type_safe.primitives.domains.common.safe_str.Safe_Str__Text                        import Safe_Str__Text
 from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria             import Enum__Text__Classification__Criteria

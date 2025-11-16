@@ -46,7 +46,7 @@ class test_Schema__Classification__Criterion_Filter(TestCase):
             threshold   = Safe_Float(0.5)
         )
 
-        assert filter_obj.obj() == __(criterion     = 'bias'     ,
+        assert filter_obj.obj() == __(criterion     = 'neutral'     ,
                                       filter_mode   = 'below'    ,
                                       threshold     = 0.5        ,
                                       threshold_max = None       )
