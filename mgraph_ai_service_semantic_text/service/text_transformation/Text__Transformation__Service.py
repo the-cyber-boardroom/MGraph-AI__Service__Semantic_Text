@@ -1,4 +1,5 @@
 from typing                                                                                                                     import Dict
+from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text                                                   import Safe_Str__Comprehend__Text
 from osbot_utils.type_safe.Type_Safe                                                                                            import Type_Safe
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                                                            import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                                              import Safe_Str__Hash
@@ -69,10 +70,10 @@ class Text__Transformation__Service(Type_Safe):                                 
 
     # todo: see what Safe_Str_* should be used instead of str in original_mapping and original_mapping
     @type_safe
-    def _count_transformed_hashes(self,                                             # Count how many hashes were actually transformed
-                                  original_mapping    : Dict[Safe_Str__Hash, str],  # Original hash mapping
-                                  transformed_mapping : Dict[Safe_Str__Hash, str]   # Transformed hash mapping
-                             ) -> Safe_UInt:                                        # Number of transformed hashes
+    def _count_transformed_hashes(self,                                                                     # Count how many hashes were actually transformed
+                                  original_mapping    : Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text],   # Original hash mapping
+                                  transformed_mapping : Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text]    # Transformed hash mapping
+                             ) -> Safe_UInt:                                                                # Number of transformed hashes
         count = 0
         for hash_key, original_text in original_mapping.items():
             if hash_key in transformed_mapping and transformed_mapping[hash_key] != original_text:

@@ -1,5 +1,7 @@
 from typing                                                                                               import Dict
+from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text                             import Safe_Str__Comprehend__Text
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                        import Safe_Str__Hash
+from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict                                     import Type_Safe__Dict
 from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                            import type_safe
 from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine     import Text__Transformation__Engine
 from mgraph_ai_service_semantic_text.service.text_transformation.Text__Selection__Service                 import Text__Selection__Service
@@ -12,17 +14,19 @@ class Text__Transformation__Engine__Hashes_Random(Text__Transformation__Engine):
 
     @type_safe
     def transform(self,                                                             # Randomly show ~50% of text as hash values
-                  hash_mapping: Dict[Safe_Str__Hash, str]                           # Input hash → text mapping
-             ) -> Dict[Safe_Str__Hash, str]:                                        # Transformed hash → text mapping
+                  hash_mapping: Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text]    # Input hash → text mapping
+             ) -> Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text]:                 # Transformed hash → text mapping
         if not hash_mapping:
             return hash_mapping
 
         selected_hashes  = self.text_selection.randomly_select_hashes(hash_mapping, self.randomness_percentage)
-        modified_mapping = {}
+        modified_mapping = Type_Safe__Dict(expected_key_type  =  Safe_Str__Hash,
+                                           expected_value_type = Safe_Str__Comprehend__Text)
+
 
         for hash_key, original_text in hash_mapping.items():
             if hash_key in selected_hashes:
-                modified_mapping[hash_key] = str(hash_key)                          # Replace text with hash value itself
+                modified_mapping[hash_key] = Safe_Str__Comprehend__Text(hash_key)   # Replace text with hash value itself (coverted to Safe_Str__Comprehend__Text)
             else:
                 modified_mapping[hash_key] = original_text                          # Keep original text
 

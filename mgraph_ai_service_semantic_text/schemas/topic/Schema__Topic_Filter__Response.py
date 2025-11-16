@@ -5,16 +5,15 @@ from osbot_utils.type_safe.primitives.core.Safe_UInt                            
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                      import Safe_Str__Hash
 from mgraph_ai_service_semantic_text.schemas.classification.enums.Enum__Classification__Logic_Operator  import Enum__Classification__Logic_Operator
 from mgraph_ai_service_semantic_text.schemas.classification.enums.Enum__Classification__Output_Mode     import Enum__Classification__Output_Mode
-from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Criteria                 import Enum__Text__Classification__Criteria
-from mgraph_ai_service_semantic_text.schemas.safe_float.Safe_Float__Text__Classification                import Safe_Float__Text__Classification
 from mgraph_ai_service_semantic_text.schemas.topic.enums.Enum__Classification__Topic                    import Enum__Classification__Topic
+from mgraph_ai_service_semantic_text.schemas.topic.safe_float.Safe_Float__Topic_Confidence              import Safe_Float__Topic_Confidence
 
 
 class Schema__Topic_Filter__Response(Type_Safe):                                                # Response with filtered hashes based on topic criteria
     filtered_hashes         : List[Safe_Str__Hash]                                              # List of hash IDs that matched filters
     filtered_with_text      : Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text]                  # Hash → text mapping (if output_mode includes text)
-    filtered_with_scores    : Dict[Safe_Str__Hash, Dict[Enum__Text__Classification__Criteria,
-                                                       Safe_Float__Text__Classification ]]      # Hash → {topic → confidence} (if output_mode includes scores)
+    filtered_with_scores    : Dict[Safe_Str__Hash, Dict[Enum__Classification__Topic,
+                                                        Safe_Float__Topic_Confidence ]]         # Hash → {topic → confidence} (if output_mode includes scores)
     topics_used             : List[Enum__Classification__Topic]                                 # List of Enum__Classification__Topic used in filtering
     logic_operator          : Enum__Classification__Logic_Operator                              # Enum__Classification__Logic_Operator used - typed as None
     output_mode             : Enum__Classification__Output_Mode                                 # Enum__Classification__Output_Mode used - typed as None

@@ -2,6 +2,7 @@ from unittest                                                                   
 from osbot_utils.type_safe.Type_Safe                                                                                  import Type_Safe
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                                                  import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                                    import Safe_Str__Hash
+from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict                                                 import Type_Safe__Dict
 from osbot_utils.utils.Objects                                                                                        import base_classes
 from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine                 import Text__Transformation__Engine
 from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine__ABCDE_By_Size  import Text__Transformation__Engine__ABCDE_By_Size
@@ -42,7 +43,7 @@ class test_Text__Transformation__Engine__ABCDE_By_Size(TestCase):
         with Text__Transformation__Engine__ABCDE_By_Size() as _:
             _.setup()
             result = _.transform(hash_mapping)
-            assert type(result) is dict
+            assert type(result) is Type_Safe__Dict
             assert result       == { Safe_Str__Hash('a123456789'): 'a',
                                      Safe_Str__Hash('b123456789'): 'bb',
                                      Safe_Str__Hash('c123456789'): 'ccc',

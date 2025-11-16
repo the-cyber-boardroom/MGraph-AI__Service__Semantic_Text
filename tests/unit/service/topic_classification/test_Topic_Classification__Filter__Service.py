@@ -148,8 +148,8 @@ class test_Topic_Classification__Filter__Service(TestCase):
         assert response.topics_used     == [Enum__Classification__Topic.TECHNOLOGY_SOFTWARE]
         assert response.logic_operator  == Enum__Classification__Logic_Operator.AND
 
-        assert response.obj() == __(filtered_with_text   = None                    ,
-                                    filtered_with_scores = None                    ,
+        assert response.obj() == __(filtered_with_text   = __()                    ,
+                                    filtered_with_scores = __()                    ,
                                     filtered_hashes      = ['f1feeaa3d6']          ,
                                     topics_used          = ['technology-software'] ,
                                     logic_operator       = 'and'                   ,
@@ -184,8 +184,8 @@ class test_Topic_Classification__Filter__Service(TestCase):
         assert Safe_Str__Hash("b10a8db164") in response.filtered_with_scores
 
         assert response.obj() == __(filtered_with_text       = __(b10a8db164 = 'Hello World')                                             ,
-                                    filtered_with_scores     = __(b10a8db164 = __(Enum__Classification__Topic_TECHNOLOGY_SOFTWARE = 0.2915 ,
-                                                                                 Enum__Classification__Topic_BUSINESS_FINANCE        = 0.284 )) ,
+                                    filtered_with_scores     = __(b10a8db164 = __(technology_software = 0.2915 ,
+                                                                                  business_finance    = 0.284 )) ,
                                     filtered_hashes          = ['b10a8db164']                                                             ,
                                     topics_used              = ['technology-software', 'business-finance']                               ,
                                     logic_operator           = 'and'                                                                      ,
@@ -275,8 +275,8 @@ class test_Topic_Classification__Filter__Service(TestCase):
         response = self.service.filter_by_topics(request)
 
         assert response.success              is True
-        assert response.filtered_with_text   is None                           # Not included in HASHES_ONLY
-        assert response.filtered_with_scores is None                           # Not included in HASHES_ONLY
+        assert response.filtered_with_text   == {}                            # Not included in HASHES_ONLY
+        assert response.filtered_with_scores == {}                            # Not included in HASHES_ONLY
         assert len(response.filtered_hashes) == 1
 
     def test__filter_by_topics__output_mode__hashes_with_text(self):          # Test HASHES_WITH_TEXT output mode
@@ -294,7 +294,7 @@ class test_Topic_Classification__Filter__Service(TestCase):
 
         assert response.success              is True
         assert response.filtered_with_text   is not None                       # Included in HASHES_WITH_TEXT
-        assert response.filtered_with_scores is None                           # Not included in HASHES_WITH_TEXT
+        assert response.filtered_with_scores == {}                             # Not included in HASHES_WITH_TEXT
         assert response.filtered_with_text[Safe_Str__Hash("b10a8db164")] == "Hello World"
 
     def test__filter_by_topics__output_mode__full_ratings(self):              # Test FULL_RATINGS output mode
