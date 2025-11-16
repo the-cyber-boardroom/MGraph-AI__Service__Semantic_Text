@@ -1,15 +1,15 @@
-from unittest                                                                                           import TestCase
-from fastapi                                                                                            import FastAPI
-from osbot_utils.testing.__                                                                             import __
-from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                      import Safe_Str__Hash
-from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Text_Transformation                        import Routes__Text_Transformation
-from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Request       import Schema__Text__Transformation__Request
-from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Response      import Schema__Text__Transformation__Response
-from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Transformation__Mode      import Enum__Text__Transformation__Mode
-from mgraph_ai_service_semantic_text.schemas.routes.Schema__Text__Transformation__Request__XXX_Random   import Schema__Text__Transformation__Request__XXX_Random
+from unittest                                                                                            import TestCase
+from fastapi                                                                                             import FastAPI
+from osbot_utils.testing.__                                                                              import __
+from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                       import Safe_Str__Hash
+from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Text_Transformation                         import Routes__Text_Transformation
+from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Request        import Schema__Text__Transformation__Request
+from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Response       import Schema__Text__Transformation__Response
+from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Transformation__Mode       import Enum__Text__Transformation__Mode
+from mgraph_ai_service_semantic_text.schemas.routes.Schema__Text__Transformation__Request__XXX_Random    import Schema__Text__Transformation__Request__XXX_Random
 from mgraph_ai_service_semantic_text.schemas.routes.Schema__Text__Transformation__Request__Hashes_Random import Schema__Text__Transformation__Request__Hashes_Random
 from mgraph_ai_service_semantic_text.schemas.routes.Schema__Text__Transformation__Request__ABCDE_By_Size import Schema__Text__Transformation__Request__ABCDE_By_Size
-from mgraph_ai_service_semantic_text.service.text_transformation.Text__Transformation__Service          import Text__Transformation__Service
+from mgraph_ai_service_semantic_text.service.text_transformation.Text__Transformation__Service           import Text__Transformation__Service
 
 
 class test_Routes__Text_Transformation(TestCase):

@@ -1,4 +1,4 @@
-from unittest                                                                                   import TestCase
+from unittest                                                                                  import TestCase
 from mgraph_ai_service_semantic_text.schemas.enums.Enum__Text__Classification__Engine_Mode     import Enum__Text__Classification__Engine_Mode
 
 

@@ -1,6 +1,6 @@
 import re
-from unittest                                                                                   import TestCase
 import pytest
+from unittest                                                                                  import TestCase
 from mgraph_ai_service_semantic_text.schemas.topic.safe_float.Safe_Float__Topic_Confidence     import Safe_Float__Topic_Confidence
 
 

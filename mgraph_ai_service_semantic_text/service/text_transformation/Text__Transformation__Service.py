@@ -1,18 +1,18 @@
-from typing                                                                                                                     import Dict
-from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text                                                   import Safe_Str__Comprehend__Text
-from osbot_utils.type_safe.Type_Safe                                                                                            import Type_Safe
-from osbot_utils.type_safe.primitives.core.Safe_UInt                                                                            import Safe_UInt
-from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                                              import Safe_Str__Hash
-from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                                                  import type_safe
-from mgraph_ai_service_semantic_text.service.text_transformation.Text__Grouping__Service                                        import Text__Grouping__Service
-from mgraph_ai_service_semantic_text.service.text_transformation.Text__Selection__Service                                       import Text__Selection__Service
-from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine                           import Text__Transformation__Engine
-from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine__XXX_Random               import Text__Transformation__Engine__XXX_Random
-from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine__Hashes_Random            import Text__Transformation__Engine__Hashes_Random
-from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine__ABCDE_By_Size            import Text__Transformation__Engine__ABCDE_By_Size
-from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Request                               import Schema__Text__Transformation__Request
-from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Response                              import Schema__Text__Transformation__Response
-from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Transformation__Mode                              import Enum__Text__Transformation__Mode
+from typing                                                                                                           import Dict
+from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text                                         import Safe_Str__Comprehend__Text
+from osbot_utils.type_safe.Type_Safe                                                                                  import Type_Safe
+from osbot_utils.type_safe.primitives.core.Safe_UInt                                                                  import Safe_UInt
+from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                                    import Safe_Str__Hash
+from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                                        import type_safe
+from mgraph_ai_service_semantic_text.service.text_transformation.Text__Grouping__Service                              import Text__Grouping__Service
+from mgraph_ai_service_semantic_text.service.text_transformation.Text__Selection__Service                             import Text__Selection__Service
+from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine                 import Text__Transformation__Engine
+from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine__XXX_Random     import Text__Transformation__Engine__XXX_Random
+from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine__Hashes_Random  import Text__Transformation__Engine__Hashes_Random
+from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine__ABCDE_By_Size  import Text__Transformation__Engine__ABCDE_By_Size
+from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Request                     import Schema__Text__Transformation__Request
+from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Response                    import Schema__Text__Transformation__Response
+from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Transformation__Mode                    import Enum__Text__Transformation__Mode
 
 
 class Text__Transformation__Service(Type_Safe):                                     # Main orchestrator for text transformations

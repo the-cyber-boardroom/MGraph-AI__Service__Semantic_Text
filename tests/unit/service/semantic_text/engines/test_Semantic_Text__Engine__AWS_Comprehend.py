@@ -1,7 +1,6 @@
-from unittest                                                                                                        import TestCase
-
-from osbot_utils.testing.__helpers import obj
-from osbot_utils.utils.Env import get_env, load_dotenv
+from unittest                                                                                                    import TestCase
+from osbot_utils.testing.__helpers                                                                               import obj
+from osbot_utils.utils.Env                                                                                       import get_env, load_dotenv
 from osbot_utils.testing.__                                                                                      import __
 from osbot_utils.utils.Objects                                                                                   import base_classes
 from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine__AWS_Comprehend         import Semantic_Text__Engine__AWS_Comprehend, ENV_NAME__AUTH__SERVICE__AWS__COMPREHEND__BASE_URL, ENV_NAME__AUTH__SERVICE__AWS__COMPREHEND__KEY_NAME, ENV_NAME__AUTH__SERVICE__AWS__COMPREHEND__KEY_VALUE
