@@ -14,16 +14,12 @@ class test_Text__Transformation__Engine(TestCase):
         with Text__Transformation__Engine() as _:
             assert type(_)                       is Text__Transformation__Engine
             assert base_classes(_)               == [Type_Safe, object]
-            assert type(_.randomness_percentage) is Safe_Float
-            assert _.randomness_percentage       == 0.5                             # Default value
 
     def test_with_mode(self):                                                       # Test engine with specific transformation mode
         with Text__Transformation__Engine(
             transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM     ,
-            randomness_percentage = Safe_Float(0.7)
         ) as _:
             assert _.transformation_mode   == Enum__Text__Transformation__Mode.XXX_RANDOM
-            assert _.randomness_percentage == 0.7
 
     def test_transform_not_implemented(self):                                       # Test that transform raises NotImplementedError
         hash_mapping = { Safe_Str__Hash("abc1234567") : "Hello" }
@@ -36,14 +32,5 @@ class test_Text__Transformation__Engine(TestCase):
                 assert "Subclass must implement transform() method" in str(e)
 
     def test_obj_comparison(self):                                                  # Test .obj() for state verification
-        with Text__Transformation__Engine(
-            transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  ,
-            randomness_percentage = Safe_Float(0.3)
-        ) as _:
-            assert _.obj() == __(transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  ,
-                                 randomness_percentage = 0.3                                              )
-
-    def test_randomness_percentage_default(self):                                   # Test default randomness percentage
-        with Text__Transformation__Engine() as _:
-            assert type(_.randomness_percentage) is Safe_Float
-            assert float(_.randomness_percentage) == 0.5
+        with Text__Transformation__Engine(transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM) as _:
+            assert _.obj() == __(transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  )

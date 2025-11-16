@@ -16,7 +16,6 @@ class test_Text__Transformation__Engine__Hashes_Random(TestCase):
             assert type(_)                       is Text__Transformation__Engine__Hashes_Random
             assert base_classes(_)               == [Text__Transformation__Engine, Type_Safe, object]
             assert _.transformation_mode         == Enum__Text__Transformation__Mode.HASHES_RANDOM
-            assert _.randomness_percentage       == 0.5
             assert type(_.text_selection)        is Text__Selection__Service
 
     def test_transform__empty_mapping(self):                                        # Test with empty hash mapping
@@ -30,7 +29,7 @@ class test_Text__Transformation__Engine__Hashes_Random(TestCase):
             Safe_Str__Hash("def1234567") : "World"                                  ,
         }
 
-        with Text__Transformation__Engine__Hashes_Random(randomness_percentage=Safe_Float(1.0)) as _:
+        with Text__Transformation__Engine__Hashes_Random() as _:
             result = _.transform(hash_mapping)
 
             assert len(result)             == 2                                     # Same number of hashes
@@ -38,29 +37,6 @@ class test_Text__Transformation__Engine__Hashes_Random(TestCase):
                 if transformed_text == str(hash_key):                               # If transformed to hash
                     assert transformed_text in ["abc1234567", "def1234567"]         # Should be the hash itself
 
-    def test_transform__100_percent(self):                                          # Test with 100% transformation
-        hash_mapping = {
-            Safe_Str__Hash("abc1234567") : "Hello"                                  ,
-            Safe_Str__Hash("def1234567") : "World"                                  ,
-        }
-
-        with Text__Transformation__Engine__Hashes_Random(randomness_percentage=Safe_Float(1.0)) as _:
-            result = _.transform(hash_mapping)
-
-            assert result[Safe_Str__Hash("abc1234567")] == "abc1234567"            # Text replaced with hash
-            assert result[Safe_Str__Hash("def1234567")] == "def1234567"            # Text replaced with hash
-
-    def test_transform__0_percent(self):                                            # Test with minimum transformation (at least 1)
-        hash_mapping = {
-            Safe_Str__Hash("abc1234567") : "Hello"                                  ,
-            Safe_Str__Hash("def1234567") : "World"                                  ,
-        }
-
-        with Text__Transformation__Engine__Hashes_Random(randomness_percentage=Safe_Float(0.0)) as _:
-            result = _.transform(hash_mapping)
-
-            transformed_count = sum(1 for k, v in result.items() if v == str(k))
-            assert transformed_count == 1                                           # At least 1 transformed
 
     def test_transform__preserves_unselected_text(self):                            # Test that unselected text remains original
         hash_mapping = {
@@ -68,7 +44,7 @@ class test_Text__Transformation__Engine__Hashes_Random(TestCase):
             Safe_Str__Hash("def1234567") : "Another Text"                           ,
         }
 
-        with Text__Transformation__Engine__Hashes_Random(randomness_percentage=Safe_Float(0.5)) as _:
+        with Text__Transformation__Engine__Hashes_Random() as _:
             result = _.transform(hash_mapping)
 
             for hash_key, transformed_text in result.items():
@@ -86,38 +62,18 @@ class test_Text__Transformation__Engine__Hashes_Random(TestCase):
             assert len(result)             == 1
             assert Safe_Str__Hash("abc1234567") in result
 
-    def test_transform__randomness_percentage(self):                                # Test various randomness percentages
-        hash_mapping = {
-            Safe_Str__Hash(f"a{i:09d}") : f"Text {i}"
-            for i in range(10)
-        }
-
-        with Text__Transformation__Engine__Hashes_Random(randomness_percentage=Safe_Float(0.3)) as _:
-            result = _.transform(hash_mapping)
-            transformed_count = sum(1 for k, v in result.items() if v == str(k))
-            assert transformed_count >= 1                                           # At least 1
-            assert transformed_count <= 10                                          # At most all
-
-        with Text__Transformation__Engine__Hashes_Random(randomness_percentage=Safe_Float(0.7)) as _:
-            result = _.transform(hash_mapping)
-            transformed_count = sum(1 for k, v in result.items() if v == str(k))
-            assert transformed_count >= 1
-            assert transformed_count <= 10
-
     def test_transform__hash_format(self):                                          # Test that hash values are properly formatted
         hash_mapping = {
             Safe_Str__Hash("abc1234567") : "Test"                                   ,
         }
 
-        with Text__Transformation__Engine__Hashes_Random(randomness_percentage=Safe_Float(1.0)) as _:
-            result = _.transform(hash_mapping)
-
+        with Text__Transformation__Engine__Hashes_Random() as _:
+            result             = _.transform(hash_mapping)
             transformed_value = result[Safe_Str__Hash("abc1234567")]
             assert transformed_value == "abc1234567"                                # Hash as string
             assert isinstance(transformed_value, str)                               # Is string type
 
     def test_obj_comparison(self):                                                  # Test .obj() for state verification
-        with Text__Transformation__Engine__Hashes_Random(randomness_percentage=Safe_Float(0.6)) as _:
+        with Text__Transformation__Engine__Hashes_Random() as _:
             obj = _.obj()
             assert obj.transformation_mode   == Enum__Text__Transformation__Mode.HASHES_RANDOM
-            assert obj.randomness_percentage == 0.6

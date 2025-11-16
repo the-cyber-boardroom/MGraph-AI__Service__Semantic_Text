@@ -133,8 +133,7 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         assert hash_mapping      == {'b10a8db164': 'Hello World'}
 
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request           = Schema__Text__Transformation__Request__XXX_Random(hash_mapping          = safe_hash_mapping,
-                                                                              randomness_percentage = Safe_Float(1.0)  )                               # Transform all
+        request           = Schema__Text__Transformation__Request__XXX_Random(hash_mapping = safe_hash_mapping)                               # Transform all
 
         response = self.text_transformation.transform__xxx_random(request)
 
@@ -164,8 +163,7 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         assert len(hash_mapping) == 1                                           # "This is a test paragraph."
 
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping=safe_hash_mapping,
-                                                                    randomness_percentage=Safe_Float(0.5))                           # Transform ~50%
+        request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping=safe_hash_mapping)                           # Transform ~50%
 
 
         response = self.text_transformation.transform__xxx_random(request)
@@ -182,10 +180,7 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         hash_mapping = self.get_hash_mapping(self.html_complex)
         assert len(hash_mapping) > 5                                            # Multiple text nodes
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__XXX_Random(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(0.7)                               # Transform 70%
-        )
+        request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping=safe_hash_mapping)
 
         response = self.text_transformation.transform__xxx_random(request)
 
@@ -196,7 +191,7 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         assert response.transformed_hashes <= response.total_hashes
 
         # Verify some text was transformed, some preserved
-        assert response.transformed_hashes < response.total_hashes or response.randomness_percentage == 1.0
+        assert response.transformed_hashes < response.total_hashes
 
     def test__xxx_random__article_html(self):                                   # Test xxx-random with article HTML
         hash_mapping = self.get_hash_mapping(self.html_article)
@@ -204,15 +199,12 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         assert original_count > 10                                              # Should have many text nodes
 
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__XXX_Random(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(1.0)                               # Transform all
-        )
+        request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping=safe_hash_mapping)
 
         response = self.text_transformation.transform__xxx_random(request)
 
-        assert response.success is True
-        assert response.total_hashes == original_count
+        assert response.success            is True
+        assert response.total_hashes       == original_count
         assert response.transformed_hashes >= 1
 
         # Verify all keys preserved
@@ -226,8 +218,7 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         hash_mapping = self.get_hash_mapping(self.html_simple)
 
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping=safe_hash_mapping,
-                                                                       randomness_percentage=Safe_Float(1.0))
+        request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping=safe_hash_mapping)
 
         response = self.text_transformation.transform__hashes_random(request)
 
@@ -247,10 +238,7 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         hash_mapping = self.get_hash_mapping(self.html_complex)
 
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__Hashes_Random(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(1.0)                               # Transform all
-        )
+        request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping=safe_hash_mapping)
 
         response = self.text_transformation.transform__hashes_random(request)
 
@@ -269,10 +257,7 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         hash_mapping = self.get_hash_mapping(self.html_article)
 
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__Hashes_Random(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(0.3)                               # Transform only 30%
-        )
+        request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping=safe_hash_mapping)
 
         response = self.text_transformation.transform__hashes_random(request)
 
@@ -301,8 +286,7 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         hash_mapping = self.get_hash_mapping(self.html_simple)
 
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping,
-                                                                       randomness_percentage=Safe_Float(1.0))
+        request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping)
 
         response = self.text_transformation.transform__abcde_by_size(request)
 
@@ -324,10 +308,7 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
             text_lengths[hash_key] = len(text)
 
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__ABCDE_By_Size(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(1.0)
-        )
+        request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping)
 
         response = self.text_transformation.transform__abcde_by_size(request)
 
@@ -352,11 +333,8 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         hash_mapping = self.get_hash_mapping(self.html_article)
 
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__ABCDE_By_Size(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(1.0),
-            num_groups=Safe_UInt(5)
-        )
+        request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping,
+                                                                       num_groups=Safe_UInt(5))
 
         response = self.text_transformation.transform__abcde_by_size(request)
 
@@ -391,10 +369,7 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         assert len(hash_mapping) >= 4                                           # At least 4 different texts
 
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__ABCDE_By_Size(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(1.0)
-        )
+        request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping)
 
         response = self.text_transformation.transform__abcde_by_size(request)
 
@@ -420,22 +395,13 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
 
         # Apply all three transformations
-        request_xxx = Schema__Text__Transformation__Request__XXX_Random(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(1.0)
-        )
+        request_xxx = Schema__Text__Transformation__Request__XXX_Random(hash_mapping=safe_hash_mapping)
         response_xxx = self.text_transformation.transform__xxx_random(request_xxx)
 
-        request_hashes = Schema__Text__Transformation__Request__Hashes_Random(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(1.0)
-        )
+        request_hashes = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping=safe_hash_mapping)
         response_hashes = self.text_transformation.transform__hashes_random(request_hashes)
 
-        request_abcde = Schema__Text__Transformation__Request__ABCDE_By_Size(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(1.0)
-        )
+        request_abcde = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping)
         response_abcde = self.text_transformation.transform__abcde_by_size(request_abcde)
 
         # All should succeed
@@ -490,10 +456,7 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
 
         # Step 3: Transform hashes (Mitmproxy calls Semantic Text service)
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__XXX_Random(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(0.5)
-        )
+        request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping=safe_hash_mapping)
 
         response = self.text_transformation.transform__xxx_random(request)
 
@@ -504,45 +467,6 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         # Step 5: Verify transformed hashes can be mapped back
         for hash_key in safe_hash_mapping.keys():
             assert hash_key in response.transformed_mapping                     # All hashes present
-
-    def test__realistic_workflow__privacy_aware_content_analysis(self):         # Test privacy-aware analysis workflow
-        # Simulate analyzing content while preserving privacy
-        sensitive_html = """
-            <article>
-                <h1>User Report</h1>
-                <section>
-                    <h2>Personal Information</h2>
-                    <p>Name: John Doe</p>
-                    <p>Email: john.doe@example.com</p>
-                </section>
-                <section>
-                    <h2>Activity Summary</h2>
-                    <p>User has completed 15 tasks this week.</p>
-                    <p>Average completion time is 2.5 hours.</p>
-                </section>
-            </article>
-        """
-
-        # Extract hashes
-        hash_mapping = self.get_hash_mapping(sensitive_html)
-        safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-
-        # Transform to protect sensitive data
-        request = Schema__Text__Transformation__Request__XXX_Random(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(1.0)                               # Mask all content
-        )
-
-        response = self.text_transformation.transform__xxx_random(request)
-
-        assert response.success is True
-
-        # Verify no original sensitive content in transformed mapping
-        for transformed_text in response.transformed_mapping.values():
-            assert "John Doe" not in transformed_text
-            assert "john.doe@example.com" not in transformed_text
-            # Structure should be preserved (can analyze layout)
-            assert len(transformed_text) > 0
 
     def test__realistic_workflow__semantic_structure_analysis(self):            # Test analyzing semantic structure without content
         # Use ABCDE to understand content structure by length
@@ -559,10 +483,7 @@ class test__Routes__Text_Transformation__using_html_service(TestCase):
         hash_mapping = self.get_hash_mapping(structured_html)
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
 
-        request = Schema__Text__Transformation__Request__ABCDE_By_Size(
-            hash_mapping=safe_hash_mapping,
-            randomness_percentage=Safe_Float(1.0)
-        )
+        request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping)
 
         response = self.text_transformation.transform__abcde_by_size(request)
 

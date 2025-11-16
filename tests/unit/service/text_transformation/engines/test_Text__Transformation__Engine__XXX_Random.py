@@ -16,7 +16,6 @@ class test_Text__Transformation__Engine__XXX_Random(TestCase):
             assert type(_)                       is Text__Transformation__Engine__XXX_Random
             assert base_classes(_)               == [Text__Transformation__Engine, Type_Safe, object]
             assert _.transformation_mode         == Enum__Text__Transformation__Mode.XXX_RANDOM
-            assert _.randomness_percentage       == 0.5
             assert type(_.text_selection)        is Text__Selection__Service
 
     def test_transform__empty_mapping(self):                                        # Test with empty hash mapping
@@ -30,7 +29,7 @@ class test_Text__Transformation__Engine__XXX_Random(TestCase):
             Safe_Str__Hash("def1234567") : "World"                                  ,
         }
 
-        with Text__Transformation__Engine__XXX_Random(randomness_percentage=Safe_Float(1.0)) as _:
+        with Text__Transformation__Engine__XXX_Random() as _:
             result = _.transform(hash_mapping)
 
             assert len(result)             == 2                                     # Same number of hashes
@@ -67,28 +66,12 @@ class test_Text__Transformation__Engine__XXX_Random(TestCase):
             assert _._mask_text("user@example.com") == "xxxx@xxxxxxx.xxx"
             assert _._mask_text("(123) 456-7890")   == "(xxx) xxx-xxxx"
 
-    def test_transform__randomness_percentage(self):                                # Test that randomness percentage affects selection
-        hash_mapping = {
-            Safe_Str__Hash(f"a{i:09d}") : f"Text {i}"
-            for i in range(10)
-        }
-
-        with Text__Transformation__Engine__XXX_Random(randomness_percentage=Safe_Float(0.0)) as _:
-            result = _.transform(hash_mapping)
-            transformed_count = sum(1 for k, v in result.items() if v != hash_mapping[k])
-            assert transformed_count == 1                                           # Minimum of 1
-
-        with Text__Transformation__Engine__XXX_Random(randomness_percentage=Safe_Float(1.0)) as _:
-            result = _.transform(hash_mapping)
-            transformed_count = sum(1 for k, v in result.items() if v != hash_mapping[k])
-            assert transformed_count == 10                                          # All transformed
-
     def test_transform__preserves_unselected_text(self):                            # Test that unselected text is preserved
         hash_mapping = {
             Safe_Str__Hash("abc1234567") : "Keep This"                              ,
         }
 
-        with Text__Transformation__Engine__XXX_Random(randomness_percentage=Safe_Float(0.0)) as _:
+        with Text__Transformation__Engine__XXX_Random() as _:
             _.text_selection = Text__Selection__Service()                          # Fresh selection service
             result = _.transform(hash_mapping)
 
@@ -96,7 +79,6 @@ class test_Text__Transformation__Engine__XXX_Random(TestCase):
             assert original_text_exists or any('x' in v for v in result.values())  # Either kept or masked
 
     def test_obj_comparison(self):                                                  # Test .obj() for state verification
-        with Text__Transformation__Engine__XXX_Random(randomness_percentage=Safe_Float(0.8)) as _:
+        with Text__Transformation__Engine__XXX_Random() as _:
             obj = _.obj()
             assert obj.transformation_mode   == Enum__Text__Transformation__Mode.XXX_RANDOM
-            assert obj.randomness_percentage == 0.8

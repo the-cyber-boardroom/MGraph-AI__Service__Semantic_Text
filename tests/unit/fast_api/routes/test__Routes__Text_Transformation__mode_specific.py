@@ -32,8 +32,7 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
     def test__transform__xxx_random__basic(self):                               # Basic xxx-random transformation
         with self.text_transformation as _:
 
-            request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping          = {Safe_Str__Hash("abc1234567"): "Hello World"},
-                                                                        randomness_percentage = Safe_Float(0.5))
+            request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping = {Safe_Str__Hash("abc1234567"): "Hello World"})
             response = _.transform__xxx_random(request)
 
             assert response.success             is True
@@ -44,8 +43,7 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
     def test__transform__xxx_random__empty_mapping(self):                       # Edge case: empty input
         with self.text_transformation as _:
 
-            request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping={},
-                                                                        randomness_percentage=Safe_Float(0.5))
+            request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping={})
 
             response = _.transform__xxx_random(request)
 
@@ -58,8 +56,7 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
         with self.text_transformation as _:
 
             request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping={ Safe_Str__Hash("abc4567890"): "Hello",
-                                                                                       Safe_Str__Hash("abc4567891"): "World"},
-                                                                        randomness_percentage=Safe_Float(1.0))
+                                                                                       Safe_Str__Hash("abc4567891"): "World"})
 
             response = _.transform__xxx_random(request)
 
@@ -69,8 +66,7 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
 
     def test__transform__xxx_random__preserves_structure(self):                 # Verify structure preservation
         with self.text_transformation as _:
-            request          = Schema__Text__Transformation__Request__XXX_Random(hash_mapping={Safe_Str__Hash("abc4567890"): "Hello, World!"},
-                                                                                 randomness_percentage=Safe_Float(1.0))
+            request          = Schema__Text__Transformation__Request__XXX_Random(hash_mapping={Safe_Str__Hash("abc4567890"): "Hello, World!"})
             response         = _.transform__xxx_random(request)
             transformed_text = response.transformed_mapping[Safe_Str__Hash("abc4567890")]
             assert response.success is True
@@ -85,8 +81,7 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
     def test__transform__hashes_random__basic(self):                            # Basic hashes-random transformation
         with self.text_transformation as _:
 
-            request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping={Safe_Str__Hash("abc1234567"): "Test content"},
-                                                                           randomness_percentage=Safe_Float(0.5))
+            request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping={Safe_Str__Hash("abc1234567"): "Test content"})
 
             response = _.transform__hashes_random(request)
 
@@ -97,10 +92,7 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
     def test__transform__hashes_random__empty_mapping(self):                    # Edge case: empty input
         with self.text_transformation as _:
 
-            request = Schema__Text__Transformation__Request__Hashes_Random(
-                hash_mapping={},
-                randomness_percentage=Safe_Float(0.5)
-            )
+            request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping={})
 
             response = _.transform__hashes_random(request)
 
@@ -112,8 +104,7 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
         with self.text_transformation as _:
 
             hash_key = Safe_Str__Hash("abc4567890")
-            request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping={hash_key: "Some text"},
-                                                                           randomness_percentage=Safe_Float(1.0))
+            request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping={hash_key: "Some text"})
 
             response = _.transform__hashes_random(request)
 
@@ -126,13 +117,9 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
         with self.text_transformation as _:
 
             request = Schema__Text__Transformation__Request__Hashes_Random(
-                hash_mapping={
-                    Safe_Str__Hash("abc4567890"): "First",
-                    Safe_Str__Hash("abc4567891"): "Second",
-                    Safe_Str__Hash("abc4567892"): "Third"
-                },
-                randomness_percentage=Safe_Float(0.5)
-            )
+                hash_mapping={Safe_Str__Hash("abc4567890"): "First",
+                              Safe_Str__Hash("abc4567891"): "Second",
+                              Safe_Str__Hash("abc4567892"): "Third"})
 
             response = _.transform__hashes_random(request)
 
@@ -148,9 +135,7 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
         with self.text_transformation as _:
 
             request = Schema__Text__Transformation__Request__ABCDE_By_Size(
-                hash_mapping={Safe_Str__Hash("abc4567890"): "Test"},
-                randomness_percentage=Safe_Float(1.0)
-            )
+                hash_mapping={Safe_Str__Hash("abc4567890"): "Test"})
 
             response = _.transform__abcde_by_size(request)
 
@@ -161,10 +146,7 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
     def test__transform__abcde_by_size__empty_mapping(self):                    # Edge case: empty input
         with self.text_transformation as _:
 
-            request = Schema__Text__Transformation__Request__ABCDE_By_Size(
-                hash_mapping={},
-                randomness_percentage=Safe_Float(1.0)
-            )
+            request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping={})
 
             response = _.transform__abcde_by_size(request)
 
@@ -180,9 +162,7 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
                     Safe_Str__Hash("abc4567890"): "Short",
                     Safe_Str__Hash("abc4567891"): "Medium text here",
                     Safe_Str__Hash("abc4567892"): "A"
-                },
-                randomness_percentage=Safe_Float(1.0)
-            )
+                })
 
             response = _.transform__abcde_by_size(request)
 
@@ -199,7 +179,6 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
 
             request = Schema__Text__Transformation__Request__ABCDE_By_Size(
                 hash_mapping={Safe_Str__Hash("abc4567890"): "Text"},
-                randomness_percentage=Safe_Float(1.0),
                 num_groups=Safe_UInt(7)                                         # Note: currently ignored, uses default 5
             )
 
@@ -211,10 +190,7 @@ class test__Routes__Text_Transformation__mode_specific(TestCase):
     def test__transform__abcde_by_size__preserves_structure(self):              # Verify structure preservation
         with self.text_transformation as _:
 
-            request = Schema__Text__Transformation__Request__ABCDE_By_Size(
-                hash_mapping={Safe_Str__Hash("abc4567890"): "Hello, World!"},
-                randomness_percentage=Safe_Float(1.0)
-            )
+            request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping={Safe_Str__Hash("abc4567890"): "Hello, World!"})
 
             response = _.transform__abcde_by_size(request)
 

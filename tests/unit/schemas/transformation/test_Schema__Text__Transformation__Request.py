@@ -18,33 +18,26 @@ class test_Schema__Text__Transformation__Request(TestCase):
             assert base_classes(_)                   == [Type_Safe, object]
             assert type(_.hash_mapping)              is Type_Safe__Dict
             assert type(_.transformation_mode)       is types.NoneType
-            assert type(_.randomness_percentage)     is Safe_Float
-            assert _.randomness_percentage           == 0.5                         # Default value
 
     def test_with_values(self):                                                     # Test schema with specific values
         hash_mapping = { Safe_Str__Hash("abc1234567") : "Hello" ,
                          Safe_Str__Hash("def1234567") : "World" }
 
-        with Schema__Text__Transformation__Request( hash_mapping          = hash_mapping                                    ,
-                                                    transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM     ,
-                                                    randomness_percentage = Safe_Float(0.7) ) as _:
+        with Schema__Text__Transformation__Request( hash_mapping          = hash_mapping                               ,
+                                                    transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM) as _:
             assert _.obj() == __(hash_mapping          = __(abc1234567 = 'Hello',
                                                             def1234567 = 'World'),
-                                 transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM     ,
-                                 randomness_percentage = 0.7                                              )
+                                 transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM     )
 
     def test_json_round_trip(self):                                                 # Test JSON serialization round-trip
         hash_mapping = { Safe_Str__Hash("abc1234567") : "Test text" }
 
         with Schema__Text__Transformation__Request(hash_mapping          = hash_mapping                                    ,
-                                                   transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  ,
-                                                   randomness_percentage = Safe_Float(0.3)  ) as _:
+                                                   transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  ) as _:
             json_data = _.json()
             restored  = Schema__Text__Transformation__Request(**json_data)
 
             assert restored.transformation_mode   == Enum__Text__Transformation__Mode.HASHES_RANDOM
-            assert restored.randomness_percentage == 0.3
             assert "abc1234567" in restored.hash_mapping
-            assert restored.obj() == __(randomness_percentage   = 0.3                       ,
-                                        hash_mapping            = __(abc1234567='Test text'),
+            assert restored.obj() == __(hash_mapping            = __(abc1234567='Test text'),
                                         transformation_mode     = 'hashes-random'           )

@@ -7,6 +7,7 @@ from osbot_utils.type_safe.primitives.core.Safe_UInt                            
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash   import Safe_Str__Hash
 from osbot_utils.type_safe.type_safe_core.decorators.type_safe                       import type_safe
 
+FLOAT_SELECT_HASHES__RANDOM_PERCENTAGE = 0.5
 
 class Text__Selection__Service(Type_Safe):                                          # Service for randomly selecting hashes for transformation
 
@@ -14,9 +15,9 @@ class Text__Selection__Service(Type_Safe):                                      
     def randomly_select_hashes(self,                                                        # Randomly select hashes for transformation
                                hash_mapping           : Dict[Safe_Str__Hash,
                                                              Safe_Str__Comprehend__Text],   # Full hash mapping
-                               randomness_percentage  : Safe_Float                          # Percentage to select (0.0-1.0)
                           ) -> List[Safe_Str__Hash]:                                        # List of selected hash keys
-        all_hashes = list(hash_mapping.keys())
+        randomness_percentage = FLOAT_SELECT_HASHES__RANDOM_PERCENTAGE
+        all_hashes            = list(hash_mapping.keys())
 
         if not all_hashes:
             return []

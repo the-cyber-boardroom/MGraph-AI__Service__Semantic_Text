@@ -17,7 +17,6 @@ class test_Text__Transformation__Engine__ABCDE_By_Size(TestCase):
             assert type(_)                       is Text__Transformation__Engine__ABCDE_By_Size
             assert base_classes(_)               == [Text__Transformation__Engine, Type_Safe, object]
             assert _.transformation_mode         == Enum__Text__Transformation__Mode.ABCDE_BY_SIZE
-            assert _.randomness_percentage       == 0.5
             assert type(_.text_grouping)         is Text__Grouping__Service
             assert _.num_groups                  == 5                               # Default 5 groups
 

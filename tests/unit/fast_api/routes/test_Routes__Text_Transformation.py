@@ -43,8 +43,7 @@ class test_Routes__Text_Transformation(TestCase):
                         Safe_Str__Hash("def1234567"): "Test Text"}
 
         request = Schema__Text__Transformation__Request(hash_mapping        = hash_mapping                                  ,
-                                                        transformation_mode = Enum__Text__Transformation__Mode.XXX_RANDOM   ,
-                                                        randomness_percentage = 0.5                                         )
+                                                        transformation_mode = Enum__Text__Transformation__Mode.XXX_RANDOM   )
 
         response = self.routes.transform(request)
 
@@ -56,11 +55,8 @@ class test_Routes__Text_Transformation(TestCase):
     def test__transform__hashes_random(self):                                   # Test generic transform with HASHES_RANDOM mode
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Hello World"}
 
-        request = Schema__Text__Transformation__Request(
-            hash_mapping        = hash_mapping                                      ,
-            transformation_mode = Enum__Text__Transformation__Mode.HASHES_RANDOM    ,
-            randomness_percentage = 0.5
-        )
+        request = Schema__Text__Transformation__Request(hash_mapping        = hash_mapping                                      ,
+                                                        transformation_mode = Enum__Text__Transformation__Mode.HASHES_RANDOM    )
 
         response = self.routes.transform(request)
 
@@ -79,8 +75,7 @@ class test_Routes__Text_Transformation(TestCase):
                         Safe_Str__Hash("ccc1234567"): "Medium text"}
 
         request = Schema__Text__Transformation__Request(hash_mapping        = hash_mapping                                      ,
-                                                        transformation_mode = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE   ,
-                                                        randomness_percentage = 1.0)
+                                                        transformation_mode = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE   )
 
         response = self.routes.transform(request)
 
@@ -89,11 +84,8 @@ class test_Routes__Text_Transformation(TestCase):
         assert response.total_hashes == 3
 
     def test__transform__empty_mapping(self):                                   # Test with empty hash mapping
-        request = Schema__Text__Transformation__Request(
-            hash_mapping        = {}                                            ,
-            transformation_mode = Enum__Text__Transformation__Mode.XXX_RANDOM   ,
-            randomness_percentage = 0.5
-        )
+        request = Schema__Text__Transformation__Request(hash_mapping        = {}                                            ,
+                                                        transformation_mode = Enum__Text__Transformation__Mode.XXX_RANDOM   )
 
         response = self.routes.transform(request)
 
@@ -107,13 +99,8 @@ class test_Routes__Text_Transformation(TestCase):
 
     def test__transform__xxx_random__convenience(self):                         # Test XXX-Random convenience endpoint
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Hello World"}
-
-        request = Schema__Text__Transformation__Request__XXX_Random(
-            hash_mapping          = hash_mapping,
-            randomness_percentage = 0.5
-        )
-
-        response = self.routes.transform__xxx_random(request)
+        request      = Schema__Text__Transformation__Request__XXX_Random(hash_mapping = hash_mapping)
+        response     = self.routes.transform__xxx_random(request)
 
         assert type(response) is Schema__Text__Transformation__Response
         assert response.success is True
@@ -121,13 +108,8 @@ class test_Routes__Text_Transformation(TestCase):
 
     def test__transform__hashes_random__convenience(self):                      # Test Hashes-Random convenience endpoint
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Hello World"}
-
-        request = Schema__Text__Transformation__Request__Hashes_Random(
-            hash_mapping          = hash_mapping,
-            randomness_percentage = 0.5
-        )
-
-        response = self.routes.transform__hashes_random(request)
+        request      = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping = hash_mapping)
+        response     = self.routes.transform__hashes_random(request)
 
         assert response.success is True
         assert response.transformation_mode == Enum__Text__Transformation__Mode.HASHES_RANDOM
@@ -136,54 +118,13 @@ class test_Routes__Text_Transformation(TestCase):
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Hello World",
                         Safe_Str__Hash("def1234567"): "Short"}
 
-        request = Schema__Text__Transformation__Request__ABCDE_By_Size(
-            hash_mapping          = hash_mapping,
-            randomness_percentage = 1.0,
-            num_groups            = 5
-        )
+        request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping          = hash_mapping ,
+                                                                       num_groups            = 5            )
 
         response = self.routes.transform__abcde_by_size(request)
 
         assert response.success is True
         assert response.transformation_mode == Enum__Text__Transformation__Mode.ABCDE_BY_SIZE
-
-    # ========================================
-    # Randomness Percentage Tests
-    # ========================================
-
-    def test__bug__transform__randomness_0_percent(self):                            # Test with 0% randomness (no transformation)
-        hash_mapping = {Safe_Str__Hash("abc1234567"): "Hello World"}
-
-        request = Schema__Text__Transformation__Request(hash_mapping          = hash_mapping                                ,
-                                                        transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM ,
-                                                        randomness_percentage = 0.0 )
-
-        response = self.routes.transform(request)
-        assert response.obj() == __(error_message=None,
-                                    transformed_mapping=__(abc1234567='xxxxx xxxxx'),
-                                    transformation_mode='xxx-random',
-                                    success=True,
-                                    total_hashes=1,
-                                    transformed_hashes=1)
-        assert response.success is True
-        assert response.transformed_hashes != 0                     # BUG              # Nothing transformed
-        assert response.transformed_hashes == 1                     # BUG
-
-
-    def test__transform__randomness_100_percent(self):                          # Test with 100% randomness (all transformed)
-        hash_mapping = {Safe_Str__Hash("abc1234567"): "Hello World",
-                        Safe_Str__Hash("def1234567"): "Test"}
-
-        request = Schema__Text__Transformation__Request(
-            hash_mapping          = hash_mapping                                ,
-            transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM ,
-            randomness_percentage = 1.0
-        )
-
-        response = self.routes.transform(request)
-
-        assert response.success is True
-        assert response.transformed_hashes == 2                                 # All transformed
 
     # ========================================
     # Transformation Verification Tests
@@ -192,11 +133,8 @@ class test_Routes__Text_Transformation(TestCase):
     def test__transform__xxx_random__verification(self):                        # Test XXX-Random actually transforms text
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Hello World"}
 
-        request = Schema__Text__Transformation__Request(
-            hash_mapping          = hash_mapping                                ,
-            transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM ,
-            randomness_percentage = 1.0
-        )
+        request = Schema__Text__Transformation__Request(hash_mapping          = hash_mapping                                ,
+                                                        transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM)
 
         response = self.routes.transform(request)
 
@@ -208,11 +146,8 @@ class test_Routes__Text_Transformation(TestCase):
     def test__transform__hashes_random__verification(self):                     # Test Hashes-Random shows hash values
         hash_mapping = {Safe_Str__Hash("abc1234567"): "Hello World"}
 
-        request = Schema__Text__Transformation__Request(
-            hash_mapping          = hash_mapping                                    ,
-            transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  ,
-            randomness_percentage = 1.0
-        )
+        request = Schema__Text__Transformation__Request(hash_mapping          = hash_mapping                                    ,
+                                                        transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  )
 
         response = self.routes.transform(request)
 
@@ -224,11 +159,8 @@ class test_Routes__Text_Transformation(TestCase):
         hash_mapping = {Safe_Str__Hash("aaa1234567"): "Hi",                     # Short
                         Safe_Str__Hash("bbb1234567"): "Hello World"}            # Long
 
-        request = Schema__Text__Transformation__Request(
-            hash_mapping          = hash_mapping                                    ,
-            transformation_mode   = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE  ,
-            randomness_percentage = 1.0
-        )
+        request = Schema__Text__Transformation__Request(hash_mapping          = hash_mapping                                    ,
+                                                        transformation_mode   = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE  )
 
         response = self.routes.transform(request)
 

@@ -49,8 +49,7 @@ class Routes__Text_Transformation(Fast_API__Routes):                            
                          ) -> Schema__Text__Transformation__Response:                           # Transformation response
 
         full_request = Schema__Text__Transformation__Request(hash_mapping            = request.hash_mapping                          ,
-                                                             transformation_mode     = Enum__Text__Transformation__Mode.XXX_RANDOM   ,
-                                                             randomness_percentage   = request.randomness_percentage                 )
+                                                             transformation_mode     = Enum__Text__Transformation__Mode.XXX_RANDOM   )
 
         return self.transform(full_request)
 
@@ -59,8 +58,7 @@ class Routes__Text_Transformation(Fast_API__Routes):                            
                             ) -> Schema__Text__Transformation__Response:                        # Transformation response
 
         full_request = Schema__Text__Transformation__Request(hash_mapping            = request.hash_mapping                          ,
-                                                             transformation_mode     = Enum__Text__Transformation__Mode.HASHES_RANDOM,
-                                                             randomness_percentage   = request.randomness_percentage                 )
+                                                             transformation_mode     = Enum__Text__Transformation__Mode.HASHES_RANDOM)
 
         return self.transform(full_request)
 
@@ -71,8 +69,7 @@ class Routes__Text_Transformation(Fast_API__Routes):                            
         # Future enhancement will pass this through to the engine via engine_config parameter
 
         full_request = Schema__Text__Transformation__Request(hash_mapping            = request.hash_mapping                          ,
-                                                             transformation_mode     = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE,
-                                                             randomness_percentage   = request.randomness_percentage                 )
+                                                             transformation_mode     = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE)
 
         return self.transform(full_request)
 

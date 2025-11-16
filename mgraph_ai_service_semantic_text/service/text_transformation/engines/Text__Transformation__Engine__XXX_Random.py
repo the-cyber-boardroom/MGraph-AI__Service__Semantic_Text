@@ -19,7 +19,7 @@ class Text__Transformation__Engine__XXX_Random(Text__Transformation__Engine):   
         if not hash_mapping:
             return hash_mapping
 
-        selected_hashes  = self.text_selection.randomly_select_hashes(hash_mapping, self.randomness_percentage)
+        selected_hashes  = self.text_selection.randomly_select_hashes(hash_mapping)
         modified_mapping = Type_Safe__Dict(expected_key_type  =  Safe_Str__Hash,
                                            expected_value_type = Safe_Str__Comprehend__Text)
 

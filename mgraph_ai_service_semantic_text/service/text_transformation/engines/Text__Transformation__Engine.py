@@ -8,7 +8,6 @@ from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Tr
 
 class Text__Transformation__Engine(Type_Safe):                                          # Base class for text transformation engines
     transformation_mode     : Enum__Text__Transformation__Mode                          # Transformation mode this engine handles
-    randomness_percentage   : Safe_Float                    = Safe_Float(0.5)           # Percentage of hashes to transform (0.0-1.0)
 
     def transform(self,                                                                 # Transform hash mapping according to engine logic
                        hash_mapping: Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text]   # Input hash → text mapping
