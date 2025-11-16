@@ -35,7 +35,7 @@ class Text__Transformation__Service(Type_Safe):                                 
              ) -> Schema__Text__Transformation__Response:                           # Transformation response
         try:
             engine                       = self._get_engine(request.transformation_mode)
-            engine.randomness_percentage = request.randomness_percentage
+            engine.randomness_percentage = request.randomness_percentage                # BUG, this will impact the next requests since _get_engine returns the singleton of an engine
             transformed_mapping          = engine.transform(request.hash_mapping)
             total_hashes                 = Safe_UInt(len(request.hash_mapping))
             transformed_hashes           = Safe_UInt(self._count_transformed_hashes(request.hash_mapping, transformed_mapping))
