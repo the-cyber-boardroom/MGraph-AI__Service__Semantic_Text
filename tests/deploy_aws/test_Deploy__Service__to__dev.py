@@ -3,3 +3,10 @@ from tests.deploy_aws.test_Deploy__Service__base import test_Deploy__Service__ba
 
 class test_Deploy__Service__to__dev(test_Deploy__Service__base, TestCase):
     stage = 'dev'
+
+
+    # def test_4__invoke(self):
+    #     self.test_3__create()
+    #     response = self.deploy_fast_api.invoke()
+    #     from osbot_utils.utils.Dev import pprint
+    #     pprint(response)

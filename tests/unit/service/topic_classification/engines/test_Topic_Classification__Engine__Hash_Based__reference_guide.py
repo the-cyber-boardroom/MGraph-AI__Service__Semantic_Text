@@ -73,7 +73,7 @@ class test_Topic_Classification__Engine__Hash_Based__reference_guide(TestCase):
 
         assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.TECHNOLOGY_SOFTWARE)) == 0.2915
         assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.TECHNOLOGY_HARDWARE)) == 0.066
-        assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.TECHNOLOGY_AI_ML   )) == 0.3354
+        assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.TECHNOLOGY_AI_ML   )) == 0.0171
         assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.BUSINESS_FINANCE   )) == 0.284
         assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.BUSINESS_MARKETING )) == 0.3765
         assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.EDUCATION_ACADEMIC )) == 0.9113
@@ -84,7 +84,7 @@ class test_Topic_Classification__Engine__Hash_Based__reference_guide(TestCase):
 
         assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.TECHNOLOGY_SOFTWARE  )) == 0.3881
         assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.TECHNOLOGY_HARDWARE  )) == 0.6094
-        assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.TECHNOLOGY_AI_ML     )) == 0.515
+        assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.TECHNOLOGY_AI_ML     )) == 0.3179
         assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.BUSINESS_FINANCE     )) == 0.6692
         assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.BUSINESS_MARKETING   )) == 0.9444
         assert float(self.engine.hash_based_confidence(text, Enum__Classification__Topic.BUSINESS_OPERATIONS  )) == 0.2369

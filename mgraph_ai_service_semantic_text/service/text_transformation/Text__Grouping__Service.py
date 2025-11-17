@@ -1,4 +1,6 @@
 from typing                                                                          import Dict, List
+
+from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text import Safe_Str__Comprehend__Text
 from osbot_utils.type_safe.Type_Safe                                                 import Type_Safe
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                 import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash   import Safe_Str__Hash
@@ -9,9 +11,9 @@ class Text__Grouping__Service(Type_Safe):                                       
     num_groups : Safe_UInt = Safe_UInt(5)                                            # Default: 5 groups (a,b,c,d,e)
 
     @type_safe
-    def group_by_length(self,                                                       # Group hashes by text length into N equal-sized buckets
-                        hash_mapping: Dict[Safe_Str__Hash, str]                     # Hash → text mapping
-                   ) -> Dict[int, List[Safe_Str__Hash]]:                            # Group index → list of hashes
+    def group_by_length(self,                                                           # Group hashes by text length into N equal-sized buckets
+                        hash_mapping: Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text]  # Hash → text mapping
+                   ) -> Dict[int, List[Safe_Str__Hash]]:                                # Group index → list of hashes
         if not hash_mapping:
             return {}
 
@@ -38,10 +40,10 @@ class Text__Grouping__Service(Type_Safe):                                       
         return {k: v for k, v in groups.items() if v}
 
     @type_safe
-    def get_group_stats(self,                                                       # Get statistics about each group
-                        hash_mapping : Dict[Safe_Str__Hash, str],                   # Hash → text mapping
-                        groups       : Dict[int, List[Safe_Str__Hash]]              # Group index → list of hashes
-                       ) -> Dict[int, dict]:                                        # Group index → stats dict
+    def get_group_stats(self,                                                               # Get statistics about each group
+                        hash_mapping : Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text],    # Hash → text mapping
+                        groups       : Dict[int, List[Safe_Str__Hash]]                      # Group index → list of hashes
+                       ) -> Dict[int, dict]:                                                # Group index → stats dict
         stats = {}
 
         for group_idx, hashes in groups.items():

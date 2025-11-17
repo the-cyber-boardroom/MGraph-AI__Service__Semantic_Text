@@ -9,23 +9,19 @@ class test__Schema__Text__Transformation__Request__Hashes_Random(TestCase):
     def test__init__(self):                                                     # Verify Type_Safe inheritance and auto-initialization
         with Schema__Text__Transformation__Request__Hashes_Random() as _:
             assert _.hash_mapping == {}
-            assert _.randomness_percentage == 0.5
             assert type(_).__name__ == 'Schema__Text__Transformation__Request__Hashes_Random'
 
     def test__with_data(self):                                                  # Test with actual data
         hash_mapping = { Safe_Str__Hash("def4567890"): "Test message" }
 
-        with Schema__Text__Transformation__Request__Hashes_Random(hash_mapping=hash_mapping,
-                                                                   randomness_percentage=0.3) as _:
+        with Schema__Text__Transformation__Request__Hashes_Random(hash_mapping=hash_mapping) as _:
             assert len(_.hash_mapping)                          == 1
             assert _.hash_mapping[Safe_Str__Hash("def4567890")]  == "Test message"
-            assert _.randomness_percentage                      == 0.3
 
     def test__obj(self):                                                        # Test .obj() serialization
         hash_mapping = {Safe_Str__Hash("def4567890"): "data"}
         request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping=hash_mapping)
 
-        assert request.obj() == __(randomness_percentage = 0.5                   ,
-                                   hash_mapping           = __(def4567890='data'))
+        assert request.obj() == __(hash_mapping           = __(def4567890='data'))
 
 

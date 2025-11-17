@@ -2,6 +2,7 @@ from unittest                                                                   
 from osbot_utils.type_safe.Type_Safe                                                                                  import Type_Safe
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                                                  import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                                    import Safe_Str__Hash
+from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict                                                 import Type_Safe__Dict
 from osbot_utils.utils.Objects                                                                                        import base_classes
 from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine                 import Text__Transformation__Engine
 from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine__ABCDE_By_Size  import Text__Transformation__Engine__ABCDE_By_Size
@@ -16,7 +17,6 @@ class test_Text__Transformation__Engine__ABCDE_By_Size(TestCase):
             assert type(_)                       is Text__Transformation__Engine__ABCDE_By_Size
             assert base_classes(_)               == [Text__Transformation__Engine, Type_Safe, object]
             assert _.transformation_mode         == Enum__Text__Transformation__Mode.ABCDE_BY_SIZE
-            assert _.randomness_percentage       == 0.5
             assert type(_.text_grouping)         is Text__Grouping__Service
             assert _.num_groups                  == 5                               # Default 5 groups
 
@@ -31,6 +31,56 @@ class test_Text__Transformation__Engine__ABCDE_By_Size(TestCase):
             result = _.transform({})
             assert result == {}
 
+    def test_transform__ignores_selected_hashes__transforms_all(self):              # CRITICAL: ABCDE mode IGNORES selected_hashes and transforms ALL
+        hash_mapping = {
+            Safe_Str__Hash("a123456789") : "A"                                       ,
+            Safe_Str__Hash("b123456789") : "BB"                                      ,
+            Safe_Str__Hash("c123456789") : "CCC"                                     ,
+        }
+
+        selected_hashes = [ Safe_Str__Hash("a123456789") ]                         # Only select first hash
+
+        with Text__Transformation__Engine__ABCDE_By_Size() as _:
+            _.setup()
+            result = _.transform(hash_mapping, selected_hashes)                     # Pass selected_hashes
+
+            # CRITICAL: ALL hashes are transformed, not just selected ones
+            assert len(result)             == 3                                     # All 3 hashes present
+            assert result[Safe_Str__Hash("a123456789")] != "A"                      # First transformed (even though selected)
+            assert result[Safe_Str__Hash("b123456789")] != "BB"                     # Second transformed (even though NOT selected)
+            assert result[Safe_Str__Hash("c123456789")] != "CCC"                    # Third transformed (even though NOT selected)
+
+    def test_transform__with_none_selected_hashes__transforms_all(self):            # Test with None selected_hashes (explicit transform all)
+        hash_mapping = {
+            Safe_Str__Hash("a123456789") : "A"                                       ,
+            Safe_Str__Hash("b123456789") : "BB"                                      ,
+        }
+
+        with Text__Transformation__Engine__ABCDE_By_Size() as _:
+            _.setup()
+            result = _.transform(hash_mapping, selected_hashes=None)
+
+            assert len(result)             == 2                                     # All hashes transformed
+            assert result[Safe_Str__Hash("a123456789")] != "A"
+            assert result[Safe_Str__Hash("b123456789")] != "BB"
+
+    def test_transform__with_empty_selected_hashes__still_transforms_all(self):     # CRITICAL: Even empty list is ignored - ALL transformed
+        hash_mapping = {
+            Safe_Str__Hash("a123456789") : "A"                                       ,
+            Safe_Str__Hash("b123456789") : "BB"                                      ,
+        }
+
+        selected_hashes = []                                                        # Empty list
+
+        with Text__Transformation__Engine__ABCDE_By_Size() as _:
+            _.setup()
+            result = _.transform(hash_mapping, selected_hashes)
+
+            # CRITICAL: Even with empty selected_hashes, ALL are transformed
+            assert len(result)             == 2                                     # All hashes present
+            assert result[Safe_Str__Hash("a123456789")] != "A"                      # Still transformed
+            assert result[Safe_Str__Hash("b123456789")] != "BB"                     # Still transformed
+
     def test_transform__groups_by_length(self):                                     # Test that text is grouped by length and replaced with letters
         hash_mapping = { Safe_Str__Hash("a123456789") : "A"     ,                   # Length 1 → group 0 → 'a'
                          Safe_Str__Hash("b123456789") : "BB"    ,                   # Length 2 → group 1 → 'b'
@@ -42,7 +92,7 @@ class test_Text__Transformation__Engine__ABCDE_By_Size(TestCase):
         with Text__Transformation__Engine__ABCDE_By_Size() as _:
             _.setup()
             result = _.transform(hash_mapping)
-            assert type(result) is dict
+            assert type(result) is Type_Safe__Dict
             assert result       == { Safe_Str__Hash('a123456789'): 'a',
                                      Safe_Str__Hash('b123456789'): 'bb',
                                      Safe_Str__Hash('c123456789'): 'ccc',

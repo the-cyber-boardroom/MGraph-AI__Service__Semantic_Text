@@ -5,7 +5,7 @@ class Enum__Classification__Topic(str, Enum):                                  #
     # Technology (3 topics)
     TECHNOLOGY_SOFTWARE      = 'technology-software'                           # Software development, programming, apps
     TECHNOLOGY_HARDWARE      = 'technology-hardware'                           # Hardware, devices, electronics
-    TECHNOLOGY_AI_ML         = 'technology-ai-ml'                              # AI, machine learning, data science
+    TECHNOLOGY_AI_ML         = 'technology-ai_ml'                              # AI, machine learning, data science
     
     # Business (3 topics)
     BUSINESS_FINANCE         = 'business-finance'                              # Finance, banking, investments

@@ -1,5 +1,6 @@
 from unittest                                                                                             import TestCase
 from fastapi                                                                                              import FastAPI
+from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text                             import Safe_Str__Comprehend__Text
 from osbot_utils.testing.__                                                                               import __
 from osbot_utils.type_safe.primitives.core.Safe_Float                                                     import Safe_Float
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                        import Safe_Str__Hash
@@ -194,9 +195,9 @@ class test_Routes__Topic_Classification(TestCase):
         assert response.success         is True
         assert response.filtered_count  == 1
         assert response.filtered_hashes == [Safe_Str__Hash("f1feeaa3d6")]
-        assert response.obj()           == __(filtered_hashes      = ['f1feeaa3d6']         ,
-                                              filtered_with_text   = None                    ,
-                                              filtered_with_scores = None                    ,
+        assert response.obj()           == __(filtered_hashes      = ['f1feeaa3d6']          ,
+                                              filtered_with_text   = __()                    ,
+                                              filtered_with_scores = __()                    ,
                                               topics_used          = ['technology-software'] ,
                                               logic_operator       = 'and'                   ,
                                               output_mode          = 'hashes-only'           ,
@@ -205,16 +206,14 @@ class test_Routes__Topic_Classification(TestCase):
                                               success              = True                    )
 
     def test__filter__and_logic__both_match(self):                             # Test AND logic where both topics match
-        hash_mapping = {Safe_Str__Hash("b10a8db164"): "Hello World"}           # tech-software=0.7478, business-finance=0.6789
+        hash_mapping = {Safe_Str__Hash("b10a8db164"): Safe_Str__Comprehend__Text("Hello World")}           # tech-software=0.7478, business-finance=0.6789
 
-        request = Schema__Topic_Filter__Request(
-            hash_mapping     = hash_mapping                                              ,
-            required_topics  = [Enum__Classification__Topic.TECHNOLOGY_SOFTWARE         ,
-                                Enum__Classification__Topic.BUSINESS_FINANCE            ],
-            min_confidence   = Safe_Float(0.2)                                           ,
-            logic_operator   = Enum__Classification__Logic_Operator.AND                 ,
-            output_mode      = Enum__Classification__Output_Mode.FULL_RATINGS
-        )
+        request = Schema__Topic_Filter__Request(hash_mapping     = hash_mapping                                              ,
+                                                required_topics  = [Enum__Classification__Topic.TECHNOLOGY_SOFTWARE         ,
+                                                                    Enum__Classification__Topic.BUSINESS_FINANCE            ],
+                                                min_confidence   = Safe_Float(0.2)                                           ,
+                                                logic_operator   = Enum__Classification__Logic_Operator.AND                 ,
+                                                output_mode      = Enum__Classification__Output_Mode.FULL_RATINGS)
 
         response = self.routes.filter(request)
 
@@ -303,7 +302,7 @@ class test_Routes__Topic_Classification(TestCase):
         assert response.success              is True
         assert response.filtered_count       == 1
         assert response.filtered_with_text   is not None
-        assert response.filtered_with_scores is None                            # Not included in HASHES_WITH_TEXT mode
+        assert response.filtered_with_scores == {}                           # Not included in HASHES_WITH_TEXT mode
         assert response.filtered_with_text[Safe_Str__Hash("b10a8db164")] == "Hello World"
 
     def test__filter__output_mode__full_ratings(self):                         # Test FULL_RATINGS output mode

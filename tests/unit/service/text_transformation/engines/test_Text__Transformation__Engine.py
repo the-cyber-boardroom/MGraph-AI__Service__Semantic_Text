@@ -1,7 +1,6 @@
 from unittest                                                                                             import TestCase
 from osbot_utils.testing.__                                                                               import __
 from osbot_utils.type_safe.Type_Safe                                                                      import Type_Safe
-from osbot_utils.type_safe.primitives.core.Safe_Float                                                     import Safe_Float
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                        import Safe_Str__Hash
 from osbot_utils.utils.Objects                                                                            import base_classes
 from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine     import Text__Transformation__Engine
@@ -14,16 +13,12 @@ class test_Text__Transformation__Engine(TestCase):
         with Text__Transformation__Engine() as _:
             assert type(_)                       is Text__Transformation__Engine
             assert base_classes(_)               == [Type_Safe, object]
-            assert type(_.randomness_percentage) is Safe_Float
-            assert _.randomness_percentage       == 0.5                             # Default value
 
     def test_with_mode(self):                                                       # Test engine with specific transformation mode
         with Text__Transformation__Engine(
-            transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM     ,
-            randomness_percentage = Safe_Float(0.7)
+            transformation_mode   = Enum__Text__Transformation__Mode.XXX     ,
         ) as _:
-            assert _.transformation_mode   == Enum__Text__Transformation__Mode.XXX_RANDOM
-            assert _.randomness_percentage == 0.7
+            assert _.transformation_mode   == Enum__Text__Transformation__Mode.XXX
 
     def test_transform_not_implemented(self):                                       # Test that transform raises NotImplementedError
         hash_mapping = { Safe_Str__Hash("abc1234567") : "Hello" }
@@ -35,15 +30,27 @@ class test_Text__Transformation__Engine(TestCase):
             except NotImplementedError as e:
                 assert "Subclass must implement transform() method" in str(e)
 
-    def test_obj_comparison(self):                                                  # Test .obj() for state verification
-        with Text__Transformation__Engine(
-            transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  ,
-            randomness_percentage = Safe_Float(0.3)
-        ) as _:
-            assert _.obj() == __(transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  ,
-                                 randomness_percentage = 0.3                                              )
+    def test_transform_with_selected_hashes(self):                                  # Test that transform accepts selected_hashes parameter
+        hash_mapping     = { Safe_Str__Hash("abc1234567") : "Hello" }
+        selected_hashes  = [ Safe_Str__Hash("abc1234567") ]
 
-    def test_randomness_percentage_default(self):                                   # Test default randomness percentage
         with Text__Transformation__Engine() as _:
-            assert type(_.randomness_percentage) is Safe_Float
-            assert float(_.randomness_percentage) == 0.5
+            try:
+                _.transform(hash_mapping, selected_hashes)
+                assert False, "Should have raised NotImplementedError"
+            except NotImplementedError as e:
+                assert "Subclass must implement transform() method" in str(e)
+
+    def test_transform_with_none_selected_hashes(self):                             # Test that transform accepts None for selected_hashes (transform all)
+        hash_mapping = { Safe_Str__Hash("abc1234567") : "Hello" }
+
+        with Text__Transformation__Engine() as _:
+            try:
+                _.transform(hash_mapping, selected_hashes=None)
+                assert False, "Should have raised NotImplementedError"
+            except NotImplementedError as e:
+                assert "Subclass must implement transform() method" in str(e)
+
+    def test_obj_comparison(self):                                                  # Test .obj() for state verification
+        with Text__Transformation__Engine(transformation_mode   = Enum__Text__Transformation__Mode.HASHES) as _:
+            assert _.obj() == __(transformation_mode   = Enum__Text__Transformation__Mode.HASHES)

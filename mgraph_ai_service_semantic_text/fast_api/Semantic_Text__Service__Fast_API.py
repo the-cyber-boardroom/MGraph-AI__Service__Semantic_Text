@@ -4,7 +4,7 @@ from osbot_fast_api_serverless.fast_api.routes.Routes__Info                     
 from mgraph_ai_service_semantic_text.config                                          import FAST_API__TITLE
 from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Semantic_Classification import Routes__Semantic_Classification
 from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Text_Transformation     import Routes__Text_Transformation
-from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Topic_Classification import Routes__Topic_Classification
+from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Topic_Classification    import Routes__Topic_Classification
 from mgraph_ai_service_semantic_text.utils.Version                                   import version__mgraph_ai_service_semantic_text
 
 

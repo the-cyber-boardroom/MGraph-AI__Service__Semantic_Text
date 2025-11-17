@@ -1,4 +1,5 @@
 from typing                                                                                                 import Dict, List
+from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text                               import Safe_Str__Comprehend__Text
 from osbot_utils.type_safe.Type_Safe                                                                        import Type_Safe
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                                        import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                          import Safe_Str__Hash
@@ -75,12 +76,12 @@ class Topic_Classification__Filter__Service(Type_Safe):                        #
         
         # Build response based on output_mode
         return self._build_filter_response(filtered_hashes                    ,
-                                          request.hash_mapping                ,
-                                          classify_response.hash_topic_scores ,
-                                          request.required_topics             ,
-                                          request.logic_operator              ,
-                                          request.output_mode                 ,
-                                          classify_response.total_hashes      )
+                                           request.hash_mapping                ,
+                                           classify_response.hash_topic_scores ,
+                                           request.required_topics             ,
+                                           request.logic_operator              ,
+                                           request.output_mode                 ,
+                                           classify_response.total_hashes      )
     
     @type_safe
     def _apply_logic_operator(self,                                                         # Apply AND/OR logic to filter hashes by topics
@@ -110,12 +111,12 @@ class Topic_Classification__Filter__Service(Type_Safe):                        #
     
     @type_safe
     def _build_filter_response(self,                                                                    # Build filter response based on output mode
-                               filtered_hashes      : List[Safe_Str__Hash]                ,
-                               hash_mapping         : Dict[Safe_Str__Hash, str]           ,
-                               hash_topic_scores    : Dict[Safe_Str__Hash, Dict]          ,
-                               required_topics      : List[Enum__Classification__Topic]   ,
-                               logic_operator       : Enum__Classification__Logic_Operator,
-                               output_mode          : Enum__Classification__Output_Mode   ,
+                               filtered_hashes      : List[Safe_Str__Hash]                             ,
+                               hash_mapping         : Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text] ,
+                               hash_topic_scores    : Dict[Safe_Str__Hash, Dict]                       ,
+                               required_topics      : List[Enum__Classification__Topic]                ,
+                               logic_operator       : Enum__Classification__Logic_Operator             ,
+                               output_mode          : Enum__Classification__Output_Mode                ,
                                total_hashes         : Safe_UInt
                           ) -> Schema__Topic_Filter__Response:
 
@@ -129,12 +130,12 @@ class Topic_Classification__Filter__Service(Type_Safe):                        #
         if output_mode == Enum__Classification__Output_Mode.FULL_RATINGS:
             filtered_with_scores = {h: hash_topic_scores[h] for h in filtered_hashes if h in hash_topic_scores}
         
-        return Schema__Topic_Filter__Response(filtered_hashes    = filtered_hashes                 ,
-                                              filtered_with_text  = filtered_with_text             ,
+        return Schema__Topic_Filter__Response(filtered_hashes      = filtered_hashes                 ,
+                                              filtered_with_text   = filtered_with_text             ,
                                               filtered_with_scores = filtered_with_scores          ,
-                                              topics_used         = required_topics                ,
-                                              logic_operator      = logic_operator                 ,
-                                              output_mode         = output_mode                    ,
-                                              total_hashes        = total_hashes                   ,
-                                              filtered_count      = Safe_UInt(len(filtered_hashes)),
-                                              success             = True                           )
+                                              topics_used          = required_topics                ,
+                                              logic_operator       = logic_operator                 ,
+                                              output_mode          = output_mode                    ,
+                                              total_hashes         = total_hashes                   ,
+                                              filtered_count       = Safe_UInt(len(filtered_hashes)),
+                                              success              = True                           )
