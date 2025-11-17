@@ -1,7 +1,7 @@
 import pytest
 from enum                                                                                                 import Enum
 from unittest                                                                                             import TestCase
-from osbot_utils.testing.__                                                                               import __, __SKIP__
+from osbot_utils.testing.__                                                                               import __
 from osbot_utils.type_safe.Type_Safe                                                                      import Type_Safe
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                        import Safe_Str__Hash
 from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                            import type_safe
@@ -38,12 +38,12 @@ class test_Text__Transformation__Service(TestCase):
     # Basic Transformation Tests (No Filtering)
     # ========================================
 
-    def test_transform__xxx_random__no_filters(self):                               # Test xxx-random transformation without filters (transforms all)
+    def test_transform__xxx_random__no_filters(self):                               # Test xxx transformation without filters (transforms all)
         hash_mapping = { Safe_Str__Hash("abc1234567") : "Hello" ,
                          Safe_Str__Hash("def1234567") : "World" }
 
-        request = Schema__Text__Transformation__Request(hash_mapping          = hash_mapping                                ,
-                                                        transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM )
+        request = Schema__Text__Transformation__Request(hash_mapping          = hash_mapping,
+                                                        transformation_mode   = Enum__Text__Transformation__Mode.XXX)
 
         with Text__Transformation__Service() as _:
             _.setup()
@@ -51,11 +51,11 @@ class test_Text__Transformation__Service(TestCase):
 
             assert type(response)                     is Schema__Text__Transformation__Response
             assert response.success                   is True
-            assert response.transformation_mode       == Enum__Text__Transformation__Mode.XXX_RANDOM
+            assert response.transformation_mode       == Enum__Text__Transformation__Mode.XXX
             assert response.total_hashes              == 2
             assert response.transformed_hashes        == 2                          # All transformed (no filters)
 
-    def test_transform__hashes_random__no_filters(self):                            # Test hashes-random transformation without filters
+    def test_transform__hashes__no_filters(self):                            # Test hashes transformation without filters
         hash_mapping = {
             Safe_Str__Hash("abc1234567") : "Hello"                                  ,
             Safe_Str__Hash("def1234567") : "World"                                  ,
@@ -63,14 +63,14 @@ class test_Text__Transformation__Service(TestCase):
 
         request = Schema__Text__Transformation__Request(
             hash_mapping          = hash_mapping                                  ,
-            transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM)
+            transformation_mode   = Enum__Text__Transformation__Mode.HASHES)
 
         with Text__Transformation__Service() as _:
             _.setup()
             response = _.transform(request)
 
             assert response.success                   is True
-            assert response.transformation_mode       == Enum__Text__Transformation__Mode.HASHES_RANDOM
+            assert response.transformation_mode       == Enum__Text__Transformation__Mode.HASHES
             assert response.transformed_hashes        == 2                          # All transformed
 
     def test_transform__abcde_by_size__no_filters(self):                            # Test abcde-by-size transformation (always transforms all)
@@ -117,7 +117,7 @@ class test_Text__Transformation__Service(TestCase):
             hash_mapping          = hash_mapping                                    ,
             engine_mode           = Enum__Text__Transformation__Engine_Mode.TEXT_HASH,
             criterion_filters     = criterion_filters                               ,
-            transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM     )
+            transformation_mode   = Enum__Text__Transformation__Mode.XXX     )
 
         with Text__Transformation__Service() as _:
             _.setup()
@@ -146,7 +146,7 @@ class test_Text__Transformation__Service(TestCase):
             hash_mapping          = hash_mapping                                    ,
             engine_mode           = Enum__Text__Transformation__Engine_Mode.RANDOM  ,
             criterion_filters     = criterion_filters                               ,
-            transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM     )
+            transformation_mode   = Enum__Text__Transformation__Mode.XXX     )
 
         with Text__Transformation__Service() as _:
             _.setup()
@@ -179,7 +179,7 @@ class test_Text__Transformation__Service(TestCase):
             engine_mode           = Enum__Text__Transformation__Engine_Mode.TEXT_HASH,
             criterion_filters     = criterion_filters                               ,
             logic_operator        = Enum__Classification__Logic_Operator.AND        ,
-            transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM     )
+            transformation_mode   = Enum__Text__Transformation__Mode.XXX     )
 
         with Text__Transformation__Service() as _:
             _.setup()
@@ -210,7 +210,7 @@ class test_Text__Transformation__Service(TestCase):
             engine_mode           = Enum__Text__Transformation__Engine_Mode.TEXT_HASH,
             criterion_filters     = criterion_filters                               ,
             logic_operator        = Enum__Classification__Logic_Operator.OR         ,
-            transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM     )
+            transformation_mode   = Enum__Text__Transformation__Mode.XXX     )
 
         with Text__Transformation__Service() as _:
             _.setup()
@@ -254,7 +254,7 @@ class test_Text__Transformation__Service(TestCase):
     def test_transform__empty_mapping(self):                                        # Test with empty hash mapping
         request = Schema__Text__Transformation__Request(
             hash_mapping          = {}                                                                  ,
-            transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM                         )
+            transformation_mode   = Enum__Text__Transformation__Mode.XXX                         )
 
         with Text__Transformation__Service() as _:
             _.setup()
@@ -268,7 +268,7 @@ class test_Text__Transformation__Service(TestCase):
     def test_transform__none_mapping(self):                                         # Test with None hash mapping
         invalid_request = Schema__Text__Transformation__Request(
             hash_mapping          = None                                                                ,
-            transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM                         )
+            transformation_mode   = Enum__Text__Transformation__Mode.XXX                         )
 
         with Text__Transformation__Service() as _:
             _.setup()
@@ -276,7 +276,7 @@ class test_Text__Transformation__Service(TestCase):
 
             assert response.obj() == __(error_message       = None        ,
                                         transformed_mapping = __()        ,
-                                        transformation_mode = 'xxx-random',
+                                        transformation_mode = 'xxx',
                                         success             = True        ,
                                         total_hashes        = 0           ,
                                         transformed_hashes  = 0           )
@@ -290,7 +290,7 @@ class test_Text__Transformation__Service(TestCase):
             hash_mapping          = hash_mapping                                    ,
             engine_mode           = Enum__Text__Transformation__Engine_Mode.TEXT_HASH,
             criterion_filters     = []                                               ,  # Empty list
-            transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM     )
+            transformation_mode   = Enum__Text__Transformation__Mode.XXX     )
 
         with Text__Transformation__Service() as _:
             _.setup()
@@ -303,14 +303,16 @@ class test_Text__Transformation__Service(TestCase):
     # Helper Method Tests
     # ========================================
 
-    def test_get_engine__all_modes(self):                                           # Test getting engines for all transformation modes
+    def test__get_engine__all_modes(self):                                           # Test getting engines for all transformation modes
         with Text__Transformation__Service() as _:
             _.setup()
 
-            engine_xxx    = _._get_engine(Enum__Text__Transformation__Mode.XXX_RANDOM)
-            engine_hashes = _._get_engine(Enum__Text__Transformation__Mode.HASHES_RANDOM)
+            engine_xxx    = _._get_engine(Enum__Text__Transformation__Mode.XXX)
+            engine_hashes = _._get_engine(Enum__Text__Transformation__Mode.HASHES)
             engine_abcde  = _._get_engine(Enum__Text__Transformation__Mode.ABCDE_BY_SIZE)
 
+            assert engine_xxx    != engine_hashes
+            assert engine_xxx    != engine_abcde
             assert engine_xxx    is _.engine__xxx_random
             assert engine_hashes is _.engine__hashes_random
             assert engine_abcde  is _.engine__abcde_by_size

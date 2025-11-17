@@ -8,7 +8,7 @@ from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Tr
 
 
 class Text__Transformation__Engine__Hashes_Random(Text__Transformation__Engine):                            # Randomly replace text with hash values
-    transformation_mode : Enum__Text__Transformation__Mode = Enum__Text__Transformation__Mode.HASHES_RANDOM
+    transformation_mode : Enum__Text__Transformation__Mode = Enum__Text__Transformation__Mode.HASHES
 
     @type_safe
     def transform(self,                                                                  # Replace selected hashes with their hash values

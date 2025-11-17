@@ -13,7 +13,7 @@ class test_Text__Transformation__Engine__XXX_Random(TestCase):
         with Text__Transformation__Engine__XXX_Random() as _:
             assert type(_)                       is Text__Transformation__Engine__XXX_Random
             assert base_classes(_)               == [Text__Transformation__Engine, Type_Safe, object]
-            assert _.transformation_mode         == Enum__Text__Transformation__Mode.XXX_RANDOM
+            assert _.transformation_mode         == Enum__Text__Transformation__Mode.XXX
 
     def test_transform__empty_mapping(self):                                        # Test with empty hash mapping
         with Text__Transformation__Engine__XXX_Random() as _:
@@ -115,4 +115,4 @@ class test_Text__Transformation__Engine__XXX_Random(TestCase):
     def test_obj_comparison(self):                                                  # Test .obj() for state verification
         with Text__Transformation__Engine__XXX_Random() as _:
             obj = _.obj()
-            assert obj.transformation_mode   == Enum__Text__Transformation__Mode.XXX_RANDOM
+            assert obj.transformation_mode   == Enum__Text__Transformation__Mode.XXX

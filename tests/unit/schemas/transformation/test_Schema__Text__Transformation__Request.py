@@ -22,26 +22,26 @@ class test_Schema__Text__Transformation__Request(TestCase):
         hash_mapping = { Safe_Str__Hash("abc1234567") : "Hello" ,
                          Safe_Str__Hash("def1234567") : "World" }
 
-        with Schema__Text__Transformation__Request( hash_mapping          = hash_mapping                               ,
-                                                    transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM) as _:
+        with Schema__Text__Transformation__Request(hash_mapping          = hash_mapping                               ,
+                                                   transformation_mode   = Enum__Text__Transformation__Mode.XXX) as _:
             assert _.obj() == __(logic_operator='and',
                                  hash_mapping=__(abc1234567='Hello', def1234567='World'),
                                  engine_mode=None,
                                  criterion_filters=[],
-                                 transformation_mode='xxx-random')
+                                 transformation_mode='xxx')
 
     def test_json_round_trip(self):                                                 # Test JSON serialization round-trip
         hash_mapping = { Safe_Str__Hash("abc1234567") : "Test text" }
 
         with Schema__Text__Transformation__Request(hash_mapping          = hash_mapping                                    ,
-                                                   transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  ) as _:
+                                                   transformation_mode   = Enum__Text__Transformation__Mode.HASHES) as _:
             json_data = _.json()
             restored  = Schema__Text__Transformation__Request(**json_data)
 
-            assert restored.transformation_mode   == Enum__Text__Transformation__Mode.HASHES_RANDOM
+            assert restored.transformation_mode   == Enum__Text__Transformation__Mode.HASHES
             assert "abc1234567" in restored.hash_mapping
             assert restored.obj() == __(logic_operator      = 'and'                     ,
                                         hash_mapping        = __(abc1234567='Test text'),
                                         engine_mode         = None,
                                         criterion_filters   = [],
-                                        transformation_mode = 'hashes-random')
+                                        transformation_mode = 'hashes')

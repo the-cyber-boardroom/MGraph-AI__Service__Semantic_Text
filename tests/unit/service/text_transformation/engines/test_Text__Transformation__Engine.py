@@ -16,9 +16,9 @@ class test_Text__Transformation__Engine(TestCase):
 
     def test_with_mode(self):                                                       # Test engine with specific transformation mode
         with Text__Transformation__Engine(
-            transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM     ,
+            transformation_mode   = Enum__Text__Transformation__Mode.XXX     ,
         ) as _:
-            assert _.transformation_mode   == Enum__Text__Transformation__Mode.XXX_RANDOM
+            assert _.transformation_mode   == Enum__Text__Transformation__Mode.XXX
 
     def test_transform_not_implemented(self):                                       # Test that transform raises NotImplementedError
         hash_mapping = { Safe_Str__Hash("abc1234567") : "Hello" }
@@ -52,5 +52,5 @@ class test_Text__Transformation__Engine(TestCase):
                 assert "Subclass must implement transform() method" in str(e)
 
     def test_obj_comparison(self):                                                  # Test .obj() for state verification
-        with Text__Transformation__Engine(transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM) as _:
-            assert _.obj() == __(transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  )
+        with Text__Transformation__Engine(transformation_mode   = Enum__Text__Transformation__Mode.HASHES) as _:
+            assert _.obj() == __(transformation_mode   = Enum__Text__Transformation__Mode.HASHES)

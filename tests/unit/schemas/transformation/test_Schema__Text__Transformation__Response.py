@@ -28,13 +28,13 @@ class test_Schema__Text__Transformation__Response(TestCase):
 
         with Schema__Text__Transformation__Response(
             transformed_mapping = transformed_mapping                                                   ,
-            transformation_mode = Enum__Text__Transformation__Mode.XXX_RANDOM                           ,
+            transformation_mode = Enum__Text__Transformation__Mode.XXX                           ,
             success             = True                                                                  ,
             total_hashes        = Safe_UInt(2)                                                          ,
             transformed_hashes  = Safe_UInt(1)
         ) as _:
             assert _.success                    is True
-            assert _.transformation_mode        == Enum__Text__Transformation__Mode.XXX_RANDOM
+            assert _.transformation_mode        == Enum__Text__Transformation__Mode.XXX
             assert _.total_hashes               == 2
             assert _.transformed_hashes         == 1
             assert _.error_message              is None
@@ -45,7 +45,7 @@ class test_Schema__Text__Transformation__Response(TestCase):
 
         with Schema__Text__Transformation__Response(
             transformed_mapping = original_mapping                                                      ,
-            transformation_mode = Enum__Text__Transformation__Mode.HASHES_RANDOM                        ,
+            transformation_mode = Enum__Text__Transformation__Mode.HASHES                        ,
             success             = False                                                                 ,
             total_hashes        = Safe_UInt(1)                                                          ,
             transformed_hashes  = Safe_UInt(0)                                                          ,
@@ -78,7 +78,7 @@ class test_Schema__Text__Transformation__Response(TestCase):
 
         with Schema__Text__Transformation__Response(
             transformed_mapping = transformed_mapping                                                   ,
-            transformation_mode = Enum__Text__Transformation__Mode.XXX_RANDOM                           ,
+            transformation_mode = Enum__Text__Transformation__Mode.XXX                           ,
             success             = True                                                                  ,
             total_hashes        = Safe_UInt(5)                                                          ,
             transformed_hashes  = Safe_UInt(3)
@@ -87,13 +87,13 @@ class test_Schema__Text__Transformation__Response(TestCase):
             restored  = Schema__Text__Transformation__Response(**json_data)
 
             assert restored.success                    == True
-            assert restored.transformation_mode        == Enum__Text__Transformation__Mode.XXX_RANDOM
+            assert restored.transformation_mode        == Enum__Text__Transformation__Mode.XXX
             assert restored.total_hashes               == 5
             assert restored.transformed_hashes         == 3
             assert "abc1234567"                        in restored.transformed_mapping
             assert restored.obj()                      == __(error_message       = None                        ,
                                                              transformed_mapping = __(abc1234567='Test output'),
-                                                             transformation_mode = 'xxx-random'                ,
+                                                             transformation_mode = 'xxx'                ,
                                                              success             = True                        ,
                                                              total_hashes        = 5                           ,
                                                              transformed_hashes  = 3                           )

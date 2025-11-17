@@ -1,26 +1,23 @@
-from unittest                                                                                               import TestCase
-from fastapi                                                                                                import FastAPI
-from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Text_Transformation                            import Routes__Text_Transformation
-from mgraph_ai_service_semantic_text.schemas.routes.Schema__Text__Transformation__Request__ABCDE_By_Size    import Schema__Text__Transformation__Request__ABCDE_By_Size
-from mgraph_ai_service_semantic_text.schemas.routes.Schema__Text__Transformation__Request__Hashes_Random    import Schema__Text__Transformation__Request__Hashes_Random
-from mgraph_ai_service_semantic_text.schemas.routes.Schema__Text__Transformation__Request__XXX_Random       import Schema__Text__Transformation__Request__XXX_Random
-from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Transformation__Mode          import Enum__Text__Transformation__Mode
-from osbot_utils.testing.__                                                                                 import __
-from osbot_utils.type_safe.primitives.core.Safe_UInt                                                        import Safe_UInt
-from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                          import Safe_Str__Hash
-from starlette.testclient                                                                                   import TestClient
-from tests.unit.Semantic_Text__Service__Fast_API__Test_Objs                                                 import get__service__html__client
+from unittest                                                                                       import TestCase
+from fastapi                                                                                        import FastAPI
+from osbot_utils.testing.__                                                                         import __, __SKIP__
+from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                  import Safe_Str__Hash
+from starlette.testclient                                                                           import TestClient
+from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Text_Transformation                    import Routes__Text_Transformation
+from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Request   import Schema__Text__Transformation__Request
+from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Transformation__Mode  import Enum__Text__Transformation__Mode
+from tests.unit.Semantic_Text__Service__Fast_API__Test_Objs                                         import get__service__html__client
 
 
 class test_Routes__Text_Transformation__using_html_service(TestCase):
 
     @classmethod
-    def setUpClass(cls) -> None:
-        cls.app                 = FastAPI()
-        cls.text_transformation = Routes__Text_Transformation(app=cls.app).setup()
-        cls.client__html_service = get__service__html__client()
+    def setUpClass(cls) -> None:                                                # Setup shared test objects (called once)
+        cls.app                     = FastAPI()
+        cls.text_transformation     = Routes__Text_Transformation(app=cls.app).setup()
+        cls.client__html_service    = get__service__html__client()
 
-        cls.html_simple      = "<html><body>Hello World</body></html>"                          # todo: see if we should move these examples into static vars stored in a separate class or at the end of this test class
+        cls.html_simple      = "<html><body>Hello World</body></html>"
         cls.html_paragraph   = "<html><body><p>This is a test paragraph.</p></body></html>"
         cls.html_complex     = """
             <html>
@@ -69,292 +66,253 @@ class test_Routes__Text_Transformation__using_html_service(TestCase):
     # Helper Methods
     # ========================================
 
-    def get_hash_mapping(self, html: str) -> dict:                              # Extract hash mapping from HTML
+    def get_hash_mapping(self, html: str) -> dict:                              # Extract hash mapping from HTML using HTML service
         payload  = dict(html=html)
         response = self.client__html_service.post('/html/to/text/hashes', json=payload)
         assert response.status_code == 200
         data = response.json()
         return data['hash_mapping']
 
-    # todo: see if we do need this method since Type_Safe should handle these cases ok
-    def convert_to_safe_hash_dict(self, hash_mapping: dict):                    # Convert dict to Safe_Str__Hash keys
+    def convert_to_safe_hash_dict(self, hash_mapping: dict):                    # Convert dict to Safe_Str__Hash keys (Type_Safe handles this but explicit for clarity)
         return {Safe_Str__Hash(k): v for k, v in hash_mapping.items()}
 
     # ========================================
-    # test setup
+    # Test Setup Verification
     # ========================================
 
-    def test__setUpClass(self):
+    def test__setUpClass(self):                                                 # Verify test class setup completed correctly
         with self.text_transformation as _:
             assert type(_) is Routes__Text_Transformation
         assert type(self.client__html_service) is TestClient
-        assert self.client__html_service.get('/docs').status_code == 200
+        assert self.client__html_service.get('/docs').status_code == 200        # HTML service is up
 
-    def test__client__html_service(self):
+    def test__client__html_service(self):                                       # Verify HTML service is working and returns expected structure
         payload     = dict(html="<html><body>some text <b>in bold</b></body></html>")
         response_1  = self.client__html_service.post('/html/to/text/nodes', json=payload)
-        assert response_1.json() == { 'max_depth_reached' : False,
+
+        assert response_1.json() == { 'max_depth_reached' : False                                      ,
                                       'text_nodes'        : { '7d67718d23': {'tag': 'body', 'text': 'some text '},
-                                                              'a247f7d958': {'tag': 'b', 'text': 'in bold'}},
-                                      'total_nodes'       : 2 }
+                                                              'a247f7d958': {'tag': 'b', 'text': 'in bold'}   },
+                                      'total_nodes'       : 2                                           }
 
         response_2 = self.client__html_service.post('/html/to/dict/hashes', json=payload)
-        assert response_2.json() == { 'hash_mapping': {'7d67718d23': 'some text ',
-                                                       'a247f7d958': 'in bold'   },
-                                      'html_dict': {'attrs': {},
-                                                    'nodes': [{'attrs': {},
-                                                               'nodes': [{'data': '7d67718d23', 'type': 'TEXT'},
-                                                                         {'attrs': {},
-                                                                          'nodes': [{'data': 'a247f7d958',
-                                                                                     'type': 'TEXT'}],
-                                                                          'tag': 'b'}],
-                                                               'tag': 'body'}],
-                                                    'tag': 'html'},
-                                      'max_depth': 3,
-                                      'max_depth_reached': False,
-                                      'node_count': 5,
-                                      'total_text_hashes': 2}
+        result_2   = response_2.json()
+        assert result_2['hash_mapping']     == {'7d67718d23': 'some text ', 'a247f7d958': 'in bold'}
+        assert result_2['total_text_hashes'] == 2
 
         response_3 = self.client__html_service.post('/html/to/text/hashes', json=payload)
-        assert response_3.json() == {'hash_mapping': {'7d67718d23': 'some text ',
-                                                      'a247f7d958': 'in bold'  },
-                                                      'max_depth_reached': False,
-                                                      'total_text_hashes': 2}
-
+        assert response_3.json() == {'hash_mapping'       : {'7d67718d23': 'some text ', 'a247f7d958': 'in bold'},
+                                     'max_depth_reached'  : False                                               ,
+                                     'total_text_hashes'  : 2                                                   }
 
     # ========================================
-    # XXX-Random Transformation Tests
+    # xxx Transformation Tests
     # ========================================
 
-    def test__xxx_random__simple_html(self):                                    # Test xxx-random with simple HTML
+    def test__transform__xxx_random__simple_html(self):                         # Test xxx transformation with simple HTML
         hash_mapping = self.get_hash_mapping(self.html_simple)
         assert len(hash_mapping) == 1                                           # Should have 1 text node: "Hello World"
         assert hash_mapping      == {'b10a8db164': 'Hello World'}
 
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request           = Schema__Text__Transformation__Request__XXX_Random(hash_mapping = safe_hash_mapping)                               # Transform all
 
-        response = self.text_transformation.transform__xxx_random(request)
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                          ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.XXX) as request:
 
-        assert response.success             is True
-        assert response.transformation_mode == Enum__Text__Transformation__Mode.XXX_RANDOM
-        assert response.total_hashes        == 1
-        assert response.transformed_hashes  >= 1
-        assert response.obj()               == __( error_message       = None                        ,
-                                                   transformed_mapping = __(b10a8db164='xxxxx xxxxx'),
-                                                   transformation_mode = 'xxx-random',
-                                                   success             = True,
-                                                   total_hashes        =  1   ,
-                                                   transformed_hashes  = 1  )
+            response = self.text_transformation.transform(request)
 
-        # Verify transformation preserves structure
-        original_text    = list(hash_mapping.values())[0]
-        hash_key         = Safe_Str__Hash(list(hash_mapping.keys())[0])
-        transformed_text = response.transformed_mapping[hash_key]
+            assert response.obj() == __(error_message       = None                        ,
+                                       transformed_mapping = __(b10a8db164='xxxxx xxxxx') ,
+                                       transformation_mode = 'xxx'                 ,
+                                       success             = True                         ,
+                                       total_hashes        = 1                            ,
+                                       transformed_hashes  = 1                            )
 
-        assert len(transformed_text) == len(original_text)                      # Same length
-        assert transformed_text      != original_text                           # Actually transformed
-        assert ' '                   in transformed_text                        # Space preserved
-        assert transformed_text      == 'xxxxx xxxxx'
-
-    def test__xxx_random__paragraph_html(self):                                 # Test xxx-random with paragraph
-        hash_mapping = self.get_hash_mapping(self.html_paragraph)
-        assert len(hash_mapping) == 1                                           # "This is a test paragraph."
-
+    def test__transform__xxx_random__complex_html(self):                        # Test xxx with complex multi-node HTML
+        hash_mapping      = self.get_hash_mapping(self.html_complex)
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping=safe_hash_mapping)                           # Transform ~50%
 
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                          ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.XXX) as request:
 
-        response = self.text_transformation.transform__xxx_random(request)
+            response = self.text_transformation.transform(request)
 
-        assert response.success is True
-        assert response.total_hashes == 1
+            with response as _:
+                assert _.success      is True
+                assert _.total_hashes == len(hash_mapping)
 
-        # Check that punctuation is preserved
-        transformed_text = list(response.transformed_mapping.values())[0]
-        assert '.' in transformed_text                                          # Period preserved
-        assert transformed_text == 'xxxx xx x xxxx xxxxxxxxx.'
+                for hash_key, transformed_text in _.transformed_mapping.items():   # Verify all text nodes transformed
+                    assert hash_key in safe_hash_mapping                           # All original hashes present
+                    if transformed_text != safe_hash_mapping[hash_key]:            # If transformed
+                        assert 'x' in transformed_text                             # Should contain x's
 
-    def test__xxx_random__complex_html(self):                                   # Test xxx-random with complex HTML
-        hash_mapping = self.get_hash_mapping(self.html_complex)
-        assert len(hash_mapping) > 5                                            # Multiple text nodes
-        safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping=safe_hash_mapping)
+                assert response.obj() == __(error_message=None,
+                                            transformed_mapping=__(_094cf2ae96='xxxx xxxx',
+                                                                   _9f6c1a3ffc='xxxxxxx xx xxxxxx',
+                                                                   _658bbd823c='xxxx xx x ',
+                                                                   _69dcab4a73='xxxx',
+                                                                   _78aa26e3ec=' xxxxxxxxx xxxx ',
+                                                                   _030c5b6d1e='xxxxxx',
+                                                                   _2d99d326cd=' xxxx.',
+                                                                   f1ef59ee34='xxxxx xxxx',
+                                                                   _4e864ad0c1='xxxxxx xxxx',
+                                                                   _1267f9f89a='xxxxx xxxx',
+                                                                   _14c3c2854c='xxxx xxxxxx xxxxxxx',
+                                                                   _936ccdb971='xxxxx xxxx'),
+                                            transformation_mode='xxx',
+                                            success=True,
+                                            total_hashes=12,
+                                            transformed_hashes=12)
 
-        response = self.text_transformation.transform__xxx_random(request)
+    def test__transform__xxx_random__preserves_structure(self):                 # Test xxx preserves HTML structure (punctuation, spaces)
+        html_with_structure = "<p>Hello, World! How are you?</p>"
+        hash_mapping        = self.get_hash_mapping(html_with_structure)
+        safe_hash_mapping   = self.convert_to_safe_hash_dict(hash_mapping)
 
-        assert response.success is True
-        assert response.transformation_mode == Enum__Text__Transformation__Mode.XXX_RANDOM
-        assert response.total_hashes == len(hash_mapping)
-        assert response.transformed_hashes > 0
-        assert response.transformed_hashes <= response.total_hashes
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                          ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.XXX) as request:
 
-        # Verify some text was transformed, some preserved
-        assert response.transformed_hashes < response.total_hashes
+            response = self.text_transformation.transform(request)
 
-    def test__xxx_random__article_html(self):                                   # Test xxx-random with article HTML
-        hash_mapping = self.get_hash_mapping(self.html_article)
-        original_count = len(hash_mapping)
-        assert original_count > 10                                              # Should have many text nodes
+            for hash_key, transformed_text in response.transformed_mapping.items():
+                if 'x' in transformed_text:                                    # If this was transformed
+                    assert ', ' in transformed_text or '!' in transformed_text or '?' in transformed_text   # Punctuation preserved
 
-        safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping=safe_hash_mapping)
-
-        response = self.text_transformation.transform__xxx_random(request)
-
-        assert response.success            is True
-        assert response.total_hashes       == original_count
-        assert response.transformed_hashes >= 1
-
-        # Verify all keys preserved
-        assert set(response.transformed_mapping.keys()) == set(safe_hash_mapping.keys())
+            assert response.obj() == __(error_message=None,
+                                        transformed_mapping=__(b26ffe6849='xxxxx, xxxxx! xxx xxx xxx?'),
+                                        transformation_mode='xxx',
+                                        success=True,
+                                        total_hashes=1,
+                                        transformed_hashes=1)
 
     # ========================================
     # Hashes-Random Transformation Tests
     # ========================================
 
-    def test__hashes_random__simple_html(self):                                 # Test hashes-random with simple HTML
-        hash_mapping = self.get_hash_mapping(self.html_simple)
-
+    def test__transform__hashes_random__simple_html(self):                      # Test Hashes-Random shows hash values
+        hash_mapping      = self.get_hash_mapping(self.html_simple)
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping=safe_hash_mapping)
 
-        response = self.text_transformation.transform__hashes_random(request)
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                              ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.HASHES) as request:
 
-        assert response.success is True
-        assert response.transformation_mode == Enum__Text__Transformation__Mode.HASHES_RANDOM
-        assert response.total_hashes == 1
-        assert response.transformed_hashes >= 1
+            response = self.text_transformation.transform(request)
 
-        # Verify transformed text is either original or hash
-        hash_key = Safe_Str__Hash(list(hash_mapping.keys())[0])
-        transformed = response.transformed_mapping[hash_key]
-        original = hash_mapping[list(hash_mapping.keys())[0]]
+            with response as _:
+                assert _.success             is True
+                assert _.transformation_mode == Enum__Text__Transformation__Mode.HASHES
+                assert _.total_hashes        == 1
+                assert _.transformed_hashes  == 1
 
-        assert transformed == original or transformed == str(hash_key)
+                first_hash = list(safe_hash_mapping.keys())[0]
+                assert _.transformed_mapping[first_hash] == str(first_hash)    # Hash replaces text
 
-    def test__hashes_random__complex_html__verify_hashes_shown(self):           # Test that hashes are actually shown
-        hash_mapping = self.get_hash_mapping(self.html_complex)
+                assert response.obj() == __(error_message=None,
+                                            transformed_mapping=__(b10a8db164='b10a8db164'),
+                                            transformation_mode='hashes',
+                                            success=True,
+                                            total_hashes=1,
+                                            transformed_hashes=1)
 
+    def test__transform__hashes_random__complex_html(self):                     # Test Hashes-Random with multiple text nodes
+        hash_mapping      = self.get_hash_mapping(self.html_complex)
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping=safe_hash_mapping)
 
-        response = self.text_transformation.transform__hashes_random(request)
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                              ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.HASHES) as request:
 
-        assert response.success is True
-        assert response.transformed_hashes >= 1
+            response = self.text_transformation.transform(request)
 
-        # Count how many texts were replaced with their hashes
-        hash_count = 0
-        for hash_key, transformed_text in response.transformed_mapping.items():
-            if transformed_text == str(hash_key):
-                hash_count += 1
+            with response as _:
+                assert _.success      is True
+                assert _.total_hashes == len(hash_mapping)
 
-        assert hash_count > 0                                                   # At least some hashes shown
+                for hash_key, transformed_text in _.transformed_mapping.items():
+                    if transformed_text != safe_hash_mapping[hash_key]:        # If transformed
+                        assert transformed_text == str(hash_key)               # Should show hash value
 
-    def test__hashes_random__article_html__partial_transformation(self):        # Test partial transformation
-        hash_mapping = self.get_hash_mapping(self.html_article)
-
-        safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping=safe_hash_mapping)
-
-        response = self.text_transformation.transform__hashes_random(request)
-
-        assert response.success is True
-        assert response.total_hashes == len(hash_mapping)
-
-        # Verify mix of original and transformed
-        original_count = 0
-        hash_count = 0
-
-        for hash_key, transformed_text in response.transformed_mapping.items():
-            original_text = safe_hash_mapping[hash_key]
-            if transformed_text == original_text:
-                original_count += 1
-            elif transformed_text == str(hash_key):
-                hash_count += 1
-
-        assert original_count + hash_count == response.total_hashes
-        assert hash_count == response.transformed_hashes
+                assert _.obj() == __(error_message=None,
+                                     transformed_mapping=__(_094cf2ae96='094cf2ae96',
+                                                            _9f6c1a3ffc='9f6c1a3ffc',
+                                                            _658bbd823c='658bbd823c',
+                                                            _69dcab4a73='69dcab4a73',
+                                                            _78aa26e3ec='78aa26e3ec',
+                                                            _030c5b6d1e='030c5b6d1e',
+                                                            _2d99d326cd='2d99d326cd',
+                                                            f1ef59ee34='f1ef59ee34',
+                                                            _4e864ad0c1='4e864ad0c1',
+                                                            _1267f9f89a='1267f9f89a',
+                                                            _14c3c2854c='14c3c2854c',
+                                                            _936ccdb971='936ccdb971'),
+                                     transformation_mode='hashes',
+                                     success=True,
+                                     total_hashes=12,
+                                     transformed_hashes=12)
 
     # ========================================
     # ABCDE-By-Size Transformation Tests
     # ========================================
 
-    def test__abcde_by_size__simple_html(self):                                 # Test abcde-by-size with simple HTML
-        hash_mapping = self.get_hash_mapping(self.html_simple)
-
+    def test__transform__abcde_by_size__simple_html(self):                      # Test ABCDE groups by text length
+        hash_mapping      = self.get_hash_mapping(self.html_simple)
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping)
 
-        response = self.text_transformation.transform__abcde_by_size(request)
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                              ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE  ) as request:
 
-        assert response.success is True
-        assert response.transformation_mode == Enum__Text__Transformation__Mode.ABCDE_BY_SIZE
-        assert response.total_hashes == 1
+            response = self.text_transformation.transform(request)
 
-        # Verify text replaced with letters
-        transformed_text = list(response.transformed_mapping.values())[0]
-        alphas = [c for c in transformed_text if c.isalpha()]
-        assert all(c in 'abcde' for c in alphas)                                # Only letters a-e used
+            assert response.obj() == __(error_message=None,
+                                        transformed_mapping=__(b10a8db164='aaaaa aaaaa'),
+                                        transformation_mode='abcde-by-size',
+                                        success=True,
+                                        total_hashes=1,
+                                        transformed_hashes=1)
 
-    def test__abcde_by_size__complex_html__verify_grouping(self):               # Test that texts are grouped by length
-        hash_mapping = self.get_hash_mapping(self.html_complex)
+            first_hash        = list(safe_hash_mapping.keys())[0]
+            transformed_text  = response.transformed_mapping[first_hash]
+            assert transformed_text != safe_hash_mapping[first_hash]           # Should be transformed
+            assert any(c in transformed_text for c in 'abcde')                 # Should contain group letter
 
-        # Get original text lengths
-        text_lengths = {}
-        for hash_key, text in hash_mapping.items():
-            text_lengths[hash_key] = len(text)
-
+    def test__transform__abcde_by_size__complex_html(self):                     # Test ABCDE with multiple lengths
+        hash_mapping      = self.get_hash_mapping(self.html_complex)
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping)
 
-        response = self.text_transformation.transform__abcde_by_size(request)
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                              ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE  ) as request:
 
-        assert response.success is True
-        assert response.transformed_hashes >= 1
+            response = self.text_transformation.transform(request)
 
-        # Verify texts of similar length get same letter
-        letter_groups = {}
-        for hash_key, transformed_text in response.transformed_mapping.items():
-            # Extract the letter used
-            alphas = [c for c in transformed_text if c.isalpha()]
-            if alphas:
-                letter = alphas[0]
-                if letter not in letter_groups:
-                    letter_groups[letter] = []
-                letter_groups[letter].append(str(hash_key))
+            with response as _:
+                assert _.success             is True
+                assert _.total_hashes        == len(hash_mapping)
+                assert _.transformed_hashes  == len(hash_mapping)              # ABCDE transforms ALL
 
-        assert len(letter_groups) >= 1                                          # At least one group
-        assert len(letter_groups) <= 5                                          # At most 5 groups (a-e)
+                letters_used = set()
+                for hash_key, transformed_text in _.transformed_mapping.items():
+                    alphas = [c for c in transformed_text if c.isalpha()]
+                    if alphas:
+                        letters_used.add(alphas[0])
 
-    def test__abcde_by_size__article_html__full_transformation(self):           # Test with article HTML
-        hash_mapping = self.get_hash_mapping(self.html_article)
+                assert len(letters_used) >= 2                                  # At least 2 different length groups
 
-        safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping,
-                                                                       num_groups=Safe_UInt(5))
+    def test__transform__abcde_by_size__preserves_structure(self):              # Test ABCDE preserves punctuation and spaces
+        html_with_structure = "<p>Hello, World!</p>"
+        hash_mapping        = self.get_hash_mapping(html_with_structure)
+        safe_hash_mapping   = self.convert_to_safe_hash_dict(hash_mapping)
 
-        response = self.text_transformation.transform__abcde_by_size(request)
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                              ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE  ) as request:
 
-        assert response.success is True
-        assert response.transformation_mode == Enum__Text__Transformation__Mode.ABCDE_BY_SIZE
-        assert response.total_hashes == len(hash_mapping)
-        assert response.transformed_hashes >= 1
+            response = self.text_transformation.transform(request)
 
-        # Verify structure preserved (spaces and punctuation)
-        for hash_key, transformed_text in response.transformed_mapping.items():
-            original_text = safe_hash_mapping[hash_key]
+            first_hash       = list(safe_hash_mapping.keys())[0]
+            transformed_text = response.transformed_mapping[first_hash]
 
-            # Count spaces
-            original_spaces = original_text.count(' ')
-            transformed_spaces = transformed_text.count(' ')
-            assert transformed_spaces == original_spaces                        # Spaces preserved
+            assert ', ' in transformed_text                                    # Comma and space preserved
+            assert '!'  in transformed_text                                    # Exclamation preserved
 
-            # Check length matches
-            assert len(transformed_text) == len(original_text)                  # Length preserved
-
-    def test__abcde_by_size__varying_lengths(self):                             # Test texts with very different lengths
+    def test__transform__abcde_by_size__varying_lengths(self):                  # Test ABCDE with texts of very different lengths
         html_varying = """
             <div>
                 <span>A</span>
@@ -364,77 +322,70 @@ class test_Routes__Text_Transformation__using_html_service(TestCase):
             </div>
         """
 
-        hash_mapping = self.get_hash_mapping(html_varying)
-        assert len(hash_mapping) >= 4                                           # At least 4 different texts
-
+        hash_mapping      = self.get_hash_mapping(html_varying)
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping)
 
-        response = self.text_transformation.transform__abcde_by_size(request)
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                              ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE  ) as request:
 
-        assert response.success is True
+            response = self.text_transformation.transform(request)
 
-        # Extract letters used for each text
-        text_to_letter = {}
-        for hash_key, transformed_text in response.transformed_mapping.items():
-            alphas = [c for c in transformed_text if c.isalpha()]
-            if alphas:
-                text_to_letter[str(hash_key)] = alphas[0]
+            assert response.success is True
 
-        # Verify different lengths got different letters
-        unique_letters = set(text_to_letter.values())
-        assert len(unique_letters) >= 2                                         # At least 2 different groups
+            text_to_letter = {}                                                # Extract group letter for each text
+            for hash_key, transformed_text in response.transformed_mapping.items():
+                alphas = [c for c in transformed_text if c.isalpha()]
+                if alphas:
+                    text_to_letter[str(hash_key)] = alphas[0]
+
+            unique_letters = set(text_to_letter.values())
+            assert len(unique_letters) >= 2                                    # At least 2 different length groups
 
     # ========================================
     # Cross-Mode Comparison Tests
     # ========================================
 
-    def test__all_modes__same_html__different_transformations(self):            # Verify each mode produces different results
-        hash_mapping = self.get_hash_mapping(self.html_complex)
+    def test__all_modes__same_html__different_transformations(self):            # Verify each mode produces different results for same input
+        hash_mapping      = self.get_hash_mapping(self.html_complex)
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
 
-        # Apply all three transformations
-        request_xxx = Schema__Text__Transformation__Request__XXX_Random(hash_mapping=safe_hash_mapping)
-        response_xxx = self.text_transformation.transform__xxx_random(request_xxx)
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                          ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.XXX) as request_xxx:
+            response_xxx = self.text_transformation.transform(request_xxx)
 
-        request_hashes = Schema__Text__Transformation__Request__Hashes_Random(hash_mapping=safe_hash_mapping)
-        response_hashes = self.text_transformation.transform__hashes_random(request_hashes)
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                              ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.HASHES) as request_hashes:
+            response_hashes = self.text_transformation.transform(request_hashes)
 
-        request_abcde = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping)
-        response_abcde = self.text_transformation.transform__abcde_by_size(request_abcde)
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                              ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE  ) as request_abcde:
+            response_abcde = self.text_transformation.transform(request_abcde)
 
-        # All should succeed
-        assert response_xxx.success is True
-        assert response_hashes.success is True
-        assert response_abcde.success is True
+        assert response_xxx.success            is True                         # All should succeed
+        assert response_hashes.success         is True
+        assert response_abcde.success          is True
 
-        # All should have same number of hashes
-        assert response_xxx.total_hashes == len(hash_mapping)
-        assert response_hashes.total_hashes == len(hash_mapping)
-        assert response_abcde.total_hashes == len(hash_mapping)
+        assert response_xxx.total_hashes       == len(hash_mapping)            # All should have same number of hashes
+        assert response_hashes.total_hashes    == len(hash_mapping)
+        assert response_abcde.total_hashes     == len(hash_mapping)
 
-        # Verify different transformation modes
-        assert response_xxx.transformation_mode == Enum__Text__Transformation__Mode.XXX_RANDOM
-        assert response_hashes.transformation_mode == Enum__Text__Transformation__Mode.HASHES_RANDOM
-        assert response_abcde.transformation_mode == Enum__Text__Transformation__Mode.ABCDE_BY_SIZE
+        assert response_xxx.transformation_mode    == Enum__Text__Transformation__Mode.XXX       # Verify modes
+        assert response_hashes.transformation_mode == Enum__Text__Transformation__Mode.HASHES
+        assert response_abcde.transformation_mode  == Enum__Text__Transformation__Mode.ABCDE_BY_SIZE
 
-        # Verify transformations are actually different
-        # Pick first hash and compare transformations
-        first_hash = Safe_Str__Hash(list(hash_mapping.keys())[0])
-        xxx_result = response_xxx.transformed_mapping[first_hash]
+        first_hash = Safe_Str__Hash(list(hash_mapping.keys())[0])             # Compare transformations
+        xxx_result    = response_xxx.transformed_mapping[first_hash]
         hashes_result = response_hashes.transformed_mapping[first_hash]
-        abcde_result = response_abcde.transformed_mapping[first_hash]
+        abcde_result  = response_abcde.transformed_mapping[first_hash]
 
-        # At least two should be different (they might randomly be same)
         unique_results = len({xxx_result, hashes_result, abcde_result})
-        assert unique_results >= 2                                              # At least 2 different transformations
+        assert unique_results >= 2                                             # At least 2 different transformations
 
     # ========================================
     # Real-World Scenario Tests
     # ========================================
 
-    def test__realistic_workflow__html_to_transformation_pipeline(self):        # Test complete workflow: HTML → hashes → transform
-        # Step 1: Get HTML content (simulating from Mitmproxy)
+    def test__realistic_workflow__html_to_transformation_pipeline(self):        # Test complete workflow: HTML → hashes → transform → reconstruct
         html_content = """
             <html>
                 <body>
@@ -449,26 +400,22 @@ class test_Routes__Text_Transformation__using_html_service(TestCase):
             </html>
         """
 
-        # Step 2: Extract hash mapping (Mitmproxy calls HTML service)
-        hash_mapping = self.get_hash_mapping(html_content)
-        assert len(hash_mapping) >= 3                                           # Header + 2 paragraphs
-
-        # Step 3: Transform hashes (Mitmproxy calls Semantic Text service)
+        hash_mapping      = self.get_hash_mapping(html_content)               # Step 1: Extract hash mapping (HTML service)
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
-        request = Schema__Text__Transformation__Request__XXX_Random(hash_mapping=safe_hash_mapping)
 
-        response = self.text_transformation.transform__xxx_random(request)
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                          ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.XXX) as request:
 
-        # Step 4: Verify transformation
-        assert response.success is True
-        assert response.total_hashes == len(hash_mapping)
+            response = self.text_transformation.transform(request)             # Step 2: Transform hashes (Semantic Text service)
 
-        # Step 5: Verify transformed hashes can be mapped back
-        for hash_key in safe_hash_mapping.keys():
-            assert hash_key in response.transformed_mapping                     # All hashes present
+            with response as _:                                                # Step 3: Verify transformation
+                assert _.success      is True
+                assert _.total_hashes == len(hash_mapping)
 
-    def test__realistic_workflow__semantic_structure_analysis(self):            # Test analyzing semantic structure without content
-        # Use ABCDE to understand content structure by length
+                for hash_key in safe_hash_mapping.keys():                     # Step 4: Verify all hashes can be mapped back
+                    assert hash_key in _.transformed_mapping
+
+    def test__realistic_workflow__semantic_structure_analysis(self):            # Test analyzing semantic structure without exposing content
         structured_html = """
             <div>
                 <h1>Title</h1>
@@ -479,22 +426,42 @@ class test_Routes__Text_Transformation__using_html_service(TestCase):
             </div>
         """
 
-        hash_mapping = self.get_hash_mapping(structured_html)
+        hash_mapping      = self.get_hash_mapping(structured_html)
         safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
 
-        request = Schema__Text__Transformation__Request__ABCDE_By_Size(hash_mapping=safe_hash_mapping)
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                              ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE  ) as request:
 
-        response = self.text_transformation.transform__abcde_by_size(request)
+            response = self.text_transformation.transform(request)
 
-        assert response.success is True
+            assert response.success is True
 
-        # Analyze structure: count texts by length group
-        length_groups = {}
-        for hash_key, transformed_text in response.transformed_mapping.items():
-            alphas = [c for c in transformed_text if c.isalpha()]
-            if alphas:
-                letter = alphas[0]
-                length_groups[letter] = length_groups.get(letter, 0) + 1
+            length_groups = {}                                                 # Analyze structure: count texts by length group
+            for hash_key, transformed_text in response.transformed_mapping.items():
+                alphas = [c for c in transformed_text if c.isalpha()]
+                if alphas:
+                    letter = alphas[0]
+                    length_groups[letter] = length_groups.get(letter, 0) + 1
 
-        # We should see different groups for different length texts
-        assert len(length_groups) >= 2                                          # At least 2 different length groups
+            assert len(length_groups) >= 2                                     # Should see different groups for different lengths
+
+    def test__realistic_workflow__article_analysis(self):                       # Test article structure analysis with ABCDE
+        hash_mapping      = self.get_hash_mapping(self.html_article)
+        safe_hash_mapping = self.convert_to_safe_hash_dict(hash_mapping)
+
+        with Schema__Text__Transformation__Request(hash_mapping        = safe_hash_mapping                              ,
+                                                   transformation_mode = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE  ) as request:
+
+            response = self.text_transformation.transform(request)
+
+            with response as _:
+                assert _.success             is True
+                assert _.transformed_hashes  == len(hash_mapping)              # All transformed
+
+                letters_found = set()
+                for transformed_text in _.transformed_mapping.values():
+                    alphas = [c for c in transformed_text if c.isalpha()]
+                    if alphas:
+                        letters_found.add(alphas[0])
+
+                assert len(letters_found) >= 2                                 # Multiple length categories

@@ -8,7 +8,7 @@ from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Tr
 
 
 class Text__Transformation__Engine__XXX_Random(Text__Transformation__Engine):       # Randomly mask text with 'x' characters
-    transformation_mode : Enum__Text__Transformation__Mode = Enum__Text__Transformation__Mode.XXX_RANDOM
+    transformation_mode : Enum__Text__Transformation__Mode = Enum__Text__Transformation__Mode.XXX
 
     @type_safe
     def transform(self,                                                                 # Mask selected hashes with 'x' characters

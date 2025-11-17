@@ -1,11 +1,11 @@
 from typing                                                                                                           import Dict, List, Optional
 from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text                                         import Safe_Str__Comprehend__Text
+from osbot_utils.decorators.methods.cache_on_self                                                                     import cache_on_self
 from osbot_utils.type_safe.Type_Safe                                                                                  import Type_Safe
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                                                  import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                                    import Safe_Str__Hash
 from osbot_utils.type_safe.type_safe_core.decorators.type_safe                                                        import type_safe
-from osbot_utils.utils.Misc import list_set
-
+from osbot_utils.utils.Misc                                                                                           import list_set
 from mgraph_ai_service_semantic_text.service.semantic_text.classification.Classification__Filter__Service             import Classification__Filter__Service
 from mgraph_ai_service_semantic_text.service.text_transformation.Text__Grouping__Service                              import Text__Grouping__Service
 from mgraph_ai_service_semantic_text.service.text_transformation.engines.Text__Transformation__Engine                 import Text__Transformation__Engine
@@ -22,7 +22,7 @@ from mgraph_ai_service_semantic_text.schemas.classification.enums.Enum__Classifi
 class Text__Transformation__Service(Type_Safe):                                     # Main orchestrator for text transformations with sentiment filtering
     classification_service : Classification__Filter__Service                        # Service for classification and filtering
     text_grouping          : Text__Grouping__Service                                # Service for grouping text by criteria
-    engine__xxx_random     : Text__Transformation__Engine__XXX_Random               # Engine for xxx-random mode
+    engine__xxx_random     : Text__Transformation__Engine__XXX_Random               # Engine for xxx mode
     engine__hashes_random  : Text__Transformation__Engine__Hashes_Random            # Engine for hashes-random mode
     engine__abcde_by_size  : Text__Transformation__Engine__ABCDE_By_Size            # Engine for abcde-by-size mode
 
@@ -105,12 +105,13 @@ class Text__Transformation__Service(Type_Safe):                                 
                                                       total_hashes        = total_hashes                ,
                                                       transformed_hashes  = total_hashes                )  # ABCDE transforms all
 
+    @cache_on_self
     @type_safe
     def _get_engine(self,                                                           # Get transformation engine for mode
                     mode: Enum__Text__Transformation__Mode                          # Transformation mode
                ) -> Text__Transformation__Engine:                                   # Transformation engine
-        engines = { Enum__Text__Transformation__Mode.XXX_RANDOM    : self.engine__xxx_random    ,
-                    Enum__Text__Transformation__Mode.HASHES_RANDOM : self.engine__hashes_random ,
+        engines = { Enum__Text__Transformation__Mode.XXX    : self.engine__xxx_random    ,
+                    Enum__Text__Transformation__Mode.HASHES : self.engine__hashes_random ,
                     Enum__Text__Transformation__Mode.ABCDE_BY_SIZE : self.engine__abcde_by_size }
 
         engine = engines.get(mode)
