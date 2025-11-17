@@ -24,9 +24,11 @@ class test_Schema__Text__Transformation__Request(TestCase):
 
         with Schema__Text__Transformation__Request( hash_mapping          = hash_mapping                               ,
                                                     transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM) as _:
-            assert _.obj() == __(hash_mapping          = __(abc1234567 = 'Hello',
-                                                            def1234567 = 'World'),
-                                 transformation_mode   = Enum__Text__Transformation__Mode.XXX_RANDOM     )
+            assert _.obj() == __(logic_operator='and',
+                                 hash_mapping=__(abc1234567='Hello', def1234567='World'),
+                                 engine_mode=None,
+                                 criterion_filters=[],
+                                 transformation_mode='xxx-random')
 
     def test_json_round_trip(self):                                                 # Test JSON serialization round-trip
         hash_mapping = { Safe_Str__Hash("abc1234567") : "Test text" }
@@ -38,5 +40,8 @@ class test_Schema__Text__Transformation__Request(TestCase):
 
             assert restored.transformation_mode   == Enum__Text__Transformation__Mode.HASHES_RANDOM
             assert "abc1234567" in restored.hash_mapping
-            assert restored.obj() == __(hash_mapping            = __(abc1234567='Test text'),
-                                        transformation_mode     = 'hashes-random'           )
+            assert restored.obj() == __(logic_operator      = 'and'                     ,
+                                        hash_mapping        = __(abc1234567='Test text'),
+                                        engine_mode         = None,
+                                        criterion_filters   = [],
+                                        transformation_mode = 'hashes-random')

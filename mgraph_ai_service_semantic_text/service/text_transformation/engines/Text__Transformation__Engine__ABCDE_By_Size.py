@@ -1,4 +1,4 @@
-from typing                                                                                               import Dict
+from typing                                                                                               import Dict, List
 from osbot_aws.aws.comprehend.schemas.safe_str.Safe_Str__AWS_Comprehend__Text                             import Safe_Str__Comprehend__Text
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                                      import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                        import Safe_Str__Hash
@@ -19,12 +19,14 @@ class Text__Transformation__Engine__ABCDE_By_Size(Text__Transformation__Engine):
         return self
 
     @type_safe
-    def transform(self,                                                             # Group text by length, replace with letters (a-e)
-                  hash_mapping: Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text]    # Input hash → text mapping
+    def transform(self,                                                             # Group text by length, replace with letters (a-e) - ALWAYS transforms ALL
+                  hash_mapping     : Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text],   # Input hash → text mapping
+                  selected_hashes  : List[Safe_Str__Hash]           = None          # IGNORED - ABCDE always transforms all hashes
              ) -> Dict[Safe_Str__Hash, Safe_Str__Comprehend__Text]:                 # Transformed hash → text mapping
         if not hash_mapping:
             return hash_mapping
 
+        # ABCDE mode ALWAYS transforms ALL hashes - selected_hashes parameter is ignored
         groups           = self.text_grouping.group_by_length(hash_mapping)
         modified_mapping = Type_Safe__Dict(expected_key_type  =  Safe_Str__Hash,
                                            expected_value_type = Safe_Str__Comprehend__Text)

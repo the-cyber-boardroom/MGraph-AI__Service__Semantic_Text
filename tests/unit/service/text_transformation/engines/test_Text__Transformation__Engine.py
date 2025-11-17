@@ -30,6 +30,27 @@ class test_Text__Transformation__Engine(TestCase):
             except NotImplementedError as e:
                 assert "Subclass must implement transform() method" in str(e)
 
+    def test_transform_with_selected_hashes(self):                                  # Test that transform accepts selected_hashes parameter
+        hash_mapping     = { Safe_Str__Hash("abc1234567") : "Hello" }
+        selected_hashes  = [ Safe_Str__Hash("abc1234567") ]
+
+        with Text__Transformation__Engine() as _:
+            try:
+                _.transform(hash_mapping, selected_hashes)
+                assert False, "Should have raised NotImplementedError"
+            except NotImplementedError as e:
+                assert "Subclass must implement transform() method" in str(e)
+
+    def test_transform_with_none_selected_hashes(self):                             # Test that transform accepts None for selected_hashes (transform all)
+        hash_mapping = { Safe_Str__Hash("abc1234567") : "Hello" }
+
+        with Text__Transformation__Engine() as _:
+            try:
+                _.transform(hash_mapping, selected_hashes=None)
+                assert False, "Should have raised NotImplementedError"
+            except NotImplementedError as e:
+                assert "Subclass must implement transform() method" in str(e)
+
     def test_obj_comparison(self):                                                  # Test .obj() for state verification
         with Text__Transformation__Engine(transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM) as _:
             assert _.obj() == __(transformation_mode   = Enum__Text__Transformation__Mode.HASHES_RANDOM  )
