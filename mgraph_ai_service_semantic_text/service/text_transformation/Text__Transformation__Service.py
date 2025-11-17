@@ -77,7 +77,7 @@ class Text__Transformation__Service(Type_Safe):                                 
             hash_mapping        = request.hash_mapping      ,
             criterion_filters   = request.criterion_filters ,
             logic_operator      = request.logic_operator    ,
-            output_mode         = Enum__Classification__Output_Mode.HASHES_ONLY
+            output_mode         = Enum__Classification__Output_Mode.HASHES_ONLY             # todo: see if we need to add support from controlling the output mode from the request params
         )
         
         # Call classification service to filter
