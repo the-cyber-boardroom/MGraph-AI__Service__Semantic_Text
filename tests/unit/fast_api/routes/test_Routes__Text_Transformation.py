@@ -5,7 +5,7 @@ from osbot_utils.type_safe.primitives.core.Safe_Float                           
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                              import Safe_Str__Hash
 from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Text_Transformation                                import Routes__Text_Transformation
 from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Request               import Schema__Text__Transformation__Request
-from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Request__Convenience  import Schema__Text__Transformation__Request__Convenience
+from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Request__Path_Params  import Schema__Text__Transformation__Request__Path_Params
 from mgraph_ai_service_semantic_text.schemas.transformation.Schema__Text__Transformation__Response              import Schema__Text__Transformation__Response
 from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Transformation__Mode              import Enum__Text__Transformation__Mode
 from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Transformation__Engine_Mode       import Enum__Text__Transformation__Engine_Mode
@@ -30,11 +30,11 @@ class test_Routes__Text_Transformation(TestCase):
             assert type(_.service) is Text__Transformation__Service             # Verify service injection
             assert _.app           is self.app                                  # Verify app reference
 
-    def test__routes_registered(self):                                          # Test both unified and convenience routes registered
+    def test__routes_registered(self):                                          # Test both unified and Path routes registered
         with self.routes as _:
             routes = _.routes_paths()
             assert routes == [ '/transform',
-                               '/{engine_mode}/{transformation_mode}/{criteria}/{filter_mode}/{threshold}']
+                               '/transform/{engine_mode}/{transformation_mode}/{criteria}/{filter_mode}/{threshold}']
 
     # ========================================
     # Unified transform() Tests - No Filtering
@@ -228,17 +228,17 @@ class test_Routes__Text_Transformation(TestCase):
                                                     transformed_hashes=2)
 
     # ========================================
-    # Convenience Route Tests
+    # Path Params Route Tests
     # ========================================
 
-    def test__transform__convenience__basic_negative_filter(self):              # Test convenience route with negative sentiment filter
+    def test__transform__path_params__basic_negative_filter(self):              # Test path params route with negative sentiment filter
         hash_mapping = { Safe_Str__Hash("abc1234567"): "Negative text",         # negative: 0.3630613175290631,
                          Safe_Str__Hash("def1234567"): "Positive text!" }       # negative: 0.16752469006093718,
 
 
-        with Schema__Text__Transformation__Request__Convenience(hash_mapping = hash_mapping) as request:
+        with Schema__Text__Transformation__Request__Path_Params(hash_mapping = hash_mapping) as request:
 
-            response = self.routes.transform__convenience(
+            response = self.routes.transform__path_filtered(
                 engine_mode          = Enum__Text__Transformation__Engine_Mode.TEXT_HASH       ,
                 transformation_mode  = Enum__Text__Transformation__Mode.XXX             ,
                 criteria             = Enum__Text__Classification__Criteria.NEGATIVE           ,
@@ -258,13 +258,13 @@ class test_Routes__Text_Transformation(TestCase):
                                             total_hashes        = 2,
                                             transformed_hashes  = 1)
 
-    def test__transform__convenience__positive_below_threshold(self):           # Test convenience route filtering by positive sentiment below threshold
+    def test__transform__path_params__positive_below_threshold(self):           # Test path params route filtering by positive sentiment below threshold
         hash_mapping = { Safe_Str__Hash("abc1234567"): "Neutral content",
                          Safe_Str__Hash("def1234567"): "Positive content" }
 
-        with Schema__Text__Transformation__Request__Convenience(hash_mapping = hash_mapping) as request:
+        with Schema__Text__Transformation__Request__Path_Params(hash_mapping = hash_mapping) as request:
 
-            response = self.routes.transform__convenience(
+            response = self.routes.transform__path_filtered(
                 engine_mode          = Enum__Text__Transformation__Engine_Mode.TEXT_HASH       ,
                 transformation_mode  = Enum__Text__Transformation__Mode.HASHES          ,
                 criteria             = Enum__Text__Classification__Criteria.POSITIVE           ,
@@ -282,14 +282,14 @@ class test_Routes__Text_Transformation(TestCase):
                                          total_hashes=2,
                                          transformed_hashes=1)
 
-    def test__transform__convenience__abcde_ignores_filters(self):              # CRITICAL: Verify convenience route ABCDE mode also ignores filters
+    def test__transform__path_params__abcde_ignores_filters(self):              # CRITICAL: Verify path params route ABCDE mode also ignores filters
         hash_mapping = { Safe_Str__Hash("aaaaa12345"): "Hi"                                ,
                          Safe_Str__Hash("bbbbb12345"): "This is medium text"               ,
                          Safe_Str__Hash("ccccc12345"): "This is a longer piece of text"    }
 
-        with Schema__Text__Transformation__Request__Convenience(hash_mapping = hash_mapping) as request:
+        with Schema__Text__Transformation__Request__Path_Params(hash_mapping = hash_mapping) as request:
 
-            response = self.routes.transform__convenience(
+            response = self.routes.transform__path_filtered(
                 engine_mode          = Enum__Text__Transformation__Engine_Mode.RANDOM          ,
                 transformation_mode  = Enum__Text__Transformation__Mode.ABCDE_BY_SIZE          ,
                 criteria             = Enum__Text__Classification__Criteria.POSITIVE           ,   # Ignored
@@ -311,7 +311,7 @@ class test_Routes__Text_Transformation(TestCase):
                                                    total_hashes=3,
                                                    transformed_hashes=3)
 
-    def test__transform__convenience__all_engine_modes(self):                   # Test convenience route works with all engine modes
+    def test__transform__path_params__all_engine_modes(self):                   # Test path params route works with all engine modes
         hash_mapping = { Safe_Str__Hash("aaaa123456"): "Test content" }
         engine_modes = [
             Enum__Text__Transformation__Engine_Mode.TEXT_HASH     ,
@@ -322,9 +322,9 @@ class test_Routes__Text_Transformation(TestCase):
         #engine_modes.append(Enum__Text__Transformation__Engine_Mode.AWS_COMPREHEND)               # this needs AWS env
 
         for engine_mode in engine_modes:
-            with Schema__Text__Transformation__Request__Convenience(hash_mapping = hash_mapping) as request:
+            with Schema__Text__Transformation__Request__Path_Params(hash_mapping = hash_mapping) as request:
 
-                response = self.routes.transform__convenience(
+                response = self.routes.transform__path_filtered(
                     engine_mode          = engine_mode                                          ,
                     transformation_mode  = Enum__Text__Transformation__Mode.XXX          ,
                     criteria             = Enum__Text__Classification__Criteria.NEGATIVE        ,
@@ -335,7 +335,7 @@ class test_Routes__Text_Transformation(TestCase):
 
                 assert response.success is True, f"Failed for engine_mode: {engine_mode}"
 
-    def test__transform__convenience__all_transformation_modes(self):           # Test convenience route works with all transformation modes
+    def test__transform__path_params__all_transformation_modes(self):           # Test path params route works with all transformation modes
         hash_mapping = { Safe_Str__Hash("aaaa123456"): "Test content" }
 
         transformation_modes = [
@@ -345,9 +345,9 @@ class test_Routes__Text_Transformation(TestCase):
         ]
 
         for transformation_mode in transformation_modes:
-            with Schema__Text__Transformation__Request__Convenience(hash_mapping = hash_mapping) as request:
+            with Schema__Text__Transformation__Request__Path_Params(hash_mapping = hash_mapping) as request:
 
-                response = self.routes.transform__convenience(
+                response = self.routes.transform__path_filtered(
                     engine_mode          = Enum__Text__Transformation__Engine_Mode.TEXT_HASH    ,
                     transformation_mode  = transformation_mode                                  ,
                     criteria             = Enum__Text__Classification__Criteria.NEGATIVE        ,
@@ -358,15 +358,15 @@ class test_Routes__Text_Transformation(TestCase):
 
                 assert response.success is True, f"Failed for transformation_mode: {transformation_mode}"
 
-    def test__transform__convenience__threshold_boundaries(self):               # Test convenience route with threshold boundary values
+    def test__transform__path_params__threshold_boundaries(self):               # Test path params route with threshold boundary values
         hash_mapping = { Safe_Str__Hash("aaaa123456"): "Test content" }
 
         thresholds = [Safe_Float(0.0), Safe_Float(0.5), Safe_Float(1.0)]
 
         for threshold in thresholds:
-            with Schema__Text__Transformation__Request__Convenience(hash_mapping = hash_mapping) as request:
+            with Schema__Text__Transformation__Request__Path_Params(hash_mapping = hash_mapping) as request:
 
-                response = self.routes.transform__convenience(
+                response = self.routes.transform__path_filtered(
                     engine_mode          = Enum__Text__Transformation__Engine_Mode.TEXT_HASH    ,
                     transformation_mode  = Enum__Text__Transformation__Mode.XXX          ,
                     criteria             = Enum__Text__Classification__Criteria.POSITIVE        ,
@@ -377,7 +377,7 @@ class test_Routes__Text_Transformation(TestCase):
 
                 assert response.success is True, f"Failed for threshold: {threshold}"
 
-    def test___build_full_request(self):                                        # Test internal helper method converts convenience params correctly
+    def test___build_full_request(self):                                        # Test internal helper method converts path params correctly
         hash_mapping = { Safe_Str__Hash("aaaa123456"): "Test text" }
 
         with self.routes as _:
@@ -432,10 +432,10 @@ class test_Routes__Text_Transformation(TestCase):
                 assert _.success             is True
                 assert _.transformed_hashes  == 1                               # All transformed
 
-    def test__transform__convenience__empty_mapping(self):                      # Test convenience route handles empty hash mapping
-        with Schema__Text__Transformation__Request__Convenience(hash_mapping = {}) as request:
+    def test__transform__path_params__empty_mapping(self):                      # Test path params route handles empty hash mapping
+        with Schema__Text__Transformation__Request__Path_Params(hash_mapping = {}) as request:
 
-            response = self.routes.transform__convenience(
+            response = self.routes.transform__path_filtered(
                 engine_mode          = Enum__Text__Transformation__Engine_Mode.TEXT_HASH    ,
                 transformation_mode  = Enum__Text__Transformation__Mode.XXX          ,
                 criteria             = Enum__Text__Classification__Criteria.NEGATIVE        ,
@@ -496,12 +496,12 @@ class test_Routes__Text_Transformation(TestCase):
             assert 'a' in transformed_short or 'b' in transformed_short         # Should have group letter
             assert ' ' in transformed_long                                      # Should preserve space
 
-    def test__transform__convenience__xxx_random__verification(self):           # Verify convenience route XXX transformation works
+    def test__transform__path_params__xxx_random__verification(self):           # Verify path params route XXX transformation works
         hash_mapping = { Safe_Str__Hash("aaaa123456"): "Hello, World!" }
 
-        with Schema__Text__Transformation__Request__Convenience(hash_mapping = hash_mapping) as request:
+        with Schema__Text__Transformation__Request__Path_Params(hash_mapping = hash_mapping) as request:
 
-            response = self.routes.transform__convenience(
+            response = self.routes.transform__path_filtered(
                 engine_mode          = Enum__Text__Transformation__Engine_Mode.TEXT_HASH    ,
                 transformation_mode  = Enum__Text__Transformation__Mode.XXX          ,
                 criteria             = Enum__Text__Classification__Criteria.NEGATIVE        ,
