@@ -9,7 +9,7 @@ from mgraph_ai_service_semantic_text.schemas.routes.Schema__Text__Transformation
 from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Transformation__Mode          import Enum__Text__Transformation__Mode
 
 
-class test__Routes__Text_Transformation__mode_specific(TestCase):
+class test_Routes__Text_Transformation__mode_specific(TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:

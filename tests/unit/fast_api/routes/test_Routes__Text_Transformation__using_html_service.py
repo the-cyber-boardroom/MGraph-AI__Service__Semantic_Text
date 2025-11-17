@@ -12,7 +12,7 @@ from starlette.testclient                                                       
 from tests.unit.Semantic_Text__Service__Fast_API__Test_Objs                                                 import get__service__html__client
 
 
-class test__Routes__Text_Transformation__using_html_service(TestCase):
+class test_Routes__Text_Transformation__using_html_service(TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
