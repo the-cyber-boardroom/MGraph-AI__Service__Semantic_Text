@@ -179,41 +179,6 @@ class test_Routes__Semantic_Classification(TestCase):
         assert response.filtered_count == 1                                     # Only Text A passes (0.3969 < 0.5)
         assert Safe_Str__Hash("abc1234567") in response.filtered_hashes
 
-    def test__engine_mode__filter__between_mode(self):                         # Test BETWEEN filter mode
-        hash_mapping = {Safe_Str__Hash("aaa1234567"): "Text A",                # positive=0.3969413061449435
-                        Safe_Str__Hash("bbb1234567"): "Text B",                # positive=0.616592082616179
-                        Safe_Str__Hash("ccc1234567"): "Text C"}                # positive=0.1645044724838576
-
-        request = Schema__Classification__Filter_Request(
-            hash_mapping            = hash_mapping                                      ,
-            classification_criteria = Enum__Text__Classification__Criteria.POSITIVE    ,
-            filter_mode             = Enum__Classification__Filter_Mode.BETWEEN        ,
-            threshold               = Safe_Float(0.3)                                  ,
-            threshold_max           = Safe_Float(0.7)                                  ,
-            output_mode             = Enum__Classification__Output_Mode.HASHES_ONLY
-        )
-
-        response = self.routes.engine_mode__filter(self.engine_mode, request)
-
-        assert response.success        is True
-        assert response.filtered_count == 2                                     # Text A and B pass (0.3 < value < 0.7)
-
-    def test__engine_mode__filter__equals_mode(self):                          # Test EQUALS filter mode
-        hash_mapping = {Safe_Str__Hash("abc1234567"): "Text"}                  # positive=0.6001957083944922
-
-        request = Schema__Classification__Filter_Request(
-            hash_mapping            = hash_mapping                                      ,
-            classification_criteria = Enum__Text__Classification__Criteria.POSITIVE    ,
-            filter_mode             = Enum__Classification__Filter_Mode.EQUALS         ,
-            threshold               = Safe_Float(0.600)                                ,
-            output_mode             = Enum__Classification__Output_Mode.HASHES_ONLY
-        )
-
-        response = self.routes.engine_mode__filter(self.engine_mode, request)
-
-        assert response.success        is True
-        assert response.filtered_count == 1                                     # Matches within tolerance (0.001)
-
     # ========================================
     # Edge Cases
     # ========================================

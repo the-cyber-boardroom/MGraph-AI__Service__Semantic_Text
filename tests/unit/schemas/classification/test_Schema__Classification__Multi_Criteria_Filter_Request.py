@@ -99,27 +99,6 @@ class test_Schema__Classification__Multi_Criteria_Filter_Request(TestCase):
             assert _.logic_operator == Enum__Classification__Logic_Operator.OR
             assert len(_.criterion_filters) == 2
 
-    def test__with_between_filter_mode(self):                                  # Test with BETWEEN filter mode
-        hash_mapping = {Safe_Str__Hash("b10a8db164"): "Hello World"}
-
-        criterion_filters = [
-            Schema__Classification__Criterion_Filter(
-                criterion     = Enum__Text__Classification__Criteria.POSITIVE,
-                filter_mode   = Enum__Classification__Filter_Mode.BETWEEN,
-                threshold     = Safe_Float(0.5),
-                threshold_max = Safe_Float(0.8)
-            )
-        ]
-
-        with Schema__Classification__Multi_Criteria_Filter_Request(
-            hash_mapping      = hash_mapping,
-            criterion_filters = criterion_filters,
-            logic_operator    = Enum__Classification__Logic_Operator.AND
-        ) as _:
-            filter_obj = _.criterion_filters[0]
-            assert filter_obj.filter_mode == Enum__Classification__Filter_Mode.BETWEEN
-            assert float(filter_obj.threshold) == 0.5
-            assert float(filter_obj.threshold_max) == 0.8
 
     def test__output_mode_default(self):                                       # Test default output mode
         request = Schema__Classification__Multi_Criteria_Filter_Request(

@@ -6,7 +6,6 @@ from mgraph_ai_service_semantic_text.schemas.routes.Schema__Text__Transformation
 from mgraph_ai_service_semantic_text.schemas.routes.Schema__Text__Transformation__Request__XXX_Random       import Schema__Text__Transformation__Request__XXX_Random
 from mgraph_ai_service_semantic_text.schemas.transformation.enums.Enum__Text__Transformation__Mode          import Enum__Text__Transformation__Mode
 from osbot_utils.testing.__                                                                                 import __
-from osbot_utils.type_safe.primitives.core.Safe_Float                                                       import Safe_Float
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                                        import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                          import Safe_Str__Hash
 from starlette.testclient                                                                                   import TestClient

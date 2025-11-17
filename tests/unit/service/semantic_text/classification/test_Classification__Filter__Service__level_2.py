@@ -437,54 +437,6 @@ class test_Classification__Filter__Service__level_2(TestCase):
             threshold     = 0.5
         ) is False
 
-    def test___check_filter_match__equals(self):                               # Test EQUALS filter mode
-        assert self.classification_service._check_filter_match(
-            rating_value  = 0.5,
-            filter_mode   = Enum__Classification__Filter_Mode.EQUALS,
-            threshold     = 0.5
-        ) is True
-
-        assert self.classification_service._check_filter_match(
-            rating_value  = 0.5001,
-            filter_mode   = Enum__Classification__Filter_Mode.EQUALS,
-            threshold     = 0.5
-        ) is True  # Within 0.001 tolerance
-
-        assert self.classification_service._check_filter_match(
-            rating_value  = 0.51,
-            filter_mode   = Enum__Classification__Filter_Mode.EQUALS,
-            threshold     = 0.5
-        ) is False
-
-    def test___check_filter_match__between(self):                              # Test BETWEEN filter mode
-        assert self.classification_service._check_filter_match(
-            rating_value  = 0.6,
-            filter_mode   = Enum__Classification__Filter_Mode.BETWEEN,
-            threshold     = 0.5,
-            threshold_max = 0.7
-        ) is True
-
-        assert self.classification_service._check_filter_match(
-            rating_value  = 0.5,
-            filter_mode   = Enum__Classification__Filter_Mode.BETWEEN,
-            threshold     = 0.5,
-            threshold_max = 0.7
-        ) is False  # Not strictly between
-
-        assert self.classification_service._check_filter_match(
-            rating_value  = 0.7,
-            filter_mode   = Enum__Classification__Filter_Mode.BETWEEN,
-            threshold     = 0.5,
-            threshold_max = 0.7
-        ) is False  # Not strictly between
-
-        assert self.classification_service._check_filter_match(
-            rating_value  = 0.8,
-            filter_mode   = Enum__Classification__Filter_Mode.BETWEEN,
-            threshold     = 0.5,
-            threshold_max = 0.7
-        ) is False
-
     # ========================================
     # Edge Cases
     # ========================================

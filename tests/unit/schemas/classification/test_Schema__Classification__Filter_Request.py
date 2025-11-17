@@ -16,7 +16,6 @@ class test_Schema__Classification__Filter_Request(TestCase):
             assert _.classification_criteria is None
             assert _.filter_mode             is None
             assert _.threshold               == 0.0
-            assert _.threshold_max           is None
             assert _.output_mode             == Enum__Classification__Output_Mode.FULL_RATINGS
             assert type(_).__name__          == 'Schema__Classification__Filter_Request'
 
@@ -32,20 +31,7 @@ class test_Schema__Classification__Filter_Request(TestCase):
             assert _.classification_criteria      == Enum__Text__Classification__Criteria.POSITIVE
             assert _.filter_mode                  == Enum__Classification__Filter_Mode.ABOVE
             assert _.threshold                    == 0.5
-            assert _.threshold_max                is None
             assert _.output_mode                  == Enum__Classification__Output_Mode.HASHES_ONLY
-
-    def test__with_between_filter(self):                                       # Test with BETWEEN filter using threshold_max
-        hash_mapping = {Safe_Str__Hash("abc1234567"): "Test"}
-
-        with Schema__Classification__Filter_Request(hash_mapping            = hash_mapping                                    ,
-                                                    classification_criteria = Enum__Text__Classification__Criteria.POSITIVE,
-                                                    filter_mode             = Enum__Classification__Filter_Mode.BETWEEN      ,
-                                                    threshold               = Safe_Float(0.3)                                ,
-                                                    threshold_max           = Safe_Float(0.7)                                ) as _:
-            assert _.filter_mode   == Enum__Classification__Filter_Mode.BETWEEN
-            assert _.threshold     == 0.3
-            assert _.threshold_max == 0.7
 
     def test__obj(self):                                                       # Test .obj() serialization
         hash_mapping = {Safe_Str__Hash("abc1234567"): "test"}
@@ -58,7 +44,6 @@ class test_Schema__Classification__Filter_Request(TestCase):
                                    classification_criteria = 'positive'                         ,
                                    filter_mode             = 'above'                              ,
                                    threshold               = 0.5                                  ,
-                                   threshold_max           = None                                 ,
                                    output_mode             = 'full-ratings'                       )
 
     def test__all_output_modes(self):                                          # Test all output mode options

@@ -13,7 +13,6 @@ class test_Schema__Classification__Criterion_Filter(TestCase):
             assert _.criterion       is None
             assert _.filter_mode     is None
             assert _.threshold       == 0
-            assert _.threshold_max   is None
             assert type(_).__name__  == 'Schema__Classification__Criterion_Filter'
 
     def test__with_basic_filter(self):                                         # Test with basic ABOVE filter
@@ -25,19 +24,6 @@ class test_Schema__Classification__Criterion_Filter(TestCase):
             assert _.criterion     == Enum__Text__Classification__Criteria.POSITIVE
             assert _.filter_mode   == Enum__Classification__Filter_Mode.ABOVE
             assert _.threshold     == 0.7
-            assert _.threshold_max is None
-
-    def test__with_between_filter(self):                                       # Test with BETWEEN filter using threshold_max
-        with Schema__Classification__Criterion_Filter(
-            criterion     = Enum__Text__Classification__Criteria.NEGATIVE    ,
-            filter_mode   = Enum__Classification__Filter_Mode.BETWEEN          ,
-            threshold     = Safe_Float(0.3)                                     ,
-            threshold_max = Safe_Float(0.7)
-        ) as _:
-            assert _.criterion     == Enum__Text__Classification__Criteria.NEGATIVE
-            assert _.filter_mode   == Enum__Classification__Filter_Mode.BETWEEN
-            assert _.threshold     == 0.3
-            assert _.threshold_max == 0.7
 
     def test__obj(self):                                                       # Test .obj() serialization
         filter_obj = Schema__Classification__Criterion_Filter(
@@ -46,10 +32,9 @@ class test_Schema__Classification__Criterion_Filter(TestCase):
             threshold   = Safe_Float(0.5)
         )
 
-        assert filter_obj.obj() == __(criterion     = 'neutral'     ,
+        assert filter_obj.obj() == __(criterion     = 'neutral'  ,
                                       filter_mode   = 'below'    ,
-                                      threshold     = 0.5        ,
-                                      threshold_max = None       )
+                                      threshold     = 0.5        )
 
     def test__all_filter_modes(self):                                          # Test all filter mode options
         for filter_mode in Enum__Classification__Filter_Mode:

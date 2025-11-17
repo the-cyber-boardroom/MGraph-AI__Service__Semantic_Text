@@ -232,10 +232,8 @@ class test_Semantic_Text__Engine__Hash_Based__rating_reference(TestCase):
 
     def test__rating_reference_guide__filter_mode_tests(self):                 # Reference guide for filter mode test hashes
         """
-        RATING REFERENCE GUIDE - Filter Mode Tests (BETWEEN, mixed modes)
+        RATING REFERENCE GUIDE - Filter Mode Tests (mixed modes)
         """
-
-        # aaa0000012 - "Test text" (BETWEEN mode test)
         result = self.engine.classify_text("Test text")
         assert result.obj() == __( positive=0.26393868216095934,
                                    negative=0.08311699015123418,

@@ -1,6 +1,5 @@
 from unittest                                                                                               import TestCase
 from fastapi                                                                                                import FastAPI
-from osbot_utils.type_safe.primitives.core.Safe_Float                                                       import Safe_Float
 from osbot_utils.type_safe.primitives.core.Safe_UInt                                                        import Safe_UInt
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                          import Safe_Str__Hash
 from mgraph_ai_service_semantic_text.fast_api.routes.Routes__Text_Transformation                            import Routes__Text_Transformation, ROUTES_PATHS__TEXT_TRANSFORMATION

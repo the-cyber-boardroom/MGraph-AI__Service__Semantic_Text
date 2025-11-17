@@ -22,8 +22,6 @@ from mgraph_ai_service_semantic_text.schemas.classification.enums.Enum__Classifi
 from mgraph_ai_service_semantic_text.service.semantic_text.engines.Semantic_Text__Engine__Factory                   import Semantic_Text__Engine__Factory
 
 
-FLOAT__CLASSIFICATION__FILTER__EQUALS__TOLERANCE = 0.001                    # todo see if this tolerance is good enough of if we shoul increase it
-
 class Classification__Filter__Service(Type_Safe):
     engine_factory : Semantic_Text__Engine__Factory                         # Type_Safe will call Semantic_Text__Engine__Factory() and assigned it to engine_factory
 
@@ -70,8 +68,7 @@ class Classification__Filter__Service(Type_Safe):
 
         filtered_hashes = self._apply_filter(criterion_ratings                ,
                                              request.filter_mode              ,
-                                             request.threshold                ,
-                                             request.threshold_max            )
+                                             request.threshold                )
 
         # Build response based on output_mode
         return self._build_filter_response(filtered_hashes                ,
@@ -86,7 +83,6 @@ class Classification__Filter__Service(Type_Safe):
                       hash_ratings  : Dict[Safe_Str__Hash, Safe_Float__Text__Classification],  # Hash → rating mapping
                       filter_mode   : Enum__Classification__Filter_Mode        ,  # Filter comparison mode
                       threshold     : float                                    ,  # Primary threshold value
-                      threshold_max : float = None                                # Max threshold (for BETWEEN)
                  ) -> List[Safe_Str__Hash]:                                    # Filtered hash list
         filtered = []
 
@@ -100,15 +96,6 @@ class Classification__Filter__Service(Type_Safe):
             elif filter_mode == Enum__Classification__Filter_Mode.BELOW:
                 if rating_value < threshold:
                     filtered.append(hash_key)
-
-            elif filter_mode == Enum__Classification__Filter_Mode.EQUALS:
-                if abs(rating_value - threshold) < FLOAT__CLASSIFICATION__FILTER__EQUALS__TOLERANCE:                      # Float comparison tolerance
-                    filtered.append(hash_key)
-
-            elif filter_mode == Enum__Classification__Filter_Mode.BETWEEN:
-                if threshold_max is not None:
-                    if threshold < rating_value < threshold_max:
-                        filtered.append(hash_key)
 
         return filtered
 
@@ -223,10 +210,9 @@ class Classification__Filter__Service(Type_Safe):
                     break
 
                 rating_value = float(rating)
-                matches = self._check_filter_match(rating_value                   ,
-                                                   criterion_filter.filter_mode  ,
-                                                   float(criterion_filter.threshold),
-                                                   float(criterion_filter.threshold_max) if criterion_filter.threshold_max else None)
+                matches = self._check_filter_match(rating_value                     ,
+                                                   criterion_filter.filter_mode     ,
+                                                   float(criterion_filter.threshold))
 
                 if not matches:
                     all_match = False
@@ -254,10 +240,9 @@ class Classification__Filter__Service(Type_Safe):
                     continue
 
                 rating_value = float(rating)
-                matches = self._check_filter_match(rating_value                   ,
-                                                   criterion_filter.filter_mode  ,
-                                                   float(criterion_filter.threshold),
-                                                   float(criterion_filter.threshold_max) if criterion_filter.threshold_max else None)
+                matches = self._check_filter_match(rating_value                     ,
+                                                   criterion_filter.filter_mode     ,
+                                                   float(criterion_filter.threshold))
 
                 if matches:
                     any_match = True
@@ -272,23 +257,13 @@ class Classification__Filter__Service(Type_Safe):
     def _check_filter_match(self,                                              # Check if rating matches filter condition
                             rating_value  : float                              ,
                             filter_mode   : Enum__Classification__Filter_Mode ,
-                            threshold     : float                              ,
-                            threshold_max : float = None
+                            threshold     : float
                        ) -> bool:                                              # Whether rating matches filter
         if filter_mode == Enum__Classification__Filter_Mode.ABOVE:
             return rating_value > threshold
 
         elif filter_mode == Enum__Classification__Filter_Mode.BELOW:
             return rating_value < threshold
-
-        elif filter_mode == Enum__Classification__Filter_Mode.EQUALS:
-            return abs(rating_value - threshold) < 0.001
-
-        elif filter_mode == Enum__Classification__Filter_Mode.BETWEEN:
-            if threshold_max is not None:
-                return threshold < rating_value < threshold_max
-
-        return False
 
     @type_safe
     def _build_multi_criteria_filter_response(self,                            # Build multi-criteria filter response based on output mode

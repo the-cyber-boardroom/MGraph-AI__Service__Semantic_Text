@@ -2,7 +2,6 @@ import types
 from unittest                                                                                             import TestCase
 from osbot_utils.testing.__                                                                               import __
 from osbot_utils.type_safe.Type_Safe                                                                      import Type_Safe
-from osbot_utils.type_safe.primitives.core.Safe_Float                                                     import Safe_Float
 from osbot_utils.type_safe.primitives.domains.cryptography.safe_str.Safe_Str__Hash                        import Safe_Str__Hash
 from osbot_utils.type_safe.type_safe_core.collections.Type_Safe__Dict                                     import Type_Safe__Dict
 from osbot_utils.utils.Objects                                                                            import base_classes
