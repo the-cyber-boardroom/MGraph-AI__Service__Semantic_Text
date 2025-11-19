@@ -105,7 +105,6 @@ class Text__Transformation__Service(Type_Safe):                                 
                                                       total_hashes        = total_hashes                ,
                                                       transformed_hashes  = total_hashes                )  # ABCDE transforms all
 
-    @cache_on_self
     @type_safe
     def _get_engine(self,                                                           # Get transformation engine for mode
                     mode: Enum__Text__Transformation__Mode                          # Transformation mode
